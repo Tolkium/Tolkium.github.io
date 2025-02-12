@@ -1,7 +1,29 @@
-/* You can add global styles to this file, and also import other style files */
+/* styles.css or styles.scss */
+
+/* Apply dark mode styles to the entire document */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-gray-100 dark:bg-gray-900 m-0 p-0;
+}
+
+/* Optional: ensure html takes full height */
+html, body {
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Handle transition smoothly */
+body {
+  transition: background-color 0.2s ease-in-out;
+}
+
 :root {
   --primary: #2d3436;
-  --secondary: #0984e3;
+  --secondary: #07ebd8;
   --accent: #00cec9;
   --light: #dfe6e9;
 }

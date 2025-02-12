@@ -1,63 +1,83 @@
-<header>
-  <div class="container">
-      <h1 class="name">Marek Šípoš</h1>
-      <h2 class="title">Frontend Web Developer</h2>
-      <div class="location">📍 Bratislava, Slovakia</div>
+<div class="relative min-h-screen">
+
+<app-background-animation></app-background-animation>
+<div class="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
+  <div class="fixed top-4 right-4 z-50">
+      <app-dark-mode-toggle></app-dark-mode-toggle>
   </div>
-</header>
 
-<main class="container">
-  <section class="section">
-      <h2>About Me</h2>
-      <p>Experienced web developer specializing in Angular, with a passion for creating exceptional digital experiences. I balance perfectionism with pragmatism to deliver high-quality work while fostering positive team dynamics. Always eager to learn and adapt in the ever-evolving world of web development! 🚀</p>
-  </section>
+  <div class="max-w-7xl mx-auto px-8">
+      <header class="mt-16 mb-8 bg-blue-500 dark:bg-blue-700 text-white p-8 rounded-lg shadow-lg">
+          <div class="text-center">
+              <h1 class="text-3xl font-bold text-white mb-2">Marek Šípoš</h1>
+              <h2 class="text-lg mb-2">Frontend Web Developer</h2>
+              <div class="flex items-center justify-center gap-2 text-sm">
+                  📍 Bratislava, Slovakia
+              </div>
+          </div>
+      </header>
+  </div>
 
-  <section class="section">
-      <h2>Experience</h2>
-      <div class="experience-item">
-          <div class="company">Capco</div>
-          <div class="period">Nov 2022 - Aug 2023</div>
-          <p>Frontend Web Developer focusing on responsive design and modern web technologies.</p>
-      </div>
-      <div class="experience-item">
-          <div class="company">Alfabase</div>
-          <div class="period">Jun 2022 - Aug 2022</div>
-          <p>Built reactive websites and maintained reusable UI component libraries using Angular 12+.</p>
-      </div>
-      <div class="experience-item">
-          <div class="company">Hamstersoc</div>
-          <div class="period">Sep 2021 - Dec 2021</div>
-          <p>Frontend and Solidity developer for NFT-focused startup.</p>
-      </div>
-  </section>
+  <main class="max-w-7xl mx-auto px-8">
+    <!-- About Section -->
+    <section class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md mb-8 transform hover:-translate-y-1 transition-transform duration-300">
+      <h2 class="text-blue-500 dark:text-blue-400 text-2xl mb-4">About Me</h2>
+      <p class="text-gray-700 dark:text-gray-300">
+        Experienced web developer specializing in Angular, with a passion for creating exceptional digital experiences.
+        I balance perfectionism with pragmatism to deliver high-quality work while fostering positive team dynamics.
+        Always eager to learn and adapt in the ever-evolving world of web development! 🚀
+      </p>
+    </section>
 
-  <section class="section">
-      <h2>Skills</h2>
-      <div class="skills">
-          <span class="skill">Angular</span>
-          <span class="skill">TypeScript</span>
-          <span class="skill">HTML5</span>
-          <span class="skill">CSS3</span>
-          <span class="skill">Responsive Design</span>
-          <span class="skill">Git</span>
-          <span class="skill">Bootstrap</span>
-          <span class="skill">Web3</span>
-          <span class="skill">Solidity</span>
-          <span class="skill">Azure</span>
-          <span class="skill">.NET Core</span>
-      </div>
-  </section>
+    <!-- Experience Section -->
+    <section class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md mb-8 transform hover:-translate-y-1 transition-transform duration-300">
+      <h2 class="text-blue-500 dark:text-blue-400 text-2xl mb-4">Experience</h2>
 
-  <section class="section">
-      <h2>Education</h2>
-      <div class="experience-item">
-          <div class="company">Slovenská technická univerzita v Bratislave</div>
-          <div class="period">2016 - 2022</div>
-          <p>Information Technology</p>
+      <div class="mb-6">
+        <div class="text-blue-500 dark:text-blue-400 font-bold">Capco</div>
+        <div class="text-gray-600 dark:text-gray-400 text-sm">Nov 2022 - Aug 2023</div>
+        <p class="text-gray-700 dark:text-gray-300">Frontend Web Developer focusing on responsive design and modern web technologies.</p>
       </div>
-  </section>
 
-  <div class="contact">
+      <div class="mb-6">
+        <div class="text-blue-500 dark:text-blue-400 font-bold">Alfabase</div>
+        <div class="text-gray-600 dark:text-gray-400 text-sm">Jun 2022 - Aug 2022</div>
+        <p class="text-gray-700 dark:text-gray-300">Built reactive websites and maintained reusable UI component libraries using Angular 12+.</p>
+      </div>
+
+      <div class="mb-6">
+        <div class="text-blue-500 dark:text-blue-400 font-bold">Hamstersoc</div>
+        <div class="text-gray-600 dark:text-gray-400 text-sm">Sep 2021 - Dec 2021</div>
+        <p class="text-gray-700 dark:text-gray-300">Frontend and Solidity developer for NFT-focused startup.</p>
+      </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md mb-8 transform hover:-translate-y-1 transition-transform duration-300">
+      <h2 class="text-blue-500 dark:text-blue-400 text-2xl mb-4">Skills</h2>
+      <div class="flex flex-wrap gap-4">
+        @for (skill of skills; track skill) {
+          <span class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-full text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-500 hover:text-white transition-colors duration-200">
+            {{skill}}
+          </span>
+        }
+      </div>
+    </section>
+
+    <!-- Education Section -->
+    <section class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md mb-8 transform hover:-translate-y-1 transition-transform duration-300">
+      <h2 class="text-blue-500 dark:text-blue-400 text-2xl mb-4">Education</h2>
+      <div class="mb-6">
+        <div class="text-blue-500 dark:text-blue-400 font-bold">Slovenská technická univerzita v Bratislave</div>
+        <div class="text-gray-600 dark:text-gray-400 text-sm">2016 - 2022</div>
+        <p class="text-gray-700 dark:text-gray-300">Information Technology</p>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <div class="text-center text-gray-700 dark:text-gray-300 mt-8 mb-8">
       <p>💼 Open for exciting opportunities!</p>
-  </div>
-</main>
+    </div>
+  </main>
+</div>
+</div>

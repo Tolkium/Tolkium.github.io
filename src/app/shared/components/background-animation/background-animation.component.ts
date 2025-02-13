@@ -1,14 +1,25 @@
-interface Point {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  color: string;
-  connections: number; // Track number of connections
-}
-
-import { Component, ElementRef, OnInit, OnDestroy, ViewChild, PLATFORM_ID, Inject } from '@angular/core';
+// components/background-animation.component.ts
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  PLATFORM_ID,
+  Inject,
+  ErrorHandler,
+  NgZone
+} from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { fromEvent, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import {
+  Point,
+  RGB,
+  ANIMATION_CONSTANTS,
+  AnimationConfig
+} from '../../../models/animation.constants';
+import { QuadTree } from '../../../utils/quad-tree';
 
 @Component({
   selector: 'app-background-animation',
@@ -16,66 +27,247 @@ import { isPlatformBrowser } from '@angular/common';
   template: `
     <canvas #canvas
       class="fixed top-0 left-0 w-full h-full"
+      [attr.aria-label]="'Background animation'"
     ></canvas>
-
   `
 })
 export class BackgroundAnimationComponent implements OnInit, OnDestroy {
-  @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvas', { static: true })
+  private readonly canvasRef!: ElementRef<HTMLCanvasElement>;
+
   private ctx!: CanvasRenderingContext2D;
   private points: Point[] = [];
-  private readonly numPoints = 100;
-  private readonly connectionRadius = 250;
-  private readonly magneticRadius = 100;
-  private readonly magneticStrength = 0.0005;
-  private readonly minSpeed = 0.15;
-  private readonly maxSpeed = 0.6;
-  private readonly pointsSize = 7;
-  private readonly lineWidth = 7;
-  private showBorder: boolean = false; // Set to true if you want the border enabled by default
-  private glowPoints: boolean = true;  // Enable/disable point glow
-  private glowLines: boolean = false;   // Enable/disable line glow
-  private glowIntensityPoints: number = 5;  // Glow strength for points
-  private glowIntensityLines: number = 10;   // Glow strength for lines
-  private readonly colors = {
-    blue: '#0066cc',
-    purple: '#8833cc'
-  };
   private animationId: number = 0;
-  private resizeHandler: () => void;
   private isRunning = false;
-  debugInfo: string = 'Initializing...';
+  private lastFrameTime: number = 0;
+  private resizeSubscription?: Subscription;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-    this.resizeHandler = () => this.resizeCanvas();
-  }
+  private readonly config: AnimationConfig = {
+    showBorder: false,
+    glowPoints: true,
+    glowLines: false,
+    ...ANIMATION_CONSTANTS
+  };
 
-  ngOnInit() {
-    if (!isPlatformBrowser(this.platformId)) {
-      this.debugInfo = 'Not in browser';
-      return;
-    }
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private ngZone: NgZone,
+    private errorHandler: ErrorHandler
+  ) {}
 
-    this.debugInfo = 'Starting initialization...';
-    this.initializeCanvas();
-  }
+  ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
 
-  private initPoints() {
-    const canvas = this.canvasRef.nativeElement;
-    this.points = [];
-    for (let i = 0; i < this.numPoints; i++) {
-      this.points.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 4,
-        vy: (Math.random() - 0.5) * 4,
-        color: i % 2 === 0 ? this.colors.blue : this.colors.purple,
-        connections: 0
+    try {
+      this.initializeCanvas();
+
+      this.resizeSubscription = fromEvent(window, 'resize')
+        .pipe(debounceTime(250))
+        .subscribe(this.handleResize);
+
+      // Run animation outside Angular's zone for better performance
+      this.ngZone.runOutsideAngular(() => {
+        this.animate(performance.now());
       });
+    } catch (error) {
+      this.errorHandler.handleError(error);
     }
   }
 
-  private hexToRgb(hex: string): { r: number, g: number, b: number } {
+  ngOnDestroy(): void {
+    this.cleanup();
+  }
+
+  private initializeCanvas(): void {
+    const canvas = this.canvasRef.nativeElement;
+    const context = canvas.getContext('2d', { alpha: true });
+
+    if (!context) {
+      throw new Error('Canvas 2D context not supported in this browser');
+    }
+
+    this.ctx = context;
+    this.handleResize();
+    this.initPoints();
+    this.isRunning = true;
+  }
+
+  private handleResize = (): void => {
+    const canvas = this.canvasRef.nativeElement;
+    const dpr = window.devicePixelRatio || 1;
+
+    // Set display size
+    canvas.style.width = `${window.innerWidth}px`;
+    canvas.style.height = `${window.innerHeight}px`;
+
+    // Set actual size in memory
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+
+    // Scale context to ensure correct drawing operations
+    this.ctx.scale(dpr, dpr);
+
+    // Only reinitialize points if necessary
+    if (this.points.length === 0) {
+      this.initPoints();
+    }
+  };
+
+  private initPoints(): void {
+    const canvas = this.canvasRef.nativeElement;
+    this.points = Array.from({ length: this.config.NUM_POINTS }, (_, i) => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 4,
+      vy: (Math.random() - 0.5) * 4,
+      color: i % 2 === 0 ? this.config.COLORS.BLUE : this.config.COLORS.PURPLE,
+      connections: 0
+    }));
+  }
+
+  private animate = (timestamp: number): void => {
+    if (!this.ctx || !this.isRunning) return;
+
+    try {
+      const deltaTime = timestamp - this.lastFrameTime;
+      this.lastFrameTime = timestamp;
+
+      // Clear canvas
+      this.ctx.clearRect(0, 0, this.canvasRef.nativeElement.width, this.canvasRef.nativeElement.height);
+
+      // Update and draw
+      this.updatePoints(deltaTime / 16.67);
+      this.drawScene();
+
+      this.animationId = requestAnimationFrame(this.animate);
+    } catch (error) {
+      this.errorHandler.handleError(error);
+      this.cleanup();
+    }
+  };
+
+  private updatePoints(deltaTime: number): void {
+    const canvas = this.canvasRef.nativeElement;
+    const quadTree = new QuadTree({
+      x: 0,
+      y: 0,
+      width: canvas.width,
+      height: canvas.height
+    });
+
+    // Reset connections and populate quadtree
+    this.points.forEach(point => {
+      point.connections = 0;
+      quadTree.insert(point);
+    });
+
+    // Update point positions and handle interactions
+    this.points.forEach(point => {
+      // Find nearby points using quadtree
+      const searchBounds = {
+        x: point.x - this.config.CONNECTION_RADIUS,
+        y: point.y - this.config.CONNECTION_RADIUS,
+        width: this.config.CONNECTION_RADIUS * 2,
+        height: this.config.CONNECTION_RADIUS * 2
+      };
+
+      const nearbyPoints = quadTree.query(searchBounds);
+
+      // Update interactions with nearby points
+      nearbyPoints.forEach(otherPoint => {
+        if (point === otherPoint) return;
+
+        const distance = this.getDistance(point, otherPoint);
+        if (distance < this.config.CONNECTION_RADIUS) {
+          point.connections++;
+          otherPoint.connections++;
+          this.applyMagneticEffect(point, otherPoint);
+        }
+      });
+
+      // Update position
+      point.x += point.vx * deltaTime;
+      point.y += point.vy * deltaTime;
+
+      this.keepPointMoving(point);
+      this.handleBoundaryCollision(point, canvas);
+    });
+  }
+
+  private drawScene(): void {
+    this.withCanvasState(() => {
+      // Draw connections first
+      this.drawConnections();
+      // Then draw points on top
+      this.drawPoints();
+    });
+  }
+
+  private handleBoundaryCollision(point: Point, canvas: HTMLCanvasElement): void {
+    const bounceCoefficient = 0.95; // Energy loss on collision
+    const margin = this.config.POINTS_SIZE; // Prevent points from getting stuck in boundaries
+
+    // Handle horizontal boundaries
+    if (point.x - margin < 0) {
+      point.x = margin;
+      point.vx = Math.abs(point.vx) * bounceCoefficient;
+    } else if (point.x + margin > canvas.width) {
+      point.x = canvas.width - margin;
+      point.vx = -Math.abs(point.vx) * bounceCoefficient;
+    }
+
+    // Handle vertical boundaries
+    if (point.y - margin < 0) {
+      point.y = margin;
+      point.vy = Math.abs(point.vy) * bounceCoefficient;
+    } else if (point.y + margin > canvas.height) {
+      point.y = canvas.height - margin;
+      point.vy = -Math.abs(point.vy) * bounceCoefficient;
+    }
+
+    // Apply minimum speed after collision to prevent sticking
+    const speed = Math.hypot(point.vx, point.vy);
+    if (speed < this.config.MIN_SPEED) {
+      const scale = this.config.MIN_SPEED / speed;
+      point.vx *= scale;
+      point.vy *= scale;
+    }
+  }
+
+  private drawPoints(): void {
+    this.points.forEach(point => {
+      if (!this.isInViewport(point)) return;
+
+      this.withCanvasState(() => {
+        if (this.config.glowPoints) {
+          this.ctx.shadowBlur = this.config.GLOW.POINTS_INTENSITY;
+          this.ctx.shadowColor = point.color;
+        }
+
+        this.ctx.beginPath();
+        this.ctx.arc(point.x, point.y, this.config.POINTS_SIZE, 0, Math.PI * 2);
+        this.ctx.fillStyle = point.color;
+        this.ctx.fill();
+      });
+    });
+  }
+
+  private drawConnections(): void {
+    this.points.forEach((point, i) => {
+      if (!this.isInViewport(point)) return;
+
+      this.points.slice(i + 1).forEach(otherPoint => {
+        if (!this.isInViewport(otherPoint)) return;
+
+        const distance = this.getDistance(point, otherPoint);
+        if (distance < this.config.CONNECTION_RADIUS) {
+          this.drawConnection(point, otherPoint, distance);
+        }
+      });
+    });
+  }
+
+  private hexToRgb(hex: string): RGB {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? {
       r: parseInt(result[1], 16),
@@ -95,49 +287,65 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
     return `rgb(${r},${g},${b})`;
   }
 
-  private initializeCanvas() {
-    const canvas = this.canvasRef.nativeElement;
-    const context = canvas.getContext('2d');
+  private drawConnection(point: Point, otherPoint: Point, distance: number): void {
+    this.withCanvasState(() => {
+      const totalConnections = point.connections + otherPoint.connections;
+      const weight = point.connections / totalConnections;
+      const connectionColor = this.blendColors(point.color, otherPoint.color, weight);
 
-    if (!context) {
-      this.debugInfo = 'Failed to get 2D context';
-      return;
+      if (this.config.glowLines) {
+        this.ctx.shadowBlur = this.config.GLOW.LINES_INTENSITY;
+        this.ctx.shadowColor = connectionColor;
+      }
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(point.x, point.y);
+      this.ctx.lineTo(otherPoint.x, otherPoint.y);
+      this.ctx.strokeStyle = connectionColor;
+      this.ctx.lineWidth = this.config.LINE_WIDTH;
+      this.ctx.globalAlpha = 1 - (distance / this.config.CONNECTION_RADIUS);
+      this.ctx.stroke();
+    });
+  }
+
+  private cleanup(): void {
+    this.isRunning = false;
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
     }
-
-    this.ctx = context;
-    this.resizeCanvas();
-    this.initPoints();
-    this.isRunning = true;
-
-    this.drawDebugFrame();
-    this.animate();
-    window.addEventListener('resize', this.resizeHandler);
-
-    this.debugInfo = `Canvas: ${canvas.width}x${canvas.height}, Points: ${this.points.length}`;
+    this.resizeSubscription?.unsubscribe();
   }
 
-  private resizeCanvas() {
+  // Utility methods
+  private withCanvasState(callback: () => void): void {
+    this.ctx.save();
+    callback();
+    this.ctx.restore();
+  }
+
+  private isInViewport(point: Point): boolean {
+    const margin = this.config.CONNECTION_RADIUS;
     const canvas = this.canvasRef.nativeElement;
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    this.debugInfo = `Resized: ${canvas.width}x${canvas.height}`;
+    return point.x + margin >= 0 &&
+           point.x - margin <= canvas.width &&
+           point.y + margin >= 0 &&
+           point.y - margin <= canvas.height;
   }
 
+  private getDistance(point1: Point, point2: Point): number {
+    return Math.hypot(point2.x - point1.x, point2.y - point1.y);
+  }
 
-  private applyMagneticEffect(point: Point, otherPoint: Point) {
+  private applyMagneticEffect(point: Point, otherPoint: Point): void {
     const dx = otherPoint.x - point.x;
     const dy = otherPoint.y - point.y;
     const distance = Math.hypot(dx, dy);
 
-    if (distance < this.magneticRadius && distance > 0) {
-      // Calculate magnetic force (stronger when closer)
-      const force = (1 - distance / this.magneticRadius) * this.magneticStrength;
-
-      // Normalize direction
+    if (distance < this.config.MAGNETIC_RADIUS && distance > 0) {
+      const force = (1 - distance / this.config.MAGNETIC_RADIUS) * this.config.MAGNETIC_STRENGTH;
       const dirX = dx / distance;
       const dirY = dy / distance;
 
-      // Apply magnetic effect to velocity
       point.vx += dirX * force;
       point.vy += dirY * force;
       otherPoint.vx -= dirX * force;
@@ -145,145 +353,17 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
     }
   }
 
-  private keepPointMoving(point: Point) {
-    // Calculate current speed
+  private keepPointMoving(point: Point): void {
     const speed = Math.hypot(point.vx, point.vy);
 
-    if (speed < this.minSpeed) {
-      // If moving too slow, give it a random boost
+    if (speed < this.config.MIN_SPEED) {
       const angle = Math.random() * Math.PI * 2;
-      point.vx = Math.cos(angle) * this.minSpeed;
-      point.vy = Math.sin(angle) * this.minSpeed;
-    } else if (speed > this.maxSpeed) {
-      // If moving too fast, scale it down
-      const scale = this.maxSpeed / speed;
+      point.vx = Math.cos(angle) * this.config.MIN_SPEED;
+      point.vy = Math.sin(angle) * this.config.MIN_SPEED;
+    } else if (speed > this.config.MAX_SPEED) {
+      const scale = this.config.MAX_SPEED / speed;
       point.vx *= scale;
       point.vy *= scale;
-    }
-  }
-
-  private drawDebugFrame() {
-    if (!this.ctx) return;
-
-    const canvas = this.canvasRef.nativeElement;
-
-    // Draw border
-    // this.ctx.strokeStyle = 'red';
-    this.ctx.lineWidth = this.lineWidth;
-    // this.ctx.strokeRect(0, 0, canvas.width, canvas.height);
-
-    // Draw center marker
-    this.ctx.beginPath();
-    this.ctx.arc(canvas.width/2, canvas.height/2, 10, 0, Math.PI * 2);
-    // this.ctx.fillStyle = 'red';
-    this.ctx.fill();
-  }
-
-  private animate() {
-    if (!this.ctx || !this.isRunning) return;
-
-    const canvas = this.canvasRef.nativeElement;
-    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    this.drawDebugFrame();
-
-    // Reset connection counts
-    this.points.forEach(point => point.connections = 0);
-
-    // Apply magnetic effects and count connections
-    this.points.forEach((point, i) => {
-      this.points.forEach((otherPoint, j) => {
-        if (i !== j) {
-          const distance = Math.hypot(otherPoint.x - point.x, otherPoint.y - point.y);
-          if (distance < this.connectionRadius) {
-            point.connections++;
-            otherPoint.connections++;
-          }
-          this.applyMagneticEffect(point, otherPoint);
-        }
-      });
-    });
-
-    // Update and draw points
-    this.points.forEach((point, index) => {
-      // Update position
-      point.x += point.vx;
-      point.y += point.vy;
-
-      this.keepPointMoving(point);
-
-      // Bounce off walls
-      if (point.x < 0 || point.x > canvas.width) {
-        point.vx *= -0.95;
-        point.x = Math.max(0, Math.min(point.x, canvas.width));
-      }
-      if (point.y < 0 || point.y > canvas.height) {
-        point.vy *= -0.95;
-        point.y = Math.max(0, Math.min(point.y, canvas.height));
-      }
-
-      // Draw point with optional glow
-      if (this.glowPoints) {
-        this.ctx.shadowBlur = this.glowIntensityPoints;
-        this.ctx.shadowColor = point.color;
-      } else {
-        this.ctx.shadowBlur = 0;
-      }
-
-      // Draw point
-      this.ctx.beginPath();
-      this.ctx.arc(point.x, point.y, this.pointsSize, 0, Math.PI * 2);
-      this.ctx.fillStyle = point.color;
-      this.ctx.fill();
-
-      // Reset shadow to prevent affecting other elements
-      this.ctx.shadowBlur = 0;
-
-      // Draw point number and connection count
-      this.ctx.fillStyle = 'black';
-      this.ctx.font = '12px Arial';
-      // this.ctx.fillText(`${index}(${point.connections})`, point.x + 8, point.y + 8);
-    });
-
-// Draw connections with optional glow
-this.points.forEach((point, i) => {
-  this.points.slice(i + 1).forEach(otherPoint => {
-    const distance = Math.hypot(point.x - otherPoint.x, point.y - otherPoint.y);
-    if (distance < this.connectionRadius) {
-      const totalConnections = point.connections + otherPoint.connections;
-      const weight = point.connections / totalConnections;
-      const connectionColor = this.blendColors(point.color, otherPoint.color, weight);
-
-      if (this.glowLines) {
-        this.ctx.shadowBlur = this.glowIntensityLines;
-        this.ctx.shadowColor = connectionColor;
-      } else {
-        this.ctx.shadowBlur = 0;
-      }
-
-      this.ctx.beginPath();
-      this.ctx.moveTo(point.x, point.y);
-      this.ctx.lineTo(otherPoint.x, otherPoint.y);
-      this.ctx.strokeStyle = connectionColor;
-      this.ctx.globalAlpha = 1 - (distance / this.connectionRadius);
-      this.ctx.stroke();
-
-      this.ctx.shadowBlur = 0; // Reset after drawing
-    }
-  });
-});
-
-    this.ctx.globalAlpha = 1;
-    this.animationId = requestAnimationFrame(() => this.animate());
-  }
-
-  ngOnDestroy() {
-    this.isRunning = false;
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
-    }
-    if (isPlatformBrowser(this.platformId)) {
-      window.removeEventListener('resize', this.resizeHandler);
     }
   }
 }

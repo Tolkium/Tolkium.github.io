@@ -3,11 +3,12 @@ import { RouterOutlet } from '@angular/router';
 import { DarkModeToggleComponent } from './shared/components/dark-mode-toggle/dark-mode-toggle.component';
 import { CommonModule } from '@angular/common';
 import { BackgroundAnimationComponent } from './shared/components/background-animation/background-animation.component';
+import { AboutMeComponent } from './features/about-me/about-me.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, DarkModeToggleComponent, BackgroundAnimationComponent],
+  imports: [CommonModule, AboutMeComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

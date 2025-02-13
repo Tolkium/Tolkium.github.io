@@ -1,0 +1,90 @@
+<div class="relative min-h-screen bg-gray-400/60 dark:bg-slate-950 transition-colors duration-200 font-outfit">
+  <div class="fixed inset-0 z-0">
+    <app-background-animation></app-background-animation>
+  </div>
+
+  <div class="relative z-10">
+    <div class="fixed top-4 right-4 z-50">
+      <app-dark-mode-toggle></app-dark-mode-toggle>
+    </div>
+
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+      <header class="bg-gradient-to-br from-indigo-600/95 to-blue-700/95 dark:from-indigo-800/95 dark:to-blue-900/95 text-white p-8 rounded-lg shadow-lg mb-8 transition-colors duration-200 backdrop-blur-sm">
+        <div class="text-center">
+          <h1 class="text-4xl font-bold mb-3 font-outfit">Marek Šípoš</h1>
+          <h2 class="text-xl mb-3 text-indigo-100 font-inter">Frontend Web Developer</h2>
+          <div class="flex items-center justify-center gap-2 text-sm text-indigo-100 font-inter">
+            📍 Bratislava, Slovakia
+          </div>
+        </div>
+      </header>
+
+      <main class="space-y-8">
+        <!-- About Section -->
+        <section class="bg-white/30 dark:bg-slate-800/30 p-6 rounded-lg shadow-md hover:-translate-y-1 transition-all duration-300 backdrop-blur-sm">
+          <h2 class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-4 font-outfit">About Me</h2>
+          <p class="text-slate-700 dark:text-slate-300 font-inter">
+            Experienced web developer specializing in Angular, with a passion for creating exceptional digital experiences.
+            I balance perfectionism with pragmatism to deliver high-quality work while fostering positive team dynamics.
+            Always eager to learn and adapt in the ever-evolving world of web development! 🚀
+          </p>
+        </section>
+
+        <!-- Rest of the sections remain unchanged -->
+        <!-- Experience Section -->
+        <section class="bg-white/30 dark:bg-slate-800/30 p-6 rounded-lg shadow-md hover:-translate-y-1 transition-all duration-300 backdrop-blur-sm">
+          <h2 class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-4 font-outfit">Experience</h2>
+
+          <div class="space-y-6">
+            <div class="experience-item">
+              <h3 class="text-lg font-bold text-indigo-600 dark:text-indigo-400 font-outfit">Capco</h3>
+              <p class="text-sm text-slate-500 dark:text-slate-400 mb-2 font-inter">Nov 2022 - Aug 2023</p>
+              <p class="text-slate-700 dark:text-slate-300 font-inter">Frontend Web Developer focusing on responsive design and modern web technologies.</p>
+            </div>
+
+            <div class="experience-item">
+              <h3 class="text-lg font-bold text-indigo-600 dark:text-indigo-400 font-outfit">Alfabase</h3>
+              <p class="text-sm text-slate-500 dark:text-slate-400 mb-2 font-inter">Jun 2022 - Aug 2022</p>
+              <p class="text-slate-700 dark:text-slate-300 font-inter">Built reactive websites and maintained reusable UI component libraries using Angular 12+.</p>
+            </div>
+
+            <div class="experience-item">
+              <h3 class="text-lg font-bold text-indigo-600 dark:text-indigo-400 font-outfit">Hamstersoc</h3>
+              <p class="text-sm text-slate-500 dark:text-slate-400 mb-2 font-inter">Sep 2021 - Dec 2021</p>
+              <p class="text-slate-700 dark:text-slate-300 font-inter">Frontend and Solidity developer for NFT-focused startup.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section class="bg-white/30 dark:bg-slate-800/30 p-6 rounded-lg shadow-md hover:-translate-y-1 transition-all duration-300 backdrop-blur-sm">
+          <h2 class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-4 font-outfit">Skills</h2>
+          <div class="flex flex-wrap gap-3">
+            @for (skill of skills; track skill) {
+              <span class="px-4 py-2 bg-indigo-50/30 dark:bg-slate-800/30 rounded-full text-sm text-slate-700 dark:text-slate-300 hover:bg-indigo-500 hover:text-white dark:hover:bg-indigo-600 transition-colors duration-200 font-inter">
+                {{skill}}
+              </span>
+            }
+          </div>
+        </section>
+
+        <!-- Education Section -->
+        <section class="bg-white/30 dark:bg-slate-800/30 p-6 rounded-lg shadow-md hover:-translate-y-1 transition-all duration-300 backdrop-blur-sm">
+          <h2 class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-4 font-outfit">Education</h2>
+          <div class="experience-item">
+            <h3 class="text-lg font-bold text-indigo-600 dark:text-indigo-400 font-outfit">Slovenská technická univerzita v Bratislave</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mb-2 font-inter">2016 - 2022</p>
+            <p class="text-slate-700 dark:text-slate-300 font-inter">Information Technology</p>
+          </div>
+        </section>
+
+        <!-- Contact Section -->
+        <div class="text-center mt-8">
+          <p class="glitch-button inline-block text-lg text-indigo-100 font-inter cursor-pointer" (click)="goToLinkedIn()">
+            <span class="relative z-10">💼 Open for exciting opportunities!</span>
+          </p>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>

@@ -11,7 +11,7 @@ import * as UiActions from './core/store/ui.actions';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SideMenuComponent, DarkModeToggleComponent],
+  imports: [CommonModule, RouterOutlet, SideMenuComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })

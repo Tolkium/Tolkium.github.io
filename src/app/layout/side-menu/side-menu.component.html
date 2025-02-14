@@ -1,0 +1,61 @@
+<div class="menu-overlay"
+     [class.active]="!(isCollapsed$ | async)! && (isMobile$ | async)!"
+     (click)="toggleCollapse()">
+</div>
+
+<div class="menu-container"
+     [class.mobile-open]="!(isCollapsed$ | async)! && (isMobile$ | async)!"
+     [style.width]="(isCollapsed$ | async)! ? '3rem' : ((isMobile$ | async)! ? '100vw' : '16rem')">
+  <!-- Header -->
+  <div class="menu-header">
+    <h1 class="menu-title" [class.hidden]="(isCollapsed$ | async)!">
+      Menu
+    </h1>
+    <button class="menu-toggle" (click)="toggleCollapse()">
+      @if ((isCollapsed$ | async)!) {
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+        </svg>
+      } @else {
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+        </svg>
+      }
+    </button>
+  </div>
+
+  <!-- Menu Sections -->
+  <div class="menu-sections">
+    @for (section of menuSections; track section.title) {
+    <div class="menu-section">
+      <h2 class="section-title" [class.centered]="(isCollapsed$ | async)!">
+        {{ (isCollapsed$ | async)! ? "••" : section.title }}
+      </h2>
+      <div class="section-items">
+        @for (item of section.items; track item.label) {
+        <app-side-menu-item
+          [item]="item"
+          [isCollapsed]="(isCollapsed$ | async)!"
+          (menuItemClick)="onMenuItemClick()" />
+        }
+      </div>
+    </div>
+    }
+  </div>
+
+  <!-- Mobile Dark Mode Toggle -->
+  @if (isMobile$ | async) {
+    @if (isCollapsed$ | async) {
+      <div class="menu-section">
+        <app-side-menu-item
+          [item]="(isDarkMode$ | async) ? darkModeToggleLightItem : darkModeToggleItem"
+          [isCollapsed]="true"
+          (menuItemClick)="toggleDarkMode()" />
+      </div>
+    } @else {
+      <div class="mobile-footer">
+        <app-dark-mode-toggle [isMobile]="true" />
+      </div>
+    }
+  }
+</div>

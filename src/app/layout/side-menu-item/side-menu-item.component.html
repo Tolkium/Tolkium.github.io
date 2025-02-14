@@ -1,0 +1,8 @@
+<a [routerLink]="item.route"
+   class="menu-item"
+   [class.collapsed]="isCollapsed"
+   [class.active]="false"
+   (click)="menuItemClick.emit()">
+  <div class="item-icon" [innerHTML]="safeIcon"></div>
+  <div class="item-label">{{ item.label }}</div>
+</a>

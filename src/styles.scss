@@ -6,7 +6,8 @@
 @tailwind utilities;
 
 body {
-  @apply bg-gray-100 dark:bg-gray-900 m-0 p-0;
+  @apply bg-gray-300 dark:bg-slate-900 m-0 p-0;
+  transition: background-color 0.2s ease-in-out;
 }
 
 /* Optional: ensure html takes full height */
@@ -16,14 +17,34 @@ html, body {
   padding: 0;
 }
 
-/* Handle transition smoothly */
-body {
-  transition: background-color 0.2s ease-in-out;
+:root {
+  /* Primary Colors */
+  --color-primary: #f29f67;
+  --color-primary-hover: rgba(242, 159, 103, 0.05);
+
+  /* Dark Mode Colors */
+  --color-dark-primary: #8833cc;
+  --color-dark-primary-hover: rgba(136, 51, 204, 0.1);
+
+  /* Background Colors */
+  --color-bg-light: rgba(243, 244, 246, 0.7);
+  --color-bg-dark: rgba(30, 41, 59, 0.5);
+
+  /* Text Colors */
+  --color-text-light: #334155;
+  --color-text-dark: #cbd5e1;
+
+  /* Hover Colors - for light mode */
+  --hover-text-color: var(--color-dark-primary);
+  --hover-bg-color: var(--color-dark-primary-hover);
 }
 
-:root {
-  --primary: #2d3436;
-  --secondary: #07ebd8;
-  --accent: #00cec9;
-  --light: #dfe6e9;
+/* Dark mode overrides */
+.dark {
+  --color-bg-light: rgba(30, 41, 59, 0.5);
+  --color-text-light: #cbd5e1;
+  --hover-text-color: var(--color-primary);
+  --hover-bg-color: var(--color-primary-hover);
+  --color-dark-primary: var(--color-primary);
+  --color-dark-primary-hover: var(--color-primary-hover);
 }

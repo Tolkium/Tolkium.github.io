@@ -26,7 +26,8 @@ import { QuadTree } from '../../../utils/quad-tree';
   standalone: true,
   template: `
     <canvas #canvas
-      class="fixed top-0 left-0 w-full h-full"
+      class="fixed top-0 left-0 w-screen h-screen"
+      style="width: 100vw; height: 100vh;"
       [attr.aria-label]="'Background animation'"
     ></canvas>
   `
@@ -41,6 +42,8 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
   private isRunning = false;
   private lastFrameTime: number = 0;
   private resizeSubscription?: Subscription;
+  private scrollSubscription?: Subscription;
+  private scrollTimeout: any;
 
   private readonly config: AnimationConfig = {
     showBorder: false,
@@ -65,6 +68,20 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
         .pipe(debounceTime(250))
         .subscribe(this.handleResize);
 
+      // Add scroll event listener
+      this.scrollSubscription = fromEvent(window, 'scroll')
+        .pipe(debounceTime(50))
+        .subscribe(() => {
+          this.isRunning = false;
+          clearTimeout(this.scrollTimeout);
+
+          // Resume animation after scrolling stops
+          this.scrollTimeout = setTimeout(() => {
+            this.isRunning = true;
+            this.animate(performance.now());
+          }, 150);
+        });
+
       // Run animation outside Angular's zone for better performance
       this.ngZone.runOutsideAngular(() => {
         this.animate(performance.now());
@@ -76,6 +93,10 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.cleanup();
+    if (this.scrollTimeout) {
+      clearTimeout(this.scrollTimeout);
+    }
+    this.scrollSubscription?.unsubscribe();
   }
 
   private initializeCanvas(): void {
@@ -96,19 +117,25 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
     const canvas = this.canvasRef.nativeElement;
     const dpr = window.devicePixelRatio || 1;
 
-    // Set display size
-    canvas.style.width = `${window.innerWidth}px`;
-    canvas.style.height = `${window.innerHeight}px`;
+    // Get the actual viewport dimensions
+    const width = document.documentElement.clientWidth;
+    const height = document.documentElement.clientHeight;
 
-    // Set actual size in memory
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = window.innerHeight * dpr;
+    // Set display size using viewport units
+    canvas.style.width = '100vw';
+    canvas.style.height = '100vh';
+
+    // Set actual size in memory (accounting for device pixel ratio)
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
 
     // Scale context to ensure correct drawing operations
-    this.ctx.scale(dpr, dpr);
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    // Only reinitialize points if necessary
-    if (this.points.length === 0) {
+    // Reinitialize points when viewport size changes significantly
+    const currentArea = width * height;
+    const previousArea = (canvas.width / dpr) * (canvas.height / dpr);
+    if (Math.abs(currentArea - previousArea) / previousArea > 0.2) {
       this.initPoints();
     }
   };
@@ -120,7 +147,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
       y: Math.random() * canvas.height,
       vx: (Math.random() - 0.5) * 4,
       vy: (Math.random() - 0.5) * 4,
-      color: i % 2 === 0 ? this.config.COLORS.BLUE : this.config.COLORS.PURPLE,
+      color: i % 2 === 0 ? this.config.COLORS.ORANGE : this.config.COLORS.PURPLE,
       connections: 0
     }));
   }

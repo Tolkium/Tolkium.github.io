@@ -1,31 +1,64 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { DarkModeToggleComponent } from './shared/components/dark-mode-toggle/dark-mode-toggle.component';
 import { CommonModule } from '@angular/common';
-import { BackgroundAnimationComponent } from './shared/components/background-animation/background-animation.component';
-import { AboutMeComponent } from './features/about-me/about-me.component';
+import { Store } from '@ngrx/store';
+import { map } from 'rxjs/operators';
+import { SideMenuComponent } from './layout/side-menu/side-menu.component';
+import { DarkModeToggleComponent } from './layout/dark-mode-toggle/dark-mode-toggle.component';
+import * as UiSelectors from './core/store/ui.selectors';
+import * as UiActions from './core/store/ui.actions';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, AboutMeComponent],
+  imports: [CommonModule, RouterOutlet, SideMenuComponent, DarkModeToggleComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
-  title = 'Tolkium.github.io';
+export class AppComponent implements OnInit {
+  isMenuCollapsed$ = this.store.select(UiSelectors.selectIsMenuCollapsed).pipe(
+    map(isCollapsed => isCollapsed ?? true)
+  );
 
-  skills = [
-    'Angular',
-    'TypeScript',
-    'HTML5',
-    'CSS3',
-    'Responsive Design',
-    'Git',
-    'Bootstrap',
-    'Web3',
-    'Solidity',
-    'Azure',
-    '.NET Core'
-  ];
+  isMobile$ = this.store.select(UiSelectors.selectIsMobile).pipe(
+    map(isMobile => isMobile ?? false)
+  );
+
+  constructor(private store: Store) {}
+
+  ngOnInit(): void {
+    // Initialize dark mode from localStorage
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode) {
+      this.store.dispatch(UiActions.setDarkMode({ isDarkMode: JSON.parse(savedDarkMode) }));
+    }
+
+    // Initialize menu collapse state from localStorage
+    const savedMenuCollapse = localStorage.getItem('menuCollapsed');
+    if (savedMenuCollapse) {
+      this.store.dispatch(UiActions.setMenuCollapse({ isCollapsed: JSON.parse(savedMenuCollapse) }));
+    }
+
+    // Check system dark mode preference
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    if (!savedDarkMode && prefersDark.matches) {
+      this.store.dispatch(UiActions.setDarkMode({ isDarkMode: true }));
+    }
+
+    // Listen for system dark mode changes
+    prefersDark.addEventListener('change', (e) => {
+      if (!localStorage.getItem('darkMode')) {
+        this.store.dispatch(UiActions.setDarkMode({ isDarkMode: e.matches }));
+      }
+    });
+
+    // Check initial mobile state
+    this.checkMobileState();
+    window.addEventListener('resize', () => this.checkMobileState());
+  }
+
+  private checkMobileState(): void {
+    const isMobile = window.innerWidth < 768;
+    this.store.dispatch(UiActions.setMobileState({ isMobile }));
+  }
 }

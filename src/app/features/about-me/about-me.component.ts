@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { DarkModeToggleComponent } from '../../shared/components/dark-mode-toggle/dark-mode-toggle.component';
+import { DarkModeToggleComponent } from '../../layout/dark-mode-toggle/dark-mode-toggle.component';
 import { CommonModule } from '@angular/common';
 import { BackgroundAnimationComponent } from '../../shared/components/background-animation/background-animation.component';
 
@@ -14,18 +14,35 @@ import { BackgroundAnimationComponent } from '../../shared/components/background
 export class AboutMeComponent {
   title = 'Tolkium.github.io';
 
-  skills = [
+  softSkills = [
+    'Problem Solving',
+    'Fast Learner',
+    'Agile',
+    'Team Player',
+    'Creativity',
+    'Solution Design'
+  ];
+
+  technicalSkills = [
     'Angular',
+    'JavaScript',
     'TypeScript',
-    'HTML5',
-    'CSS3',
-    'Responsive Design',
-    'Git',
+    'HTML & SCSS',
+    'Web Development',
+    'Software Design Patterns',
+    'SOLID Design Principles',
     'Bootstrap',
-    'Web3',
-    'Solidity',
-    'Azure',
-    '.NET Core'
+    'Git',
+    'Azure DevOps',
+    'Docker',
+    'Nx',
+    'Unit Testing',
+    'RXJS',
+    'NodeJS',
+    'NestJS',
+    'OpenAI API',
+    'Python',
+    'And More...'
   ];
 
   goToLinkedIn() {

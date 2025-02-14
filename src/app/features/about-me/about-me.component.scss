@@ -69,3 +69,161 @@
 .glitch-effect, .glitch-effect-2 {
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
 }
+
+// transparent box
+.box {
+  background-color: color-mix(in srgb, var(--primary) 80%, transparent);
+}
+
+.textik{
+  // color: var(--primary);
+  color: #8833cc;
+
+}
+
+.experience-item {
+  position: relative;
+  padding-left: 3rem;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+
+  // Add transitions for text elements and set transform origin
+  h3 {
+    transition: transform 0.3s ease, color 0.3s ease;
+    transform-origin: left center;
+    font-size: 1.3rem;
+    max-width: calc(100% - 1rem);
+    margin-top: -0.25rem;
+
+    @media (max-width: 767px) {
+      transform-origin: left top;
+      font-size: 1.2rem;
+      max-width: calc(100vw - 5rem);
+    }
+  }
+
+  p {
+    transition: all 0.3s ease;
+    max-width: calc(100% - 1rem);
+    transform-origin: left center;
+    font-size: 1.1rem; // Increased base size
+
+    &.date {
+      font-size: 1rem;
+      color: var(--color-text-light);
+      opacity: 0.8;
+
+      .dark & {
+        color: var(--color-text-dark);
+      }
+    }
+
+    @media (max-width: 767px) {
+      font-size: 1rem;
+      max-width: calc(100vw - 5rem);
+
+      &.date {
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    height: calc(100% + 1.5rem);
+    width: 2px;
+    background-color: var(--color-text-light);
+    opacity: 0.7;
+
+    .dark & {
+      background-color: var(--color-text-dark);
+    }
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1.25rem;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--color-text-light);
+    box-shadow: 0 0 0 4px rgba(51, 65, 85, 0.1);
+    transition: all 0.3s ease;
+
+    .dark & {
+      background-color: var(--color-text-dark);
+      box-shadow: 0 0 0 4px rgba(203, 213, 225, 0.1);
+    }
+  }
+
+  &:first-child::before {
+    top: 0;
+    height: calc(100% + 1.5rem);
+  }
+
+  &:last-child::before {
+    height: 100%;
+  }
+
+  &:hover {
+    &::after {
+      transform: scale(1.5);
+      background-color: var(--color-dark-primary);
+      box-shadow: 0 0 0 6px var(--color-dark-primary-hover),
+                  0 0 20px var(--color-dark-primary);
+
+      .dark & {
+        background-color: var(--color-primary);
+        box-shadow: 0 0 0 6px var(--color-primary-hover),
+                    0 0 20px var(--color-primary);
+      }
+    }
+
+    // Scale up text on hover
+    h3 {
+      transform: scale(1.2);
+      color: var(--color-dark-primary);
+
+      @media (max-width: 767px) {
+        transform: scale(1.1);
+      }
+
+      .dark & {
+        color: var(--color-primary);
+      }
+    }
+
+    // Subtle scale for description text
+    p {
+      transform: scale(1.05);
+
+      @media (max-width: 767px) {
+        transform: scale(1.02);
+      }
+
+      &.date {
+        transform: scale(1.03);
+        opacity: 1;
+      }
+    }
+  }
+}
+
+// Special handling for education section
+.education-section .experience-item {
+  &:first-child::before {
+    top: 0;
+    height: calc(100% + 1.5rem);
+  }
+
+  &:last-child::before {
+    height: 100%;
+  }
+}
+
+

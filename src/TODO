@@ -1,17 +1,73 @@
-fix styles
-fix footer mixing
-addf font
-buton na stiahnutie cv
+# Portfolio Website TODO List
 
+## High Priority Tasks
 
-f4f5f7 Backgrolund
-f29f67 orange color of text titles lite
-1e1e2c color of text
+- [ ] Fix responsive styles and layout issues
+- [ ] Add CV download button functionality
+- [ ] Fix footer positioning and content mixing
+- [ ] Add custom fonts integration
 
-faeedb on button hower color_lens
-ffffff containers Backgrolund
-4d4d4d icons color
+## Style Improvements
 
+### Current Color Scheme
 
-ff6348 ORANZOOVA
-430f44 FIALOVA SYTA
+```css
+/* Light Theme */
+--bg-primary: #f4f5f7;      /* Main background */
+--text-title: #f29f67;      /* Title text (orange) */
+--text-body: #1e1e2c;       /* Body text */
+--container-bg: #ffffff;    /* Container background */
+--icon-color: #4d4d4d;      /* Icon color */
+--hover-bg: #faeedb;        /* Button hover background */
+```
+
+### Potential Color Palettes
+
+#### Vibrant Orange-Purple Theme
+
+```css
+--primary: #ff6348;         /* Vibrant orange */
+--secondary: #430f44;       /* Deep purple */
+--bg-light: #f7f5f4;        /* Light background */
+--accent-light: #vffdad2;   /* Light orange accent */
+```
+
+#### Modern Teal Theme
+
+```css
+--primary: #6dcbc3;         /* Teal */
+--bg-dark: #07111f;         /* Dark background */
+--hover-dark: #0a242e;      /* Hover state dark */
+```
+
+#### Professional Light Theme
+
+```css
+--bg-primary: #f4f5f7;      /* Light gray background */
+--text-primary: #1e1e2c;    /* Dark text */
+--accent: #f29f67;          /* Orange accent */
+--container: #ffffff;       /* White containers */
+```
+
+## Future Enhancements
+
+- [ ] Implement theme switcher with multiple color schemes
+- [ ] Add smooth transitions between color themes
+- [ ] Create consistent hover effects across components
+- [ ] Implement responsive typography system
+- [ ] Add animation to color transitions
+
+## Design Guidelines
+
+1. Maintain consistent spacing and padding
+2. Ensure sufficient color contrast for accessibility
+3. Use color schemes to create visual hierarchy
+4. Implement responsive design breakpoints
+5. Add subtle animations for interactions
+
+## Notes
+
+- Test all color combinations for accessibility (WCAG 2.1)
+- Consider dark mode variations for each color palette
+- Document final color scheme decisions
+- Create a style guide for consistent implementation

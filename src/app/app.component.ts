@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs/operators';
 import { SideMenuComponent } from './layout/side-menu/side-menu.component';
-import { DarkModeToggleComponent } from './layout/dark-mode-toggle/dark-mode-toggle.component';
 import * as UiSelectors from './core/store/ui.selectors';
 import * as UiActions from './core/store/ui.actions';
 
@@ -26,7 +25,7 @@ export class AppComponent implements OnInit {
 
   constructor(private store: Store) {}
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     // Initialize dark mode from localStorage
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode) {

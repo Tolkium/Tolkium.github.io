@@ -3,16 +3,19 @@ import { DarkModeToggleComponent } from '../../layout/dark-mode-toggle/dark-mode
 import { CommonModule } from '@angular/common';
 import { BackgroundAnimationComponent } from '../../shared/components/background-animation/background-animation.component';
 
-
 @Component({
   selector: 'app-about-me',
   standalone: true,
-  imports: [CommonModule, DarkModeToggleComponent, BackgroundAnimationComponent],
+  imports: [
+    CommonModule,
+    DarkModeToggleComponent,
+    BackgroundAnimationComponent
+  ],
   templateUrl: './about-me.component.html',
-  styleUrl: './about-me.component.scss'
+  styleUrls: ['./about-me.component.scss']
 })
 export class AboutMeComponent {
-  title = 'Tolkium.github.io';
+  title = 'About Me';
 
   softSkills = [
     'Problem Solving',
@@ -45,7 +48,7 @@ export class AboutMeComponent {
     'And More...'
   ];
 
-  goToLinkedIn() {
+  public goToLinkedIn(): void {
     window.open('https://www.linkedin.com/in/marek-sipos/', '_blank');
   }
 }

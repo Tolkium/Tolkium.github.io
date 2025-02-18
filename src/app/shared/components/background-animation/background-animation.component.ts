@@ -43,7 +43,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
   private lastFrameTime: number = 0;
   private resizeSubscription?: Subscription;
   private scrollSubscription?: Subscription;
-  private scrollTimeout: any;
+  private scrollTimeout: ReturnType<typeof setTimeout> | undefined;
 
   private readonly config: AnimationConfig = {
     showBorder: false,
@@ -53,12 +53,12 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
   };
 
   constructor(
-    @Inject(PLATFORM_ID) private platformId: Object,
+    @Inject(PLATFORM_ID) private platformId: string,
     private ngZone: NgZone,
     private errorHandler: ErrorHandler
   ) {}
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
     try {
@@ -66,7 +66,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
 
       this.resizeSubscription = fromEvent(window, 'resize')
         .pipe(debounceTime(250))
-        .subscribe(this.handleResize);
+        .subscribe(() => this.handleResize());
 
       // Add scroll event listener
       this.scrollSubscription = fromEvent(window, 'scroll')
@@ -91,7 +91,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.cleanup();
     if (this.scrollTimeout) {
       clearTimeout(this.scrollTimeout);

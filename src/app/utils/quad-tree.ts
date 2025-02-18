@@ -19,7 +19,7 @@ export class QuadTree {
 
   constructor(private bounds: Bounds) {}
 
-  insert(point: Point): boolean {
+  public insert(point: Point): boolean {
     if (!this.contains(point)) {
       return false;
     }
@@ -39,7 +39,7 @@ export class QuadTree {
            this.southwest!.insert(point);
   }
 
-  query(range: Bounds): Point[] {
+  public query(range: Bounds): Point[] {
     const found: Point[] = [];
 
     if (!this.intersects(range)) {

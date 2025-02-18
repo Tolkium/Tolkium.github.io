@@ -30,73 +30,31 @@
   overflow-x: hidden;
   padding: 1rem;
   width: 100%;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   transition: all 0.3s ease-in-out;
-
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 3px;
-  }
-
-  .dark & {
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-
-    &::-webkit-scrollbar-thumb {
-      background-color: rgba(9, 171, 20, 0.2);
-    }
-  }
+  margin-left: 3rem;
 
   @media (max-width: 767px) {
     padding: 0.25rem;
     padding-left: 3.25rem;
-  }
+    margin-left: 0;
 
-  @media (min-width: 768px) and (max-width: 1200px) {
+    // Only apply overlay effect on mobile when menu is expanded
     &:not(.menu-collapsed) {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+  }
+
+  // Responsive behavior for menu expansion
+  &:not(.menu-collapsed) {
+    // On medium-large screens, push content
+    @media (min-width: 768px) and (max-width: 1399px) {
       margin-left: 16rem;
-      width: calc(100% - 16rem);
     }
-  }
-}
 
-app-side-menu {
-  display: block;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 40;
-  overflow: hidden;
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-  &::-webkit-scrollbar {
-    display: none;  /* Chrome, Safari and Opera */
-  }
-
-  @media (max-width: 767px) {
-    width: 3rem;
-    transition: width 0.3s ease-in-out;
-
-    &.expanded {
-      width: 100vw;
-    }
-  }
-
-  @media (min-width: 768px) {
-    width: 3rem;
-    transition: width 0.3s ease-in-out;
-
-    &.expanded {
-      width: 16rem;
+    // On extra large screens, keep content in place (overlay)
+    @media (min-width: 1400px) {
+      margin-left: 3rem;
     }
   }
 }

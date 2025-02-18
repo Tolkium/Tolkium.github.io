@@ -125,9 +125,14 @@
 
         <!-- Contact Section -->
         <div class="text-center mt-8">
-          <p class="glitch-button inline-block text-lg text-black dark:text-white font-inter cursor-pointer" (click)="goToLinkedIn()">
+          <button class="glitch-button inline-block text-lg text-black dark:text-white font-inter"
+                  (click)="goToLinkedIn()"
+                  (keydown.enter)="goToLinkedIn()"
+                  tabindex="0"
+                  role="button"
+                  aria-label="View LinkedIn profile">
             <span class="relative z-10">💼 Open for exciting opportunities!</span>
-          </p>
+          </button>
         </div>
       </main>
     </div>

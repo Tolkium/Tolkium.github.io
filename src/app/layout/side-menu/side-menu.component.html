@@ -1,7 +1,11 @@
-<div class="menu-overlay"
+<button class="menu-overlay"
      [class.active]="!(isCollapsed$ | async)! && (isMobile$ | async)!"
-     (click)="toggleCollapse()">
-</div>
+     (click)="toggleCollapse()"
+     (keydown.escape)="toggleCollapse()"
+     tabindex="0"
+     role="button"
+     aria-label="Close menu overlay">
+</button>
 
 <div class="menu-container"
      [class.mobile-open]="!(isCollapsed$ | async)! && (isMobile$ | async)!"

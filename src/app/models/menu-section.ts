@@ -1,6 +1,9 @@
 // menu-section.ts
 export interface MenuItem {
-  icon: string;
+  // Prefer using Heroicons via ng-icons
+  iconName?: string;
+  // Fallback for legacy inline SVGs until all are migrated
+  icon?: string;
   label: string;
   route: string;
 }

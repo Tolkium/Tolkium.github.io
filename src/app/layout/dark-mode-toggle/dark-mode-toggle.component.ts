@@ -6,10 +6,9 @@ import * as UiActions from '../../core/store/ui.actions';
 import * as UiSelectors from '../../core/store/ui.selectors';
 
 @Component({
-  selector: 'app-dark-mode-toggle',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'app-dark-mode-toggle',
+    imports: [CommonModule],
+    template: `
     <button
       [class]="buttonClass"
       (click)="toggleDarkMode()"
@@ -27,7 +26,7 @@ import * as UiSelectors from '../../core/store/ui.selectors';
       }
     </button>
   `,
-  styleUrls: ['./dark-mode-toggle.component.scss']
+    styleUrls: ['./dark-mode-toggle.component.scss']
 })
 export class DarkModeToggleComponent {
   @Input() isMobile = false;

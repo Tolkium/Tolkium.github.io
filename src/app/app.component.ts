@@ -8,11 +8,10 @@ import * as UiSelectors from './core/store/ui.selectors';
 import * as UiActions from './core/store/ui.actions';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [CommonModule, RouterOutlet, SideMenuComponent],
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+    selector: 'app-root',
+    imports: [CommonModule, RouterOutlet, SideMenuComponent],
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
   isMenuCollapsed$ = this.store.select(UiSelectors.selectIsMenuCollapsed).pipe(

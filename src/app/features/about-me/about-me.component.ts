@@ -4,15 +4,14 @@ import { CommonModule } from '@angular/common';
 import { BackgroundAnimationComponent } from '../../shared/components/background-animation/background-animation.component';
 
 @Component({
-  selector: 'app-about-me',
-  standalone: true,
-  imports: [
-    CommonModule,
-    DarkModeToggleComponent,
-    BackgroundAnimationComponent
-  ],
-  templateUrl: './about-me.component.html',
-  styleUrls: ['./about-me.component.scss']
+    selector: 'app-about-me',
+    imports: [
+        CommonModule,
+        DarkModeToggleComponent,
+        BackgroundAnimationComponent
+    ],
+    templateUrl: './about-me.component.html',
+    styleUrls: ['./about-me.component.scss']
 })
 export class AboutMeComponent {
   title = 'About Me';

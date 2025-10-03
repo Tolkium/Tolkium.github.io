@@ -11,11 +11,10 @@ import * as UiSelectors from '../../core/store/ui.selectors';
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-side-menu',
-  standalone: true,
-  imports: [CommonModule, SideMenuItemComponent, DarkModeToggleComponent],
-  templateUrl: './side-menu.component.html',
-  styleUrls: ['./side-menu.component.scss']
+    selector: 'app-side-menu',
+    imports: [CommonModule, SideMenuItemComponent, DarkModeToggleComponent],
+    templateUrl: './side-menu.component.html',
+    styleUrls: ['./side-menu.component.scss']
 })
 export class SideMenuComponent {
   isCollapsed$ = this.store.select(UiSelectors.selectIsMenuCollapsed).pipe(

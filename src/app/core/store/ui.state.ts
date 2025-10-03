@@ -9,5 +9,5 @@ export const initialUiState: UiState = {
   isDarkMode: false,
   isMenuCollapsed: true,
   isMobile: window.innerWidth < 768,
-  isScrollbarHidden: false
+  isScrollbarHidden: true
 };

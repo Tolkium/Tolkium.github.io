@@ -1,0 +1,72 @@
+name: Deploy Angular to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Improve npm network resilience
+        run: |
+          npm config set fetch-retries 5
+          npm config set fetch-retry-mintimeout 20000
+          npm config set fetch-retry-maxtimeout 120000
+
+      - name: Install (with retries)
+        run: |
+          for i in 1 2 3; do \
+            npm ci --no-audit --fund=false && break || (echo "npm ci failed (attempt $i), retrying..."; sleep 10); \
+          done
+
+      - name: Build
+        run: npm run build
+
+      - name: Add CNAME for custom domain
+        run: |
+          OUT_DIR=dist/tolkium.github.io/browser
+          mkdir -p "$OUT_DIR"
+          echo "tolkium.net" > "$OUT_DIR/CNAME"
+
+      - name: Add SPA fallback (404.html)
+        run: |
+          OUT_DIR=dist/tolkium.github.io/browser
+          if [ -f "$OUT_DIR/index.html" ]; then cp "$OUT_DIR/index.html" "$OUT_DIR/404.html"; fi
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/tolkium.github.io/browser
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+

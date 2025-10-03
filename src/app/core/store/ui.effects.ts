@@ -53,12 +53,15 @@ export class UiEffects {
           const newValue = current ? !JSON.parse(current) : true;
           localStorage.setItem('scrollbarHidden', JSON.stringify(newValue));
           document.documentElement.classList.toggle('scrollbar-hidden');
+          document.body.classList.toggle('scrollbar-hidden');
         } else {
           localStorage.setItem('scrollbarHidden', JSON.stringify(action.isScrollbarHidden));
           if (action.isScrollbarHidden) {
             document.documentElement.classList.add('scrollbar-hidden');
+            document.body.classList.add('scrollbar-hidden');
           } else {
             document.documentElement.classList.remove('scrollbar-hidden');
+            document.body.classList.remove('scrollbar-hidden');
           }
         }
       })

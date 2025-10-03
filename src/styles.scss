@@ -106,3 +106,20 @@ body.scrollbar-hidden::-webkit-scrollbar {
 html.scrollbar-hidden *::-webkit-scrollbar {
   display: none !important;
 }
+html.scrollbar-hidden *,
+body.scrollbar-hidden * {
+  /* Firefox + IE/Edge legacy */
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+/* Ensure app content scroller hides too */
+html.scrollbar-hidden .main-content {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+html.scrollbar-hidden .main-content::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}

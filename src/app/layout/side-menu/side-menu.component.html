@@ -47,19 +47,12 @@
     }
   </div>
 
-  <!-- Mobile Dark Mode Toggle -->
+  <!-- Mobile Dark Mode Toggle: single footer that repositions smoothly -->
   @if (isMobile$ | async) {
-    @if (isCollapsed$ | async) {
-      <div class="menu-section">
-        <app-side-menu-item
-          [item]="(isDarkMode$ | async) ? darkModeToggleLightItem : darkModeToggleItem"
-          [isCollapsed]="true"
-          (menuItemClick)="toggleDarkMode()" />
-      </div>
-    } @else {
-      <div class="mobile-footer">
+    <div class="mobile-footer move-toggle" [class.collapsed]="(isCollapsed$ | async)!">
+      <div class="toggle-wrapper" [class.collapsed]="(isCollapsed$ | async)!">
         <app-dark-mode-toggle [isMobile]="true" />
       </div>
-    }
+    </div>
   }
 </div>

@@ -16,3 +16,9 @@ export const setMobileState = createAction(
   '[UI] Set Mobile State',
   props<{ isMobile: boolean }>()
 );
+
+export const toggleScrollbarHidden = createAction('[UI] Toggle Scrollbar Hidden');
+export const setScrollbarHidden = createAction(
+  '[UI] Set Scrollbar Hidden',
+  props<{ isScrollbarHidden: boolean }>()
+);

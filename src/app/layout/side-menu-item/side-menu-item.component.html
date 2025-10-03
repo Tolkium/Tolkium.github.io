@@ -3,6 +3,11 @@
    [class.collapsed]="isCollapsed"
    [class.active]="false"
    (click)="menuItemClick.emit()">
-  <div class="item-icon" [innerHTML]="safeIcon"></div>
+  <div class="item-icon">
+    <ng-icon *ngIf="item.iconName; else legacyIcon" [name]="item.iconName" size="24"></ng-icon>
+    <ng-template #legacyIcon>
+      <div [innerHTML]="safeIcon"></div>
+    </ng-template>
+  </div>
   <div class="item-label">{{ item.label }}</div>
 </a>

@@ -7,6 +7,7 @@ import * as UiSelectors from '../../core/store/ui.selectors';
 
 @Component({
     selector: 'app-dark-mode-toggle',
+    standalone: true,
     imports: [CommonModule],
     template: `
     <button

@@ -3,6 +3,8 @@
    [class.collapsed]="isCollapsed"
    [class.active]="false"
    (click)="menuItemClick.emit()">
-  <div class="item-icon" [innerHTML]="safeIcon"></div>
+  <div class="item-icon">
+    <ng-icon [name]="item.iconName" class="w-6 h-6"></ng-icon>
+  </div>
   <div class="item-label">{{ item.label }}</div>
 </a>

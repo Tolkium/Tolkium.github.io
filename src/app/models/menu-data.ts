@@ -8,7 +8,7 @@ export const MENU_SECTIONS: MenuSection[] = [
       {
         iconName: 'heroHome',
         label: 'Home',
-        route: '/'
+        route: '/about'
       },
       {
         iconName: 'heroFolder',

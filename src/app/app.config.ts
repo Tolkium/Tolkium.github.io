@@ -10,6 +10,7 @@ import { provideIcons } from '@ng-icons/core';
 import {
   heroCog6Tooth,
   heroFolder,
+  heroHome,
   heroChartBarSquare,
   heroPresentationChartLine,
   heroClipboardDocumentList,
@@ -50,6 +51,7 @@ export const appConfig: ApplicationConfig = {
     provideIcons({
       heroCog6Tooth,
       heroFolder,
+      heroHome,
       heroChartBarSquare,
       heroPresentationChartLine,
       heroClipboardDocumentList,

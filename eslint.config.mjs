@@ -93,7 +93,7 @@ export default tseslint.config(
       '@angular-eslint/no-input-rename': 'error',
       '@angular-eslint/no-output-rename': 'error',
       '@angular-eslint/use-pipe-transform-interface': 'error',
-      '@angular-eslint/prefer-inject': 'off', // Allow constructor injection
+      '@angular-eslint/prefer-inject': 'error',
     },
   },
   {

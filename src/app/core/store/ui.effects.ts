@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { tap } from 'rxjs/operators';
 import * as UiActions from './ui.actions';
 
 @Injectable()
 export class UiEffects {
-  constructor(private actions$: Actions) {}
+  private readonly actions$ = inject(Actions);
 
   persistDarkMode$ = createEffect(() =>
     this.actions$.pipe(

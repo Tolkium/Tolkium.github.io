@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs/operators';
@@ -30,6 +30,8 @@ import * as UiSelectors from '../../core/store/ui.selectors';
     styleUrls: ['./dark-mode-toggle.component.scss']
 })
 export class DarkModeToggleComponent {
+  private readonly store = inject(Store);
+  
   @Input() isMobile = false;
 
   isDarkMode$ = this.store.select(UiSelectors.selectIsDarkMode).pipe(
@@ -41,8 +43,6 @@ export class DarkModeToggleComponent {
       ? 'text-slate-700 dark:text-slate-300 hover:text-[#8833cc]/70 dark:hover:text-[#f29f67]/90 transition-colors duration-200'
       : 'fixed top-4 right-4 z-50 bg-white/50 dark:bg-slate-800/50 p-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 backdrop-blur-sm text-slate-700 dark:text-slate-300 hover:text-[#8833cc]/70 dark:hover:text-[#f29f67]/90';
   }
-
-  constructor(private store: Store) {}
 
   public toggleDarkMode(): void {
     this.store.dispatch(UiActions.toggleDarkMode());

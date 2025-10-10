@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { map, take, tap } from 'rxjs/operators';
@@ -18,6 +18,8 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./side-menu.component.scss']
 })
 export class SideMenuComponent {
+  private readonly store = inject(Store);
+  
   isCollapsed$ = this.store.select(UiSelectors.selectIsMenuCollapsed).pipe(
     map(isCollapsed => isCollapsed ?? true)
   );
@@ -43,8 +45,6 @@ export class SideMenuComponent {
     iconName: 'heroSun',
     route: ''
   };
-
-  constructor(private store: Store) {}
 
   @HostListener('window:resize')
   public onResize(): void {

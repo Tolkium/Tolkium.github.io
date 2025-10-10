@@ -6,9 +6,9 @@ import {
   OnDestroy,
   ViewChild,
   PLATFORM_ID,
-  Inject,
   ErrorHandler,
-  NgZone
+  NgZone,
+  inject
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { fromEvent, Subscription } from 'rxjs';
@@ -33,6 +33,10 @@ import { QuadTree } from '../../../utils/quad-tree';
   `
 })
 export class BackgroundAnimationComponent implements OnInit, OnDestroy {
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly ngZone = inject(NgZone);
+  private readonly errorHandler = inject(ErrorHandler);
+
   @ViewChild('canvas', { static: true })
   private readonly canvasRef!: ElementRef<HTMLCanvasElement>;
 
@@ -51,12 +55,6 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
     glowLines: false,
     ...ANIMATION_CONSTANTS
   };
-
-  constructor(
-    @Inject(PLATFORM_ID) private platformId: string,
-    private ngZone: NgZone,
-    private errorHandler: ErrorHandler
-  ) {}
 
   public ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;

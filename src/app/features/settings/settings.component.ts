@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { selectHideScrollbar } from '../../core/store/ui.selectors';
@@ -29,9 +29,11 @@ import { setHideScrollbar, toggleHideScrollbar } from '../../core/store/ui.actio
   ]
 })
 export class SettingsComponent {
+  private readonly store = inject(Store);
+  
   hideScrollbar$ = this.store.select(selectHideScrollbar);
 
-  constructor(private store: Store) {
+  constructor() {
     // Apply default on load from localStorage or default true
     const saved = localStorage.getItem('hideScrollbar');
     const hide = saved ? JSON.parse(saved) : true;

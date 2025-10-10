@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
@@ -14,6 +14,8 @@ import * as UiActions from './core/store/ui.actions';
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+  private readonly store = inject(Store);
+
   isMenuCollapsed$ = this.store.select(UiSelectors.selectIsMenuCollapsed).pipe(
     map(isCollapsed => isCollapsed ?? true)
   );
@@ -21,8 +23,6 @@ export class AppComponent implements OnInit {
   isMobile$ = this.store.select(UiSelectors.selectIsMobile).pipe(
     map(isMobile => isMobile ?? false)
   );
-
-  constructor(private store: Store) {}
 
   public ngOnInit(): void {
     // Initialize dark mode from localStorage

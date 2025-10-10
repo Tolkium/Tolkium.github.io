@@ -17,3 +17,8 @@ export const selectIsMobile = createSelector(
   selectUiState,
   (state: UiState) => state.isMobile
 );
+
+export const selectHideScrollbar = createSelector(
+  selectUiState,
+  (state: UiState) => state.hideScrollbar
+);

@@ -1,6 +1,6 @@
 // menu-section.ts
 export interface MenuItem {
-  icon: string;
+  iconName: string;
   label: string;
   route: string;
 }

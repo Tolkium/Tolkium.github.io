@@ -23,5 +23,13 @@ export const uiReducer = createReducer(
   on(UiActions.setMobileState, (state, { isMobile }) => ({
     ...state,
     isMobile
+  })),
+  on(UiActions.toggleHideScrollbar, state => ({
+    ...state,
+    hideScrollbar: !state.hideScrollbar
+  })),
+  on(UiActions.setHideScrollbar, (state, { hideScrollbar }) => ({
+    ...state,
+    hideScrollbar
   }))
 );

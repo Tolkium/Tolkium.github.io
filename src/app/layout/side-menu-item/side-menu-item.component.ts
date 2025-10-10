@@ -1,12 +1,12 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-
-import { RouterModule } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { MenuItem } from '../../models/menu-section';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { NgIconComponent } from '@ng-icons/core';
 
 @Component({
     selector: 'app-side-menu-item',
-    imports: [RouterModule],
+    standalone: true,
+    imports: [RouterLink, NgIconComponent],
     templateUrl: './side-menu-item.component.html',
     styleUrls: ['./side-menu-item.component.scss']
 })
@@ -14,10 +14,4 @@ export class SideMenuItemComponent {
   @Input() item!: MenuItem;
   @Input() isCollapsed = false;
   @Output() menuItemClick = new EventEmitter<void>();
-
-  constructor(private sanitizer: DomSanitizer) {}
-
-  get safeIcon(): SafeHtml {
-    return this.sanitizer.bypassSecurityTrustHtml(this.item.icon);
-  }
 }

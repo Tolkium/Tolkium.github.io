@@ -43,4 +43,22 @@ export class UiEffects {
     ),
     { dispatch: false }
   );
+
+  persistHideScrollbar$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UiActions.setHideScrollbar, UiActions.toggleHideScrollbar),
+      tap(action => {
+        let hide = true;
+        if (action.type === '[UI] Toggle Hide Scrollbar') {
+          const current = localStorage.getItem('hideScrollbar');
+          hide = current ? !JSON.parse(current) : true;
+        } else {
+          hide = action.hideScrollbar;
+        }
+        localStorage.setItem('hideScrollbar', JSON.stringify(hide));
+        document.documentElement.style.overflowY = hide ? 'hidden' : '';
+      })
+    ),
+    { dispatch: false }
+  );
 }

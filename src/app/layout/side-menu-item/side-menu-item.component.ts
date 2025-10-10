@@ -1,12 +1,12 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 import { MenuItem } from '../../models/menu-section';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
     selector: 'app-side-menu-item',
-    imports: [CommonModule, RouterModule],
+    imports: [RouterModule],
     templateUrl: './side-menu-item.component.html',
     styleUrls: ['./side-menu-item.component.scss']
 })

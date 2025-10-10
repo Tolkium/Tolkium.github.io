@@ -37,6 +37,11 @@ html, body {
   /* Hover Colors - for light mode */
   --hover-text-color: var(--color-dark-primary);
   --hover-bg-color: var(--color-dark-primary-hover);
+
+  /* Scrollbar (light) */
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb: rgba(30, 41, 59, 0.25); /* slate-800 at ~25% */
+  --scrollbar-thumb-hover: rgba(30, 41, 59, 0.4);
 }
 
 /* Dark mode overrides */
@@ -47,4 +52,74 @@ html, body {
   --hover-bg-color: var(--color-primary-hover);
   --color-dark-primary: var(--color-primary);
   --color-dark-primary-hover: var(--color-primary-hover);
+
+  /* Scrollbar (dark) */
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb: rgba(203, 213, 225, 0.25); /* slate-300 at ~25% */
+  --scrollbar-thumb-hover: rgba(203, 213, 225, 0.4);
+}
+
+/* Firefox */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
+}
+
+/* WebKit (Chrome, Edge, Safari) */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-bg);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 9999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+/* Hide scrollbar when enabled via class */
+/* Strong, explicit targets to hide page scrollbars while retaining scroll */
+html.scrollbar-hidden {
+  /* Firefox */
+  scrollbar-width: none;
+}
+html.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+/* In case body is the scrolling element */
+body.scrollbar-hidden {
+  scrollbar-width: none;
+}
+body.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+/* Hide all descendants' scrollbars when flag is active */
+html.scrollbar-hidden *::-webkit-scrollbar {
+  display: none !important;
+}
+html.scrollbar-hidden *,
+body.scrollbar-hidden * {
+  /* Firefox + IE/Edge legacy */
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+/* Ensure app content scroller hides too */
+html.scrollbar-hidden .main-content {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+html.scrollbar-hidden .main-content::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
 }

@@ -56,7 +56,13 @@ export class UiEffects {
           hide = action.hideScrollbar;
         }
         localStorage.setItem('hideScrollbar', JSON.stringify(hide));
-        document.documentElement.style.overflowY = hide ? 'hidden' : '';
+        if (hide) {
+          document.documentElement.classList.add('scrollbar-hidden');
+          document.body.classList.add('scrollbar-hidden');
+        } else {
+          document.documentElement.classList.remove('scrollbar-hidden');
+          document.body.classList.remove('scrollbar-hidden');
+        }
       })
     ),
     { dispatch: false }

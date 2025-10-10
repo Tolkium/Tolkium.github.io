@@ -33,6 +33,15 @@
   transition: all 0.3s ease-in-out;
   margin-left: 3rem;
 
+  // Hide scrollbar when global toggle is active (Firefox/IE/WebKit)
+  html.scrollbar-hidden & {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  html.scrollbar-hidden &::-webkit-scrollbar {
+    display: none;
+  }
+
   @media (max-width: 767px) {
     padding: 0.25rem;
     padding-left: 3.25rem;

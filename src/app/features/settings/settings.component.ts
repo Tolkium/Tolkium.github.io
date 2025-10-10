@@ -20,7 +20,7 @@ import { setHideScrollbar, toggleHideScrollbar } from '../../core/store/ui.actio
       <label class="inline-flex items-center cursor-pointer">
         <input type="checkbox" class="sr-only peer" [checked]="(hideScrollbar$ | async) ?? true" (change)="onToggle($event)" />
         <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:bg-[#8833cc] transition-colors"></div>
-        <div class="-ml-8 w-5 h-5 bg-white rounded-full shadow transform transition-transform" [class.translate-x-5]="(hideScrollbar$ | async) === false"></div>
+        <div class="-ml-8 w-5 h-5 bg-white rounded-full shadow transform transition-transform" [class.translate-x-5]="(hideScrollbar$ | async) ?? true"></div>
       </label>
     </div>
   </div>
@@ -38,9 +38,8 @@ export class SettingsComponent {
     this.store.dispatch(setHideScrollbar({ hideScrollbar: hide }));
   }
 
-  onToggle(event: Event): void {
-    const checked = (event.target as HTMLInputElement).checked;
-    // checked means hide? We bind checked to current state; toggle to invert
+  public onToggle(_event: Event): void {
+    // Toggle the current state
     this.store.dispatch(toggleHideScrollbar());
   }
 }

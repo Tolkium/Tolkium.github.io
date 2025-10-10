@@ -1,5 +1,6 @@
 import { MenuSection } from './menu-section';
 
+// Temporarily saved menu sections (icons as inline SVG). To be wired after Angular upgrade.
 export const MENU_SECTIONS: MenuSection[] = [
   {
     title: 'ACTIVITY DATA & TARGETS',

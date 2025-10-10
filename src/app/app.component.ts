@@ -53,6 +53,18 @@ export class AppComponent implements OnInit {
     // Check initial mobile state
     this.checkMobileState();
     window.addEventListener('resize', () => this.checkMobileState());
+
+    // Initialize scrollbar hidden: default ON unless localStorage explicitly false
+    const savedScrollbarHidden = localStorage.getItem('hideScrollbar');
+    const isHidden = savedScrollbarHidden === null ? true : JSON.parse(savedScrollbarHidden);
+    this.store.dispatch(UiActions.setHideScrollbar({ hideScrollbar: isHidden }));
+    if (isHidden) {
+      document.documentElement.classList.add('scrollbar-hidden');
+      document.body.classList.add('scrollbar-hidden');
+    } else {
+      document.documentElement.classList.remove('scrollbar-hidden');
+      document.body.classList.remove('scrollbar-hidden');
+    }
   }
 
   private checkMobileState(): void {

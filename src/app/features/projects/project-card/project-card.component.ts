@@ -66,8 +66,11 @@ export class ProjectCardComponent {
     // Calculate gradient/background positions
     const lp = 50 + (px - 50) / 1.5;
     const tp = 50 + (py - 50) / 1.5;
-    const px_spark = 50 + (px - 50) / 7;
-    const py_spark = 50 + (py - 50) / 7;
+    
+    // Sparkle follows cursor with slight damping for smooth, stretched movement
+    const px_spark = 50 + ((l / w) * 100 - 50) / 1.5;
+    const py_spark = 50 + ((t / h) * 100 - 50) / 1.5;
+    
     const p_opc = 20 + Math.abs(pa) * 1.5;
     
     // Calculate transforms

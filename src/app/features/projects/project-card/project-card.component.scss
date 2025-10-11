@@ -135,6 +135,11 @@
     }
   }
 
+  // Hide sparkle effect when disabled
+  &.sparkle-disabled::after {
+    display: none;
+  }
+
   // Enhanced effects on hover - use theme colors!
   &.active,
   &:hover {

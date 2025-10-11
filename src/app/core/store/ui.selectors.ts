@@ -22,3 +22,8 @@ export const selectHideScrollbar = createSelector(
   selectUiState,
   (state: UiState) => state.hideScrollbar
 );
+
+export const selectEnableSparkleEffect = createSelector(
+  selectUiState,
+  (state: UiState) => state.enableSparkleEffect
+);

@@ -31,5 +31,13 @@ export const uiReducer = createReducer(
   on(UiActions.setHideScrollbar, (state, { hideScrollbar }) => ({
     ...state,
     hideScrollbar
+  })),
+  on(UiActions.toggleSparkleEffect, state => ({
+    ...state,
+    enableSparkleEffect: !state.enableSparkleEffect
+  })),
+  on(UiActions.setSparkleEffect, (state, { enableSparkleEffect }) => ({
+    ...state,
+    enableSparkleEffect
   }))
 );

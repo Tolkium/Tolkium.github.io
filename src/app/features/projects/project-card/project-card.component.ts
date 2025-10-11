@@ -1,6 +1,8 @@
-import { Component, Input, ElementRef, HostListener } from '@angular/core';
+import { Component, Input, ElementRef, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Store } from '@ngrx/store';
 import { Project } from '../../../models/project.model';
+import { selectEnableSparkleEffect } from '../../../core/store/ui.selectors';
 
 @Component({
   selector: 'app-project-card',
@@ -12,6 +14,8 @@ import { Project } from '../../../models/project.model';
 export class ProjectCardComponent {
   @Input() project!: Project;
   isActive = false;
+  private readonly store = inject(Store);
+  enableSparkleEffect$ = this.store.select(selectEnableSparkleEffect);
 
   constructor(private elementRef: ElementRef) {}
 

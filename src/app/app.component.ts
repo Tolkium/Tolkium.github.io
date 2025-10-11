@@ -65,6 +65,11 @@ export class AppComponent implements OnInit {
       document.documentElement.classList.remove('scrollbar-hidden');
       document.body.classList.remove('scrollbar-hidden');
     }
+
+    // Initialize sparkle effect: default ON unless localStorage explicitly false
+    const savedSparkleEffect = localStorage.getItem('enableSparkleEffect');
+    const sparkleEnabled = savedSparkleEffect === null ? true : JSON.parse(savedSparkleEffect);
+    this.store.dispatch(UiActions.setSparkleEffect({ enableSparkleEffect: sparkleEnabled }));
   }
 
   private checkMobileState(): void {

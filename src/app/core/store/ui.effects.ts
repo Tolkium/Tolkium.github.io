@@ -67,4 +67,21 @@ export class UiEffects {
     ),
     { dispatch: false }
   );
+
+  persistSparkleEffect$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UiActions.setSparkleEffect, UiActions.toggleSparkleEffect),
+      tap(action => {
+        let enable = true;
+        if (action.type === '[UI] Toggle Sparkle Effect') {
+          const current = localStorage.getItem('enableSparkleEffect');
+          enable = current ? !JSON.parse(current) : true;
+        } else {
+          enable = action.enableSparkleEffect;
+        }
+        localStorage.setItem('enableSparkleEffect', JSON.stringify(enable));
+      })
+    ),
+    { dispatch: false }
+  );
 }

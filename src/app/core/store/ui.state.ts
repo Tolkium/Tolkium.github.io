@@ -3,11 +3,13 @@ export interface UiState {
   isMenuCollapsed: boolean;
   isMobile: boolean;
   hideScrollbar: boolean;
+  enableSparkleEffect: boolean;
 }
 
 export const initialUiState: UiState = {
   isDarkMode: false,
   isMenuCollapsed: true,
   isMobile: window.innerWidth < 768,
-  hideScrollbar: true
+  hideScrollbar: true,
+  enableSparkleEffect: true
 };

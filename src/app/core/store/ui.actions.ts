@@ -22,3 +22,9 @@ export const setHideScrollbar = createAction(
   '[UI] Set Hide Scrollbar',
   props<{ hideScrollbar: boolean }>()
 );
+
+export const toggleSparkleEffect = createAction('[UI] Toggle Sparkle Effect');
+export const setSparkleEffect = createAction(
+  '[UI] Set Sparkle Effect',
+  props<{ enableSparkleEffect: boolean }>()
+);

@@ -1,6 +1,6 @@
 <div class="project-card">
   <!-- Card Inner Container -->
-  <div class="card-inner">
+  <div class="card-inner" [class.sparkle-disabled]="!(enableSparkleEffect$ | async)">
     <!-- Shine Effect -->
     <div class="card-shine"></div>
     

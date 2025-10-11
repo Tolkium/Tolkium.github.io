@@ -16,10 +16,6 @@
   --spark-pos-x: 50%;
   --spark-pos-y: 50%;
   --sparkle-opacity: 0.4;
-  
-  @media (max-width: 639px) {
-    aspect-ratio: 4 / 5;
-  }
 }
 
 .card-inner {
@@ -33,7 +29,7 @@
   transform: rotateX(var(--rotate-x)) rotateY(var(--rotate-y));
   transform-origin: center;
   will-change: transform, filter;
-  touch-action: none;
+  touch-action: pan-y;
   isolation: isolate;
   transition: transform 0.1s ease-out, box-shadow 0.2s ease-out;
   
@@ -262,6 +258,15 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s;
 
+  @media (max-width: 639px) {
+    font-size: 1.1rem;
+    padding: 8px 14px;
+    gap: 7px;
+    top: 16px;
+    right: 16px;
+    border-radius: 10px;
+  }
+
   &.status-completed {
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.3));
     color: rgb(5, 150, 105); // Default: dark for light mode
@@ -315,6 +320,11 @@
   background: currentColor;
   box-shadow: 0 0 10px currentColor;
   animation: pulse 2s ease-in-out infinite;
+
+  @media (max-width: 639px) {
+    width: 9px;
+    height: 9px;
+  }
 }
 
 @keyframes pulse {
@@ -339,6 +349,12 @@
   border-radius: 8px;
   flex-shrink: 0;
   z-index: 3;
+
+  @media (max-width: 639px) {
+    width: calc(100% - 20px);
+    margin: 10px 10px 0;
+    border-radius: 14px;
+  }
   
   // Dark border with subtle glow
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -346,11 +362,6 @@
     0 8px 16px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     0 0 30px rgba(147, 51, 234, 0.15);
-
-  @media (max-width: 639px) {
-    height: 35%;
-    min-height: 110px;
-  }
 
   img {
     width: 100%;
@@ -395,8 +406,8 @@
   z-index: 3;
 
   @media (max-width: 639px) {
-    padding: 8px;
-    gap: 4px;
+    padding: 18px;
+    gap: 10px;
   }
 }
 
@@ -421,7 +432,7 @@
   }
 
   @media (max-width: 639px) {
-    font-size: 0.85rem;
+    font-size: 1.7rem;
   }
 }
 
@@ -431,8 +442,8 @@
   margin: 2px 0;
 
   @media (max-width: 639px) {
-    gap: 2px;
-    margin: 2px 0;
+    gap: 4px;
+    margin: 4px 0;
   }
 
   .star {
@@ -443,8 +454,8 @@
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
 
     @media (max-width: 639px) {
-      width: 12px;
-      height: 12px;
+      width: 23px;
+      height: 23px;
     }
 
     &.filled {
@@ -476,10 +487,8 @@
   }
 
   @media (max-width: 639px) {
-    font-size: 0.65rem;
-    line-height: 1.3;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
+    font-size: 1.25rem;
+    line-height: 1.4;
   }
 }
 
@@ -491,7 +500,7 @@
   margin-bottom: auto;
 
   @media (max-width: 639px) {
-    gap: 2px;
+    gap: 6px;
   }
 }
 
@@ -506,8 +515,9 @@
   line-height: 1.2;
 
   @media (max-width: 639px) {
-    padding: 2px 4px;
-    font-size: 0.45rem;
+    padding: 4px 9px;
+    font-size: 0.9rem;
+    border-radius: 7px;
   }
   
   // Purple from dark theme for light mode
@@ -561,8 +571,8 @@
   padding-top: 6px;
 
   @media (max-width: 639px) {
-    gap: 4px;
-    padding-top: 4px;
+    gap: 9px;
+    padding-top: 10px;
   }
 }
 
@@ -578,9 +588,10 @@
   font-weight: 700;
 
   @media (max-width: 639px) {
-    padding: 5px;
-    font-size: 0.6rem;
-    gap: 2px;
+    padding: 11px;
+    font-size: 1.15rem;
+    border-radius: 12px;
+    gap: 5px;
   }
   
   text-decoration: none;
@@ -614,8 +625,8 @@
     filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.5));
 
     @media (max-width: 639px) {
-      width: 10px;
-      height: 10px;
+      width: 19px;
+      height: 19px;
     }
     
     :host-context(.dark) & {

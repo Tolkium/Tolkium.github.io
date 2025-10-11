@@ -68,7 +68,7 @@ export const MOCK_PROJECTS: Project[] = [
   },
   {
     id: 6,
-    title: 'Smart Homeon Dashboardix',
+    title: 'Homeon Dashboardix',
     description: 'IoT dashboard for controlling and monitoring smart home devices with automation rules.',
     imageUrl: 'https://images.unsplash.com/photo-1558002038-1055907df827?w=800&h=600&fit=crop',
     difficulty: 5,

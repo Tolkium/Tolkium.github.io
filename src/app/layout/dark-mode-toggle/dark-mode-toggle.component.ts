@@ -1,7 +1,7 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
-import { map } from 'rxjs/operators';
+import { map, shareReplay } from 'rxjs/operators';
 import * as UiActions from '../../core/store/ui.actions';
 import * as UiSelectors from '../../core/store/ui.selectors';
 
@@ -9,6 +9,7 @@ import * as UiSelectors from '../../core/store/ui.selectors';
     selector: 'app-dark-mode-toggle',
     standalone: true,
     imports: [CommonModule],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
     <button
       [class]="buttonClass"
@@ -34,8 +35,9 @@ export class DarkModeToggleComponent {
   
   @Input() isMobile = false;
 
-  isDarkMode$ = this.store.select(UiSelectors.selectIsDarkMode).pipe(
-    map(isDarkMode => isDarkMode ?? false)
+  readonly isDarkMode$ = this.store.select(UiSelectors.selectIsDarkMode).pipe(
+    map(isDarkMode => isDarkMode ?? false),
+    shareReplay(1)
   );
 
   get buttonClass(): string {

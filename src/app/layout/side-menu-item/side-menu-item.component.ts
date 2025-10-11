@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MenuItem } from '../../models/menu-section';
 import { NgIconComponent } from '@ng-icons/core';
@@ -8,7 +8,8 @@ import { NgIconComponent } from '@ng-icons/core';
     standalone: true,
     imports: [RouterLink, NgIconComponent],
     templateUrl: './side-menu-item.component.html',
-    styleUrls: ['./side-menu-item.component.scss']
+    styleUrls: ['./side-menu-item.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SideMenuItemComponent {
   @Input() item!: MenuItem;

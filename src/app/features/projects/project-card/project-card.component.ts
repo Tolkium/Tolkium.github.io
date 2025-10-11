@@ -23,9 +23,9 @@ import { CardSparkleDirective } from './directives/card-sparkle.directive';
 export class ProjectCardComponent {
   @Input() project!: Project;
   private readonly store = inject(Store);
-  enableSparkleEffect$ = this.store.select(selectEnableSparkleEffect);
-  enable3DTiltEffect$ = this.store.select(selectEnable3DTiltEffect);
-  enableHolographicEffect$ = this.store.select(selectEnableHolographicEffect);
+  readonly enableSparkleEffect$ = this.store.select(selectEnableSparkleEffect);
+  readonly enable3DTiltEffect$ = this.store.select(selectEnable3DTiltEffect);
+  readonly enableHolographicEffect$ = this.store.select(selectEnableHolographicEffect);
 
   get difficultyStars(): number[] {
     return Array(5).fill(0).map((_, i) => i);

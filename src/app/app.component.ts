@@ -1,27 +1,31 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
-import { map } from 'rxjs/operators';
+import { map, shareReplay } from 'rxjs/operators';
 import { SideMenuComponent } from './layout/side-menu/side-menu.component';
+import { DarkModeToggleComponent } from './layout/dark-mode-toggle/dark-mode-toggle.component';
 import * as UiSelectors from './core/store/ui.selectors';
 import * as UiActions from './core/store/ui.actions';
 
 @Component({
     selector: 'app-root',
-    imports: [CommonModule, RouterOutlet, SideMenuComponent],
+    imports: [CommonModule, RouterOutlet, SideMenuComponent, DarkModeToggleComponent],
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss']
+    styleUrls: ['./app.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
   private readonly store = inject(Store);
 
-  isMenuCollapsed$ = this.store.select(UiSelectors.selectIsMenuCollapsed).pipe(
-    map(isCollapsed => isCollapsed ?? true)
+  readonly isMenuCollapsed$ = this.store.select(UiSelectors.selectIsMenuCollapsed).pipe(
+    map(isCollapsed => isCollapsed ?? true),
+    shareReplay(1)
   );
 
-  isMobile$ = this.store.select(UiSelectors.selectIsMobile).pipe(
-    map(isMobile => isMobile ?? false)
+  readonly isMobile$ = this.store.select(UiSelectors.selectIsMobile).pipe(
+    map(isMobile => isMobile ?? false),
+    shareReplay(1)
   );
 
   public ngOnInit(): void {

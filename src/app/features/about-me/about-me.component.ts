@@ -1,16 +1,12 @@
-import { Component } from '@angular/core';
-import { DarkModeToggleComponent } from '../../layout/dark-mode-toggle/dark-mode-toggle.component';
-
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { BackgroundAnimationComponent } from '../../shared/components/background-animation/background-animation.component';
 
 @Component({
     selector: 'app-about-me',
-    imports: [
-    DarkModeToggleComponent,
-    BackgroundAnimationComponent
-],
+    imports: [BackgroundAnimationComponent],
     templateUrl: './about-me.component.html',
-    styleUrls: ['./about-me.component.scss']
+    styleUrls: ['./about-me.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AboutMeComponent {
   title = 'About Me';

@@ -1,7 +1,7 @@
-import { Component, HostListener, inject } from '@angular/core';
+import { Component, HostListener, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
-import { map, take, tap } from 'rxjs/operators';
+import { map, take, tap, shareReplay } from 'rxjs/operators';
 import { SideMenuItemComponent } from '../../layout/side-menu-item/side-menu-item.component';
 import { DarkModeToggleComponent } from '../dark-mode-toggle/dark-mode-toggle.component';
 import { MENU_SECTIONS } from '../../models/menu-data';
@@ -15,21 +15,25 @@ import { Subscription } from 'rxjs';
     standalone: true,
     imports: [CommonModule, SideMenuItemComponent, DarkModeToggleComponent],
     templateUrl: './side-menu.component.html',
-    styleUrls: ['./side-menu.component.scss']
+    styleUrls: ['./side-menu.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SideMenuComponent {
   private readonly store = inject(Store);
   
-  isCollapsed$ = this.store.select(UiSelectors.selectIsMenuCollapsed).pipe(
-    map(isCollapsed => isCollapsed ?? true)
+  readonly isCollapsed$ = this.store.select(UiSelectors.selectIsMenuCollapsed).pipe(
+    map(isCollapsed => isCollapsed ?? true),
+    shareReplay(1)
   );
 
-  isMobile$ = this.store.select(UiSelectors.selectIsMobile).pipe(
-    map(isMobile => isMobile ?? false)
+  readonly isMobile$ = this.store.select(UiSelectors.selectIsMobile).pipe(
+    map(isMobile => isMobile ?? false),
+    shareReplay(1)
   );
 
-  isDarkMode$ = this.store.select(UiSelectors.selectIsDarkMode).pipe(
-    map(isDarkMode => isDarkMode ?? false)
+  readonly isDarkMode$ = this.store.select(UiSelectors.selectIsDarkMode).pipe(
+    map(isDarkMode => isDarkMode ?? false),
+    shareReplay(1)
   );
 
   menuSections = MENU_SECTIONS;

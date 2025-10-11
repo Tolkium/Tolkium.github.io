@@ -1,15 +1,16 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
+import { shareReplay } from 'rxjs/operators';
 import { selectHideScrollbar, selectEnableSparkleEffect, selectEnable3DTiltEffect, selectEnableHolographicEffect } from '../../core/store/ui.selectors';
 import { toggleHideScrollbar, toggleSparkleEffect, toggle3DTiltEffect, toggleHolographicEffect } from '../../core/store/ui.actions';
 import { BackgroundAnimationComponent } from '../../shared/components/background-animation/background-animation.component';
-import { DarkModeToggleComponent } from '../../layout/dark-mode-toggle/dark-mode-toggle.component';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, BackgroundAnimationComponent, DarkModeToggleComponent],
+  imports: [CommonModule, BackgroundAnimationComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   <div class="relative">
     <div class="fixed inset-0 z-0">
@@ -17,10 +18,6 @@ import { DarkModeToggleComponent } from '../../layout/dark-mode-toggle/dark-mode
     </div>
 
     <div class="relative z-10">
-      <div class="fixed top-4 right-4 z-40 hidden md:block">
-        <app-dark-mode-toggle></app-dark-mode-toggle>
-      </div>
-
       <div class="container mx-auto px-2 py-2 md:py-0 md:px-0 max-w-4xl">
         <div class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-lg shadow-md backdrop-blur-sm">
           <h1 class="text-2xl font-bold text-[#f29f67]/90 dark:text-[#8833cc]/70 mb-6 font-outfit">Settings</h1>
@@ -151,10 +148,10 @@ import { DarkModeToggleComponent } from '../../layout/dark-mode-toggle/dark-mode
 export class SettingsComponent {
   private readonly store = inject(Store);
   
-  hideScrollbar$ = this.store.select(selectHideScrollbar);
-  enableSparkleEffect$ = this.store.select(selectEnableSparkleEffect);
-  enable3DTiltEffect$ = this.store.select(selectEnable3DTiltEffect);
-  enableHolographicEffect$ = this.store.select(selectEnableHolographicEffect);
+  readonly hideScrollbar$ = this.store.select(selectHideScrollbar).pipe(shareReplay(1));
+  readonly enableSparkleEffect$ = this.store.select(selectEnableSparkleEffect).pipe(shareReplay(1));
+  readonly enable3DTiltEffect$ = this.store.select(selectEnable3DTiltEffect).pipe(shareReplay(1));
+  readonly enableHolographicEffect$ = this.store.select(selectEnableHolographicEffect).pipe(shareReplay(1));
 
   public onToggleScrollbar(_event: Event): void {
     this.store.dispatch(toggleHideScrollbar());

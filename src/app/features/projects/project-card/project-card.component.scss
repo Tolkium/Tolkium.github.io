@@ -15,7 +15,7 @@
   --grad-pos-y: 50%;
   --spark-pos-x: 50%;
   --spark-pos-y: 50%;
-  --sparkle-opacity: 0.1;
+  --sparkle-opacity: 0.1; // Default value, overridden by JS on interaction
 }
 
 .card-inner {
@@ -31,14 +31,12 @@
   will-change: transform, filter;
   touch-action: pan-y;
   isolation: isolate;
-  transition: transform 0.1s ease-out, box-shadow 0.2s ease-out;
   
   // Fully transparent background
   background: transparent;
   
-  // DISABLED: backdrop-filter blocks full transparency - this was necessary to remove for transparency
+  // Backdrop-filter for glassmorphism effect - reduces transparency slightly
   backdrop-filter: blur(5px) saturate(90%);
-  // -webkit-backdrop-filter: blur(6px) saturate(40%);
   
   // Premium glossy border
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -48,11 +46,10 @@
     0 2px 8px 0 rgba(0, 0, 0, 0.15),
     inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
   
-  // Ensure smooth transitions
-  transition: transform 0.1s ease-out, box-shadow 0.2s ease-out, background 0.33s ease, border-radius 0s;
+  // Smooth transitions for interactive effects
+  transition: transform 0.1s ease-out, box-shadow 0.2s ease-out, background 0.33s ease;
 
   :host-context(.dark) & {
-    background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.12);
   }
 
@@ -72,20 +69,17 @@
       rgba(16, 185, 129, 0.15) 60%,
       transparent 80%
     );
-    opacity: 0.3; //opacity of rainbow when not hovering
-    // filter: brightness(0.8) contrast(1.2);
+    opacity: 0.3;
     mix-blend-mode: screen;
     z-index: 1;
     pointer-events: none;
     transition: all 0.33s ease;
-    border-radius: inherit; // Match parent's rounded corners
+    border-radius: inherit;
     
-    // Invert colors in light mode always
     :host-context(:not(.dark)) & {
       filter: invert(1) hue-rotate(180deg) brightness(0.8) contrast(1.2);
     }
     
-    // Ensure no inversion in dark mode
     :host-context(.dark) & {
       filter: brightness(0.8) contrast(1.2);
     }
@@ -116,20 +110,17 @@
       rgba(0, 0, 0, 0.5) 60%,
       rgba(0, 0, 0, 0) 100%
     );
-    opacity: 0.1; // Base sparkle opacity
-    // filter: brightness(1.2) contrast(1.1);
+    opacity: 0.1;
     mix-blend-mode: screen;
     z-index: 2;
     pointer-events: none;
     transition: opacity 0.33s ease, filter 0.33s ease;
-    border-radius: inherit; // Match parent's rounded corners
+    border-radius: inherit;
     
-    // Invert colors in light mode always
     :host-context(:not(.dark)) & {
       filter: invert(1) hue-rotate(180deg) brightness(1.2) contrast(1.1);
     }
     
-    // Ensure no inversion in dark mode
     :host-context(.dark) & {
       filter: brightness(1.2) contrast(1.1);
     }
@@ -143,9 +134,6 @@
   // Enhanced effects on hover - use theme colors!
   &.active,
   &:hover {
-    // Fully transparent background for light mode
-    background: transparent;
-    
     // Red glow for light theme
     box-shadow: 
       0 12px 48px 0 rgba(0, 0, 0, 0.2),
@@ -156,10 +144,7 @@
       0 0 40px 0 rgba(220, 81, 38, 0.25),
       0 0 0 1px rgba(255, 255, 255, 0.3);
     
-    // Fully transparent background for dark mode
     :host-context(.dark) & {
-      background: transparent;
-      
       box-shadow: 
         0 12px 48px 0 rgba(0, 0, 0, 0.5),
         0 4px 16px 0 rgba(147, 51, 234, 0.4),
@@ -173,9 +158,6 @@
     &::before {
       opacity: 0.6;
       
-      // Enhanced brightness/contrast on hover
-      filter: brightness(1.2) contrast(1.4);
-      
       :host-context(:not(.dark)) & {
         filter: invert(1) hue-rotate(180deg) brightness(1.2) contrast(1.4);
       }
@@ -186,10 +168,7 @@
     }
 
     &::after {
-      opacity: 0.8; // Increased sparkle opacity on hover
-      
-      // Enhanced brightness/contrast on hover
-      filter: brightness(1.4) contrast(1.2);
+      opacity: 0.8;
       
       :host-context(:not(.dark)) & {
         filter: invert(1) hue-rotate(180deg) brightness(1.4) contrast(1.2);
@@ -201,10 +180,9 @@
     }
   }
 
-  // Top gloss reflection
+  // Top gloss reflection when card has an image
   &:has(.card-image) {
     &::before {
-      // Add a glossy reflection at the top
       background-image: 
         linear-gradient(
           180deg,

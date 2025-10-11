@@ -27,3 +27,13 @@ export const selectEnableSparkleEffect = createSelector(
   selectUiState,
   (state: UiState) => state.enableSparkleEffect
 );
+
+export const selectEnable3DTiltEffect = createSelector(
+  selectUiState,
+  (state: UiState) => state.enable3DTiltEffect
+);
+
+export const selectEnableHolographicEffect = createSelector(
+  selectUiState,
+  (state: UiState) => state.enableHolographicEffect
+);

@@ -84,4 +84,38 @@ export class UiEffects {
     ),
     { dispatch: false }
   );
+
+  persist3DTiltEffect$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UiActions.set3DTiltEffect, UiActions.toggle3DTiltEffect),
+      tap(action => {
+        let enable = true;
+        if (action.type === '[UI] Toggle 3D Tilt Effect') {
+          const current = localStorage.getItem('enable3DTiltEffect');
+          enable = current ? !JSON.parse(current) : true;
+        } else {
+          enable = action.enable3DTiltEffect;
+        }
+        localStorage.setItem('enable3DTiltEffect', JSON.stringify(enable));
+      })
+    ),
+    { dispatch: false }
+  );
+
+  persistHolographicEffect$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UiActions.setHolographicEffect, UiActions.toggleHolographicEffect),
+      tap(action => {
+        let enable = true;
+        if (action.type === '[UI] Toggle Holographic Effect') {
+          const current = localStorage.getItem('enableHolographicEffect');
+          enable = current ? !JSON.parse(current) : true;
+        } else {
+          enable = action.enableHolographicEffect;
+        }
+        localStorage.setItem('enableHolographicEffect', JSON.stringify(enable));
+      })
+    ),
+    { dispatch: false }
+  );
 }

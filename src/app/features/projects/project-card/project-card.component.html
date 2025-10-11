@@ -2,8 +2,8 @@
   <!-- Card Inner Container with interactive directives -->
   <div 
     class="card-inner" 
-    appCard3DTilt 
-    appCardHolographic 
+    [appCard3DTilt]="(enable3DTiltEffect$ | async) ?? true"
+    [appCardHolographic]="(enableHolographicEffect$ | async) ?? true"
     [appCardSparkle]="(enableSparkleEffect$ | async) ?? true"
     [class.sparkle-disabled]="!(enableSparkleEffect$ | async)">
     <!-- Shine Effect -->

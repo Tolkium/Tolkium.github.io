@@ -1,10 +1,12 @@
-import { Directive, ElementRef, HostListener, OnDestroy } from '@angular/core';
+import { Directive, ElementRef, HostListener, OnDestroy, Input } from '@angular/core';
 
 @Directive({
   selector: '[appCardHolographic]',
   standalone: true
 })
 export class CardHolographicDirective implements OnDestroy {
+  @Input() appCardHolographic = true; // Enable/disable holographic effect
+  
   private lastMouseMoveTime = 0;
   private readonly THROTTLE_MS = 20;
 
@@ -12,6 +14,8 @@ export class CardHolographicDirective implements OnDestroy {
 
   @HostListener('mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
+    if (!this.appCardHolographic) return;
+    
     // Throttle for performance
     const now = Date.now();
     if (now - this.lastMouseMoveTime < this.THROTTLE_MS) {

@@ -39,5 +39,21 @@ export const uiReducer = createReducer(
   on(UiActions.setSparkleEffect, (state, { enableSparkleEffect }) => ({
     ...state,
     enableSparkleEffect
+  })),
+  on(UiActions.toggle3DTiltEffect, state => ({
+    ...state,
+    enable3DTiltEffect: !state.enable3DTiltEffect
+  })),
+  on(UiActions.set3DTiltEffect, (state, { enable3DTiltEffect }) => ({
+    ...state,
+    enable3DTiltEffect
+  })),
+  on(UiActions.toggleHolographicEffect, state => ({
+    ...state,
+    enableHolographicEffect: !state.enableHolographicEffect
+  })),
+  on(UiActions.setHolographicEffect, (state, { enableHolographicEffect }) => ({
+    ...state,
+    enableHolographicEffect
   }))
 );

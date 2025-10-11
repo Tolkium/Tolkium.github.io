@@ -1,10 +1,12 @@
-import { Directive, ElementRef, HostListener, OnDestroy } from '@angular/core';
+import { Directive, ElementRef, HostListener, OnDestroy, Input } from '@angular/core';
 
 @Directive({
   selector: '[appCard3DTilt]',
   standalone: true
 })
 export class Card3DTiltDirective implements OnDestroy {
+  @Input() appCard3DTilt = true; // Enable/disable 3D tilt effect
+  
   private lastMouseMoveTime = 0;
   private readonly THROTTLE_MS = 20;
 
@@ -12,6 +14,8 @@ export class Card3DTiltDirective implements OnDestroy {
 
   @HostListener('mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
+    if (!this.appCard3DTilt) return;
+    
     // Throttle for performance
     const now = Date.now();
     if (now - this.lastMouseMoveTime < this.THROTTLE_MS) {

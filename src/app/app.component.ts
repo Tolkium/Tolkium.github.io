@@ -70,6 +70,16 @@ export class AppComponent implements OnInit {
     const savedSparkleEffect = localStorage.getItem('enableSparkleEffect');
     const sparkleEnabled = savedSparkleEffect === null ? true : JSON.parse(savedSparkleEffect);
     this.store.dispatch(UiActions.setSparkleEffect({ enableSparkleEffect: sparkleEnabled }));
+
+    // Initialize 3D tilt effect: default ON unless localStorage explicitly false
+    const saved3DTiltEffect = localStorage.getItem('enable3DTiltEffect');
+    const tiltEnabled = saved3DTiltEffect === null ? true : JSON.parse(saved3DTiltEffect);
+    this.store.dispatch(UiActions.set3DTiltEffect({ enable3DTiltEffect: tiltEnabled }));
+
+    // Initialize holographic effect: default ON unless localStorage explicitly false
+    const savedHolographicEffect = localStorage.getItem('enableHolographicEffect');
+    const holographicEnabled = savedHolographicEffect === null ? true : JSON.parse(savedHolographicEffect);
+    this.store.dispatch(UiActions.setHolographicEffect({ enableHolographicEffect: holographicEnabled }));
   }
 
   private checkMobileState(): void {

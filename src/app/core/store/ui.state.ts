@@ -4,6 +4,8 @@ export interface UiState {
   isMobile: boolean;
   hideScrollbar: boolean;
   enableSparkleEffect: boolean;
+  enable3DTiltEffect: boolean;
+  enableHolographicEffect: boolean;
 }
 
 export const initialUiState: UiState = {
@@ -11,5 +13,7 @@ export const initialUiState: UiState = {
   isMenuCollapsed: true,
   isMobile: window.innerWidth < 768,
   hideScrollbar: true,
-  enableSparkleEffect: true
+  enableSparkleEffect: true,
+  enable3DTiltEffect: true,
+  enableHolographicEffect: true
 };

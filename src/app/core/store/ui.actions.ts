@@ -28,3 +28,15 @@ export const setSparkleEffect = createAction(
   '[UI] Set Sparkle Effect',
   props<{ enableSparkleEffect: boolean }>()
 );
+
+export const toggle3DTiltEffect = createAction('[UI] Toggle 3D Tilt Effect');
+export const set3DTiltEffect = createAction(
+  '[UI] Set 3D Tilt Effect',
+  props<{ enable3DTiltEffect: boolean }>()
+);
+
+export const toggleHolographicEffect = createAction('[UI] Toggle Holographic Effect');
+export const setHolographicEffect = createAction(
+  '[UI] Set Holographic Effect',
+  props<{ enableHolographicEffect: boolean }>()
+);

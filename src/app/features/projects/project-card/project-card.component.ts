@@ -2,7 +2,7 @@ import { Component, Input, inject, ChangeDetectionStrategy } from '@angular/core
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { Project } from '../../../models/project.model';
-import { selectEnableSparkleEffect } from '../../../core/store/ui.selectors';
+import { selectEnableSparkleEffect, selectEnable3DTiltEffect, selectEnableHolographicEffect } from '../../../core/store/ui.selectors';
 import { Card3DTiltDirective } from './directives/card-3d-tilt.directive';
 import { CardHolographicDirective } from './directives/card-holographic.directive';
 import { CardSparkleDirective } from './directives/card-sparkle.directive';
@@ -24,6 +24,8 @@ export class ProjectCardComponent {
   @Input() project!: Project;
   private readonly store = inject(Store);
   enableSparkleEffect$ = this.store.select(selectEnableSparkleEffect);
+  enable3DTiltEffect$ = this.store.select(selectEnable3DTiltEffect);
+  enableHolographicEffect$ = this.store.select(selectEnableHolographicEffect);
 
   get difficultyStars(): number[] {
     return Array(5).fill(0).map((_, i) => i);

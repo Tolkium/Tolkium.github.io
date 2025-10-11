@@ -11,6 +11,7 @@ import { Project } from '../../../models/project.model';
 })
 export class ProjectCardComponent {
   @Input() project!: Project;
+  isActive = false;
 
   constructor(private elementRef: ElementRef) {}
 
@@ -46,37 +47,62 @@ export class ProjectCardComponent {
 
   @HostListener('mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
-    const card = this.elementRef.nativeElement;
+    const card = this.elementRef.nativeElement.querySelector('.card-inner') as HTMLElement;
+    if (!card) return;
+
     const rect = card.getBoundingClientRect();
     
-    // Calculate mouse position relative to card center (0 to 1)
-    const x = (event.clientX - rect.left) / rect.width;
-    const y = (event.clientY - rect.top) / rect.height;
+    // Get mouse position relative to card
+    const l = event.clientX - rect.left;
+    const t = event.clientY - rect.top;
+    const h = rect.height;
+    const w = rect.width;
     
-    // Calculate rotation angles (max ±15 degrees)
-    const rotateY = (x - 0.5) * 30; // Horizontal tilt
-    const rotateX = (0.5 - y) * 30; // Vertical tilt (inverted)
+    // Calculate percentages (Pokemon card style)
+    const px = Math.abs(Math.floor(100 / w * l) - 100);
+    const py = Math.abs(Math.floor(100 / h * t) - 100);
+    const pa = (50 - px) + (50 - py);
     
-    // Calculate shine position (0-100%)
-    const shineX = x * 100;
-    const shineY = y * 100;
+    // Calculate gradient/background positions
+    const lp = 50 + (px - 50) / 1.5;
+    const tp = 50 + (py - 50) / 1.5;
+    const px_spark = 50 + (px - 50) / 7;
+    const py_spark = 50 + (py - 50) / 7;
+    const p_opc = 20 + Math.abs(pa) * 1.5;
+    
+    // Calculate transforms
+    const ty = ((tp - 50) / 2) * -1;
+    const tx = ((lp - 50) / 1.5) * 0.5;
     
     // Apply CSS variables
-    card.style.setProperty('--rotate-x', `${rotateX}deg`);
-    card.style.setProperty('--rotate-y', `${rotateY}deg`);
-    card.style.setProperty('--shine-x', `${shineX}%`);
-    card.style.setProperty('--shine-y', `${shineY}%`);
+    card.style.setProperty('--rotate-x', `${ty}deg`);
+    card.style.setProperty('--rotate-y', `${tx}deg`);
+    card.style.setProperty('--grad-pos-x', `${lp}%`);
+    card.style.setProperty('--grad-pos-y', `${tp}%`);
+    card.style.setProperty('--spark-pos-x', `${px_spark}%`);
+    card.style.setProperty('--spark-pos-y', `${py_spark}%`);
+    card.style.setProperty('--sparkle-opacity', `${p_opc / 100}`);
+    
+    this.isActive = true;
+    card.classList.add('active');
   }
 
   @HostListener('mouseleave')
   onMouseLeave(): void {
-    const card = this.elementRef.nativeElement;
+    const card = this.elementRef.nativeElement.querySelector('.card-inner') as HTMLElement;
+    if (!card) return;
     
-    // Reset all transforms
+    // Reset all transforms and effects to initial state
     card.style.setProperty('--rotate-x', '0deg');
     card.style.setProperty('--rotate-y', '0deg');
-    card.style.setProperty('--shine-x', '50%');
-    card.style.setProperty('--shine-y', '50%');
+    card.style.setProperty('--grad-pos-x', '50%');
+    card.style.setProperty('--grad-pos-y', '50%');
+    card.style.setProperty('--spark-pos-x', '50%');
+    card.style.setProperty('--spark-pos-y', '50%');
+    card.style.setProperty('--sparkle-opacity', '0.4');
+    
+    this.isActive = false;
+    card.classList.remove('active');
   }
 }
 

@@ -14,7 +14,7 @@ export interface Project {
 export const MOCK_PROJECTS: Project[] = [
   {
     id: 1,
-    title: 'E-Commerce Platform',
+    title: 'E-Commercio Platformon',
     description: 'Full-stack e-commerce solution with real-time inventory management and payment integration.',
     imageUrl: 'https://images.unsplash.com/photo-1557821552-17105176677c?w=800&h=600&fit=crop',
     difficulty: 5,
@@ -26,7 +26,7 @@ export const MOCK_PROJECTS: Project[] = [
   },
   {
     id: 2,
-    title: 'AI Chat Assistant',
+    title: 'AI Chatto Assistix',
     description: 'Intelligent chatbot powered by machine learning for customer support automation.',
     imageUrl: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop',
     difficulty: 4,
@@ -37,7 +37,7 @@ export const MOCK_PROJECTS: Project[] = [
   },
   {
     id: 3,
-    title: 'Portfolio Dashboard',
+    title: 'Portfolion Dashboardos',
     description: 'Real-time crypto portfolio tracker with advanced analytics and market insights.',
     imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop',
     difficulty: 3,
@@ -47,7 +47,7 @@ export const MOCK_PROJECTS: Project[] = [
   },
   {
     id: 4,
-    title: 'Social Media Analytics',
+    title: 'Social Analytixor Media',
     description: 'Comprehensive analytics platform for tracking social media performance across multiple channels.',
     imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop',
     difficulty: 4,
@@ -58,7 +58,7 @@ export const MOCK_PROJECTS: Project[] = [
   },
   {
     id: 5,
-    title: 'Mobile Fitness App',
+    title: 'Mobile Fitnessor Appon',
     description: 'Cross-platform fitness tracking app with workout plans and nutrition guidance.',
     imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop',
     difficulty: 4,
@@ -68,7 +68,7 @@ export const MOCK_PROJECTS: Project[] = [
   },
   {
     id: 6,
-    title: 'Smart Home Dashboard',
+    title: 'Smart Homeon Dashboardix',
     description: 'IoT dashboard for controlling and monitoring smart home devices with automation rules.',
     imageUrl: 'https://images.unsplash.com/photo-1558002038-1055907df827?w=800&h=600&fit=crop',
     difficulty: 5,
@@ -79,7 +79,7 @@ export const MOCK_PROJECTS: Project[] = [
   },
   {
     id: 7,
-    title: 'Video Streaming Platform',
+    title: 'Video Streamingo Saurus',
     description: 'Netflix-like streaming service with adaptive bitrate streaming and content recommendations.',
     imageUrl: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=800&h=600&fit=crop',
     difficulty: 5,
@@ -89,7 +89,7 @@ export const MOCK_PROJECTS: Project[] = [
   },
   {
     id: 8,
-    title: 'Task Management Tool',
+    title: 'Task Managemon Toolix',
     description: 'Collaborative project management platform with kanban boards and team collaboration features.',
     imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=600&fit=crop',
     difficulty: 3,
@@ -98,17 +98,6 @@ export const MOCK_PROJECTS: Project[] = [
     status: 'completed',
     link: 'https://example.com',
     github: 'https://github.com'
-  },
-  {
-    id: 9,
-    title: 'Weather Forecast App',
-    description: 'Beautiful weather application with hourly forecasts, radar maps, and severe weather alerts.',
-    imageUrl: 'https://images.unsplash.com/photo-1592210454359-9043f067919b?w=800&h=600&fit=crop',
-    difficulty: 2,
-    technologies: ['React', 'OpenWeather API', 'Mapbox', 'PWA'],
-    category: 'Utility',
-    status: 'completed',
-    link: 'https://example.com'
   }
 ];
 

@@ -1,16 +1,17 @@
-import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { map, shareReplay } from 'rxjs/operators';
 import { SideMenuComponent } from './layout/side-menu/side-menu.component';
 import { DarkModeToggleComponent } from './layout/dark-mode-toggle/dark-mode-toggle.component';
+import { PerformanceMonitorComponent } from './shared/components/performance-monitor/performance-monitor.component';
 import * as UiSelectors from './core/store/ui.selectors';
 import * as UiActions from './core/store/ui.actions';
 
 @Component({
     selector: 'app-root',
-    imports: [CommonModule, RouterOutlet, SideMenuComponent, DarkModeToggleComponent],
+    imports: [CommonModule, RouterOutlet, SideMenuComponent, DarkModeToggleComponent, PerformanceMonitorComponent],
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -25,6 +26,10 @@ export class AppComponent implements OnInit {
 
   readonly isMobile$ = this.store.select(UiSelectors.selectIsMobile).pipe(
     map(isMobile => isMobile ?? false),
+    shareReplay(1)
+  );
+
+  readonly showPerformanceMonitor$ = this.store.select(UiSelectors.selectShowPerformanceMonitor).pipe(
     shareReplay(1)
   );
 
@@ -89,5 +94,14 @@ export class AppComponent implements OnInit {
   private checkMobileState(): void {
     const isMobile = window.innerWidth < 768;
     this.store.dispatch(UiActions.setMobileState({ isMobile }));
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    // Ctrl+Shift+P to toggle performance monitor
+    if (event.ctrlKey && event.shiftKey && event.key === 'P') {
+      event.preventDefault();
+      this.store.dispatch(UiActions.togglePerformanceMonitor());
+    }
   }
 }

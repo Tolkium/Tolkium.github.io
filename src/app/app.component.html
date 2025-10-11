@@ -6,6 +6,11 @@
     <app-dark-mode-toggle />
   }
 
+  <!-- Performance Monitor Overlay -->
+  @if (showPerformanceMonitor$ | async) {
+    <app-performance-monitor />
+  }
+
   <main class="main-content" [class.menu-collapsed]="isMenuCollapsed$ | async" [class.menu-expanded]="(isMenuCollapsed$ | async) === false">
     <router-outlet />
   </main>

@@ -40,3 +40,14 @@ export const setHolographicEffect = createAction(
   '[UI] Set Holographic Effect',
   props<{ enableHolographicEffect: boolean }>()
 );
+
+export const togglePerformanceMonitor = createAction('[UI] Toggle Performance Monitor');
+export const setPerformanceMonitor = createAction(
+  '[UI] Set Performance Monitor',
+  props<{ showPerformanceMonitor: boolean }>()
+);
+
+export const setPerformanceMonitorThemeColor = createAction(
+  '[UI] Set Performance Monitor Theme Color',
+  props<{ themeColor: string }>()
+);

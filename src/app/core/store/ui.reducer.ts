@@ -55,5 +55,25 @@ export const uiReducer = createReducer(
   on(UiActions.setHolographicEffect, (state, { enableHolographicEffect }) => ({
     ...state,
     enableHolographicEffect
-  }))
+  })),
+  on(UiActions.togglePerformanceMonitor, state => ({
+    ...state,
+    showPerformanceMonitor: !state.showPerformanceMonitor
+  })),
+  on(UiActions.setPerformanceMonitor, (state, { showPerformanceMonitor }) => ({
+    ...state,
+    showPerformanceMonitor
+  })),
+  on(UiActions.setPerformanceMonitorThemeColor, (state, { themeColor }) => {
+    // Save to localStorage
+    try {
+      localStorage.setItem('performanceMonitorThemeColor', themeColor);
+    } catch (e) {
+      console.warn('[UI] Failed to save theme color to localStorage:', e);
+    }
+    return {
+      ...state,
+      performanceMonitorThemeColor: themeColor
+    };
+  })
 );

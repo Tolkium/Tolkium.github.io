@@ -34,6 +34,9 @@ import {
   heroCog8Tooth,
   heroMoon,
   heroSun,
+  heroChartBar,
+  heroCpuChip,
+  heroCircleStack,
 } from '@ng-icons/heroicons/outline';
 
 export const appConfig: ApplicationConfig = {
@@ -75,6 +78,9 @@ export const appConfig: ApplicationConfig = {
       heroCog8Tooth,
       heroMoon,
       heroSun,
+      heroChartBar,
+      heroCpuChip,
+      heroCircleStack,
     })
   ],
 };

@@ -37,3 +37,13 @@ export const selectEnableHolographicEffect = createSelector(
   selectUiState,
   (state: UiState) => state.enableHolographicEffect
 );
+
+export const selectShowPerformanceMonitor = createSelector(
+  selectUiState,
+  (state: UiState) => state.showPerformanceMonitor
+);
+
+export const selectPerformanceMonitorThemeColor = createSelector(
+  selectUiState,
+  (state: UiState) => state.performanceMonitorThemeColor
+);

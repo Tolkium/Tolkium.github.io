@@ -28,6 +28,7 @@
     "@ngrx/store-devtools": "^20.0.1",
     "rxjs": "~7.8.2",
     "tslib": "^2.3.0",
+    "uplot": "^1.6.32",
     "zone.js": "~0.15.1"
   },
   "devDependencies": {

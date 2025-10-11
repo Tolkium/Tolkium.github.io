@@ -6,6 +6,8 @@ export interface UiState {
   enableSparkleEffect: boolean;
   enable3DTiltEffect: boolean;
   enableHolographicEffect: boolean;
+  showPerformanceMonitor: boolean;
+  performanceMonitorThemeColor: string;
 }
 
 export const initialUiState: UiState = {
@@ -15,5 +17,13 @@ export const initialUiState: UiState = {
   hideScrollbar: true,
   enableSparkleEffect: true,
   enable3DTiltEffect: true,
-  enableHolographicEffect: true
+  enableHolographicEffect: true,
+  showPerformanceMonitor: false,
+  performanceMonitorThemeColor: (() => {
+    try {
+      return localStorage.getItem('performanceMonitorThemeColor') || '#c77dff';
+    } catch {
+      return '#c77dff';
+    }
+  })()
 };

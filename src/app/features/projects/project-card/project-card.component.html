@@ -1,6 +1,11 @@
 <div class="project-card">
-  <!-- Card Inner Container -->
-  <div class="card-inner" [class.sparkle-disabled]="!(enableSparkleEffect$ | async)">
+  <!-- Card Inner Container with interactive directives -->
+  <div 
+    class="card-inner" 
+    appCard3DTilt 
+    appCardHolographic 
+    [appCardSparkle]="(enableSparkleEffect$ | async) ?? true"
+    [class.sparkle-disabled]="!(enableSparkleEffect$ | async)">
     <!-- Shine Effect -->
     <div class="card-shine"></div>
     

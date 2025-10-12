@@ -13,6 +13,7 @@ import {
 import { isPlatformBrowser } from '@angular/common';
 import { fromEvent, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
 import {
   Point,
   RGB,
@@ -20,6 +21,31 @@ import {
   AnimationConfig
 } from '../../../models/animation.constants';
 import { QuadTree } from '../../../utils/quad-tree';
+import { 
+  selectEnableBackgroundAnimation,
+  selectEnableMagneticForce,
+  selectEnableRepulsionForce,
+  selectEnableDamping,
+  selectEnableBrownianMotion,
+  selectEnableClusterBreaking,
+  selectNumPoints,
+  selectConnectionRadius,
+  selectMagneticRadius,
+  selectMagneticStrength,
+  selectMinSpeed,
+  selectMaxSpeed,
+  selectPointsSize,
+  selectLineWidth,
+  selectRepulsionRadius,
+  selectRepulsionStrength,
+  selectDampingFactor,
+  selectBrownianStrength,
+  selectClusterThreshold,
+  selectExplosionForce,
+  selectClusterCheckInterval,
+  selectMinClusterSize
+} from '../../../core/store/ui.selectors';
+import { ParticlePhysicsService } from '../../../core/services/particle-physics.service';
 
 @Component({
   selector: 'app-background-animation',
@@ -36,6 +62,8 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly ngZone = inject(NgZone);
   private readonly errorHandler = inject(ErrorHandler);
+  private readonly store = inject(Store);
+  private readonly physicsService = inject(ParticlePhysicsService);
 
   @ViewChild('canvas', { static: true })
   private readonly canvasRef!: ElementRef<HTMLCanvasElement>;
@@ -44,23 +72,135 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
   private points: Point[] = [];
   private animationId: number = 0;
   private isRunning = false;
+  private isAnimationEnabled = true;
   private lastFrameTime: number = 0;
+  private frameCount: number = 0;
+  
+  // Subscriptions
   private resizeSubscription?: Subscription;
   private scrollSubscription?: Subscription;
+  private animationStateSubscription?: Subscription;
+  private magneticForceSubscription?: Subscription;
+  private repulsionForceSubscription?: Subscription;
+  private dampingSubscription?: Subscription;
+  private brownianMotionSubscription?: Subscription;
+  private clusterBreakingSubscription?: Subscription;
   private scrollTimeout: ReturnType<typeof setTimeout> | undefined;
 
-  private readonly config: AnimationConfig = {
+  // Physics toggle states
+  private enableMagneticForce = true;
+  private enableRepulsionForce = true;
+  private enableDamping = true;
+  private enableBrownianMotion = true;
+  private enableClusterBreaking = true;
+
+  // Dynamic configuration from store (mutable copy)
+  private config = {
     showBorder: false,
     glowPoints: true,
     glowLines: false,
-    ...ANIMATION_CONSTANTS
+    NUM_POINTS: ANIMATION_CONSTANTS.NUM_POINTS,
+    CONNECTION_RADIUS: ANIMATION_CONSTANTS.CONNECTION_RADIUS,
+    MAGNETIC_RADIUS: ANIMATION_CONSTANTS.MAGNETIC_RADIUS,
+    MAGNETIC_STRENGTH: ANIMATION_CONSTANTS.MAGNETIC_STRENGTH,
+    MIN_SPEED: ANIMATION_CONSTANTS.MIN_SPEED,
+    MAX_SPEED: ANIMATION_CONSTANTS.MAX_SPEED,
+    POINTS_SIZE: ANIMATION_CONSTANTS.POINTS_SIZE,
+    LINE_WIDTH: ANIMATION_CONSTANTS.LINE_WIDTH,
+    COLORS: ANIMATION_CONSTANTS.COLORS,
+    GLOW: ANIMATION_CONSTANTS.GLOW,
+    REPULSION_RADIUS: ANIMATION_CONSTANTS.REPULSION_RADIUS,
+    REPULSION_STRENGTH: ANIMATION_CONSTANTS.REPULSION_STRENGTH,
+    DAMPING_FACTOR: ANIMATION_CONSTANTS.DAMPING_FACTOR,
+    BROWNIAN_STRENGTH: ANIMATION_CONSTANTS.BROWNIAN_STRENGTH,
+    CLUSTER_THRESHOLD: ANIMATION_CONSTANTS.CLUSTER_THRESHOLD,
+    EXPLOSION_FORCE: ANIMATION_CONSTANTS.EXPLOSION_FORCE,
+    CLUSTER_CHECK_INTERVAL: ANIMATION_CONSTANTS.CLUSTER_CHECK_INTERVAL,
+    MIN_CLUSTER_SIZE: ANIMATION_CONSTANTS.MIN_CLUSTER_SIZE
   };
+
+  // Subscriptions for config values
+  private configSubscriptions: Subscription[] = [];
 
   public ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
     try {
       this.initializeCanvas();
+
+      // Subscribe to animation state from store
+      this.animationStateSubscription = this.store
+        .select(selectEnableBackgroundAnimation)
+        .subscribe(enabled => {
+          this.isAnimationEnabled = enabled;
+          
+          if (enabled && !this.isRunning) {
+            // Resume animation - reset lastFrameTime to prevent jump
+            this.isRunning = true;
+            this.lastFrameTime = performance.now();
+            this.ngZone.runOutsideAngular(() => {
+              this.animate(performance.now());
+            });
+          } else if (!enabled && this.isRunning) {
+            // Pause animation - render one final frame then stop
+            this.isRunning = false;
+            if (this.animationId) {
+              cancelAnimationFrame(this.animationId);
+              this.animationId = 0;
+            }
+            // Clear and render static frame
+            this.ctx.clearRect(0, 0, this.canvasRef.nativeElement.width, this.canvasRef.nativeElement.height);
+            this.drawScene();
+          }
+        });
+
+      // Subscribe to physics toggle states
+      this.magneticForceSubscription = this.store
+        .select(selectEnableMagneticForce)
+        .subscribe(enabled => this.enableMagneticForce = enabled);
+
+      this.repulsionForceSubscription = this.store
+        .select(selectEnableRepulsionForce)
+        .subscribe(enabled => this.enableRepulsionForce = enabled);
+
+      this.dampingSubscription = this.store
+        .select(selectEnableDamping)
+        .subscribe(enabled => this.enableDamping = enabled);
+
+      this.brownianMotionSubscription = this.store
+        .select(selectEnableBrownianMotion)
+        .subscribe(enabled => this.enableBrownianMotion = enabled);
+
+      this.clusterBreakingSubscription = this.store
+        .select(selectEnableClusterBreaking)
+        .subscribe(enabled => this.enableClusterBreaking = enabled);
+
+      // Subscribe to all config value changes
+      this.configSubscriptions.push(
+        this.store.select(selectNumPoints).subscribe(v => {
+          const oldCount = this.config.NUM_POINTS;
+          this.config.NUM_POINTS = v;
+          // Dynamically adjust particle count
+          if (oldCount !== v && this.points.length > 0) {
+            this.adjustParticleCount(oldCount, v);
+          }
+        }),
+        this.store.select(selectConnectionRadius).subscribe(v => this.config.CONNECTION_RADIUS = v),
+        this.store.select(selectMagneticRadius).subscribe(v => this.config.MAGNETIC_RADIUS = v),
+        this.store.select(selectMagneticStrength).subscribe(v => this.config.MAGNETIC_STRENGTH = v),
+        this.store.select(selectMinSpeed).subscribe(v => this.config.MIN_SPEED = v),
+        this.store.select(selectMaxSpeed).subscribe(v => this.config.MAX_SPEED = v),
+        this.store.select(selectPointsSize).subscribe(v => this.config.POINTS_SIZE = v),
+        this.store.select(selectLineWidth).subscribe(v => this.config.LINE_WIDTH = v),
+        this.store.select(selectRepulsionRadius).subscribe(v => this.config.REPULSION_RADIUS = v),
+        this.store.select(selectRepulsionStrength).subscribe(v => this.config.REPULSION_STRENGTH = v),
+        this.store.select(selectDampingFactor).subscribe(v => this.config.DAMPING_FACTOR = v),
+        this.store.select(selectBrownianStrength).subscribe(v => this.config.BROWNIAN_STRENGTH = v),
+        this.store.select(selectClusterThreshold).subscribe(v => this.config.CLUSTER_THRESHOLD = v),
+        this.store.select(selectExplosionForce).subscribe(v => this.config.EXPLOSION_FORCE = v),
+        this.store.select(selectClusterCheckInterval).subscribe(v => this.config.CLUSTER_CHECK_INTERVAL = v),
+        this.store.select(selectMinClusterSize).subscribe(v => this.config.MIN_CLUSTER_SIZE = v)
+      );
 
       this.resizeSubscription = fromEvent(window, 'resize')
         .pipe(debounceTime(250))
@@ -70,20 +210,32 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
       this.scrollSubscription = fromEvent(window, 'scroll')
         .pipe(debounceTime(50))
         .subscribe(() => {
+          if (!this.isAnimationEnabled) return; // Don't handle scroll if animation is disabled
+          
           this.isRunning = false;
           clearTimeout(this.scrollTimeout);
 
           // Resume animation after scrolling stops
           this.scrollTimeout = setTimeout(() => {
-            this.isRunning = true;
-            this.animate(performance.now());
+            if (this.isAnimationEnabled) {
+              this.isRunning = true;
+              this.lastFrameTime = performance.now(); // Reset to prevent jump
+              this.animate(performance.now());
+            }
           }, 150);
         });
 
-      // Run animation outside Angular's zone for better performance
-      this.ngZone.runOutsideAngular(() => {
-        this.animate(performance.now());
-      });
+      // Run animation outside Angular's zone for better performance (if enabled)
+      // If disabled, render one static frame
+      if (this.isAnimationEnabled) {
+        this.ngZone.runOutsideAngular(() => {
+          this.animate(performance.now());
+        });
+      } else {
+        // Render initial static frame when animation is disabled
+        this.ctx.clearRect(0, 0, this.canvasRef.nativeElement.width, this.canvasRef.nativeElement.height);
+        this.drawScene();
+      }
     } catch (error) {
       this.errorHandler.handleError(error);
     }
@@ -95,6 +247,13 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
       clearTimeout(this.scrollTimeout);
     }
     this.scrollSubscription?.unsubscribe();
+    this.animationStateSubscription?.unsubscribe();
+    this.magneticForceSubscription?.unsubscribe();
+    this.repulsionForceSubscription?.unsubscribe();
+    this.dampingSubscription?.unsubscribe();
+    this.brownianMotionSubscription?.unsubscribe();
+    this.clusterBreakingSubscription?.unsubscribe();
+    this.configSubscriptions.forEach(sub => sub.unsubscribe());
   }
 
   private initializeCanvas(): void {
@@ -136,6 +295,12 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
     if (Math.abs(currentArea - previousArea) / previousArea > 0.2) {
       this.initPoints();
     }
+
+    // If animation is disabled, re-render the static frame after resize
+    if (!this.isAnimationEnabled && this.ctx) {
+      this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+      this.drawScene();
+    }
   };
 
   private initPoints(): void {
@@ -151,11 +316,14 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
   }
 
   private animate = (timestamp: number): void => {
-    if (!this.ctx || !this.isRunning) return;
+    if (!this.ctx || !this.isRunning || !this.isAnimationEnabled) return;
 
     try {
       const deltaTime = timestamp - this.lastFrameTime;
       this.lastFrameTime = timestamp;
+
+      // Increment frame counter
+      this.frameCount++;
 
       // Clear canvas
       this.ctx.clearRect(0, 0, this.canvasRef.nativeElement.width, this.canvasRef.nativeElement.height);
@@ -163,6 +331,17 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
       // Update and draw
       this.updatePoints(deltaTime / 16.67);
       this.drawScene();
+
+      // Check for cluster breaking periodically
+      if (this.enableClusterBreaking && 
+          this.frameCount % this.config.CLUSTER_CHECK_INTERVAL === 0) {
+        this.physicsService.breakUpClusters(
+          this.points,
+          this.config.CLUSTER_THRESHOLD,
+          this.config.EXPLOSION_FORCE,
+          this.config.MIN_CLUSTER_SIZE
+        );
+      }
 
       this.animationId = requestAnimationFrame(this.animate);
     } catch (error) {
@@ -188,7 +367,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
 
     // Update point positions and handle interactions
     this.points.forEach(point => {
-      // Find nearby points using quadtree
+      // Find nearby points using quadtree (performance optimization)
       const searchBounds = {
         x: point.x - this.config.CONNECTION_RADIUS,
         y: point.y - this.config.CONNECTION_RADIUS,
@@ -198,24 +377,60 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
 
       const nearbyPoints = quadTree.query(searchBounds);
 
-      // Update interactions with nearby points
+      // Apply physics forces to nearby points
       nearbyPoints.forEach(otherPoint => {
         if (point === otherPoint) return;
 
-        const distance = this.getDistance(point, otherPoint);
+        // Calculate distance once for performance (avoid repeated calculation)
+        const distance = this.physicsService.getDistance(point, otherPoint);
+        
         if (distance < this.config.CONNECTION_RADIUS) {
           point.connections++;
           otherPoint.connections++;
-          this.applyMagneticEffect(point, otherPoint);
+
+          // Apply repulsion force at very close range (prevents sticking)
+          if (this.enableRepulsionForce && distance < this.config.REPULSION_RADIUS) {
+            this.physicsService.applyRepulsionForce(
+              point,
+              otherPoint,
+              distance,
+              this.config.REPULSION_RADIUS,
+              this.config.REPULSION_STRENGTH
+            );
+          }
+          // Apply magnetic attraction at medium distance (creates clustering)
+          else if (this.enableMagneticForce && distance < this.config.MAGNETIC_RADIUS) {
+            this.physicsService.applyMagneticForce(
+              point,
+              otherPoint,
+              distance,
+              this.config.MAGNETIC_RADIUS,
+              this.config.MAGNETIC_STRENGTH
+            );
+          }
         }
       });
 
-      // Update position
+      // Apply Brownian motion (random micro-movements)
+      if (this.enableBrownianMotion) {
+        this.physicsService.applyBrownianMotion(point, this.config.BROWNIAN_STRENGTH);
+      }
+
+      // Update position based on velocity
       point.x += point.vx * deltaTime;
       point.y += point.vy * deltaTime;
 
-      this.keepPointMoving(point);
+      // Handle boundary collisions first
       this.handleBoundaryCollision(point, canvas);
+
+      // Apply velocity damping AFTER position update to avoid vibration
+      // (damping before speed constraint would cause oscillation)
+      if (this.enableDamping) {
+        this.physicsService.applyDamping(point, this.config.DAMPING_FACTOR);
+      }
+
+      // Constrain speed to min/max limits AFTER damping
+      this.physicsService.constrainSpeed(point, this.config.MIN_SPEED, this.config.MAX_SPEED);
     });
   }
 
@@ -284,7 +499,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
       this.points.slice(i + 1).forEach(otherPoint => {
         if (!this.isInViewport(otherPoint)) return;
 
-        const distance = this.getDistance(point, otherPoint);
+        const distance = this.physicsService.getDistance(point, otherPoint);
         if (distance < this.config.CONNECTION_RADIUS) {
           this.drawConnection(point, otherPoint, distance);
         }
@@ -357,38 +572,32 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
            point.y - margin <= canvas.height;
   }
 
-  private getDistance(point1: Point, point2: Point): number {
-    return Math.hypot(point2.x - point1.x, point2.y - point1.y);
-  }
-
-  private applyMagneticEffect(point: Point, otherPoint: Point): void {
-    const dx = otherPoint.x - point.x;
-    const dy = otherPoint.y - point.y;
-    const distance = Math.hypot(dx, dy);
-
-    if (distance < this.config.MAGNETIC_RADIUS && distance > 0) {
-      const force = (1 - distance / this.config.MAGNETIC_RADIUS) * this.config.MAGNETIC_STRENGTH;
-      const dirX = dx / distance;
-      const dirY = dy / distance;
-
-      point.vx += dirX * force;
-      point.vy += dirY * force;
-      otherPoint.vx -= dirX * force;
-      otherPoint.vy -= dirY * force;
+  /**
+   * Dynamically adjusts the number of particles when the config changes.
+   * Adds new particles or removes excess ones while maintaining animation continuity.
+   */
+  private adjustParticleCount(oldCount: number, newCount: number): void {
+    const canvas = this.canvasRef.nativeElement;
+    
+    if (newCount > oldCount) {
+      // Add new particles
+      const toAdd = newCount - oldCount;
+      for (let i = 0; i < toAdd; i++) {
+        this.points.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 4,
+          vy: (Math.random() - 0.5) * 4,
+          color: i % 2 === 0 ? this.config.COLORS.ORANGE : this.config.COLORS.PURPLE,
+          connections: 0
+        });
+      }
+    } else if (newCount < oldCount) {
+      // Remove excess particles
+      this.points = this.points.slice(0, newCount);
     }
   }
 
-  private keepPointMoving(point: Point): void {
-    const speed = Math.hypot(point.vx, point.vy);
-
-    if (speed < this.config.MIN_SPEED) {
-      const angle = Math.random() * Math.PI * 2;
-      point.vx = Math.cos(angle) * this.config.MIN_SPEED;
-      point.vy = Math.sin(angle) * this.config.MIN_SPEED;
-    } else if (speed > this.config.MAX_SPEED) {
-      const scale = this.config.MAX_SPEED / speed;
-      point.vx *= scale;
-      point.vy *= scale;
-    }
-  }
+  // Note: getDistance, applyMagneticEffect, applyRepulsionForce, applyDamping,
+  // applyBrownianMotion, and constrainSpeed are now handled by ParticlePhysicsService
 }

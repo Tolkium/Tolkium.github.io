@@ -1,9 +1,8 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { BackgroundAnimationComponent } from '../../shared/components/background-animation/background-animation.component';
 
 @Component({
     selector: 'app-about-me',
-    imports: [BackgroundAnimationComponent],
+    imports: [],
     templateUrl: './about-me.component.html',
     styleUrls: ['./about-me.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush

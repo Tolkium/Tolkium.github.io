@@ -11,7 +11,8 @@ import {
   effect,
   computed,
   signal,
-  untracked
+  untracked,
+  DestroyRef
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Store } from '@ngrx/store';
@@ -28,6 +29,16 @@ interface ChartConfig {
   getMaxValue: () => number;
 }
 
+interface DragCleanup {
+  cleanup: () => void;
+}
+
+interface OverlayWithCleanup extends HTMLDivElement {
+  __dragCleanup?: DragCleanup;
+}
+
+const PERF_HEADER_SELECTOR = '.perf-header';
+
 @Component({
   selector: 'app-performance-monitor',
   standalone: true,
@@ -41,6 +52,7 @@ export class PerformanceMonitorComponent implements OnInit, OnDestroy {
   private readonly perfService = inject(PerformanceMonitorService);
   private readonly ngZone = inject(NgZone);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly destroyRef = inject(DestroyRef);
 
   // View queries
   private readonly fpsChartRef = viewChild<ElementRef<HTMLCanvasElement>>('fpsChart');
@@ -145,7 +157,10 @@ export class PerformanceMonitorComponent implements OnInit, OnDestroy {
         requestAnimationFrame(() => this.updateAllCharts());
       });
     } catch (error) {
-      console.error('[PerformanceMonitor] Failed to load uplot:', error);
+      // Silently handle uplot loading failure - component works without it
+      if (typeof error === 'object' && error !== null && 'message' in error) {
+        console.warn('[PerformanceMonitor] Chart library not available:', (error as Error).message);
+      }
     }
   }
 
@@ -166,7 +181,7 @@ export class PerformanceMonitorComponent implements OnInit, OnDestroy {
         getData: () => this.perfService.getMemoryHistory(),
         color: '#f29f67',
         minValue: 0,
-        getMaxValue: () => metrics.memory?.limitMB || 100
+        getMaxValue: () => metrics.memory?.limitMB ?? 100
       },
       {
         ref: this.cpuChartRef,
@@ -187,7 +202,9 @@ export class PerformanceMonitorComponent implements OnInit, OnDestroy {
       }
     ];
 
-    charts.forEach(chart => this.renderChart(chart));
+    for (const chart of charts) {
+      this.renderChart(chart);
+    }
   }
 
   private renderChart(config: ChartConfig): void {
@@ -259,7 +276,7 @@ export class PerformanceMonitorComponent implements OnInit, OnDestroy {
   }
 
   private setupDragging(overlay: HTMLDivElement): void {
-    const header = overlay.querySelector<HTMLElement>('.perf-header');
+    const header = overlay.querySelector<HTMLElement>(PERF_HEADER_SELECTOR);
     if (!header) return;
 
     header.style.cursor = 'move';
@@ -276,7 +293,7 @@ export class PerformanceMonitorComponent implements OnInit, OnDestroy {
       this.dragState.initialY = rect.top;
       
       e.preventDefault();
-      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mousemove', handleMouseMove, { passive: false });
       document.addEventListener('mouseup', handleMouseUp);
     };
 
@@ -299,18 +316,26 @@ export class PerformanceMonitorComponent implements OnInit, OnDestroy {
 
     header.addEventListener('mousedown', handleMouseDown);
     
-    // Store for cleanup
-    (overlay as any).__dragCleanup = () => {
-      header.removeEventListener('mousedown', handleMouseDown);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+    // Store for cleanup with proper typing
+    const cleanup: DragCleanup = {
+      cleanup: () => {
+        header.removeEventListener('mousedown', handleMouseDown);
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      }
     };
+    
+    (overlay as OverlayWithCleanup).__dragCleanup = cleanup;
+    
+    // Auto-cleanup on destroy
+    this.destroyRef.onDestroy(() => {
+      cleanup.cleanup();
+    });
   }
 
   private cleanupDragging(): void {
-    const overlay = this.overlayRef()?.nativeElement;
-    const cleanup = overlay && (overlay as any).__dragCleanup;
-    if (cleanup) cleanup();
+    const overlay = this.overlayRef()?.nativeElement as OverlayWithCleanup | undefined;
+    overlay?.__dragCleanup?.cleanup();
   }
 
   public close(): void {
@@ -330,10 +355,15 @@ export class PerformanceMonitorComponent implements OnInit, OnDestroy {
   }
 
   private applyThemeColor(overlay: HTMLDivElement, color: string): void {
+    // Validate hex color format
+    if (!/^#[0-9A-Fa-f]{6}$/.test(color)) {
+      return;
+    }
+    
     // Convert hex to RGB
-    const r = parseInt(color.slice(1, 3), 16);
-    const g = parseInt(color.slice(3, 5), 16);
-    const b = parseInt(color.slice(5, 7), 16);
+    const r = Number.parseInt(color.slice(1, 3), 16);
+    const g = Number.parseInt(color.slice(3, 5), 16);
+    const b = Number.parseInt(color.slice(5, 7), 16);
     
     overlay.style.setProperty('--theme-color', color);
     overlay.style.setProperty('--theme-color-rgb', `${r}, ${g}, ${b}`);

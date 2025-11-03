@@ -4,6 +4,7 @@ import { Store } from '@ngrx/store';
 import { map, take, tap, shareReplay } from 'rxjs/operators';
 import { SideMenuItemComponent } from '../../layout/side-menu-item/side-menu-item.component';
 import { DarkModeToggleComponent } from '../dark-mode-toggle/dark-mode-toggle.component';
+import { SearchComponent } from '../../shared/components/search/search.component';
 import { MENU_SECTIONS } from '../../models/menu-data';
 import { MenuItem } from '../../models/menu-section';
 import * as UiActions from '../../core/store/ui.actions';
@@ -13,7 +14,7 @@ import { Subscription } from 'rxjs';
 @Component({
     selector: 'app-side-menu',
     standalone: true,
-    imports: [CommonModule, SideMenuItemComponent, DarkModeToggleComponent],
+    imports: [CommonModule, SideMenuItemComponent, DarkModeToggleComponent, SearchComponent],
     templateUrl: './side-menu.component.html',
     styleUrls: ['./side-menu.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush

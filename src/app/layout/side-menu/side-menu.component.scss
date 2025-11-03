@@ -167,10 +167,10 @@
     width: 2rem;
     height: 2rem;
     position: absolute;
-    right: 0.5rem;
+    right: 0.5rem; // Keep on right side
     top: 0.5rem;
-    left: auto;
-    transform: none;
+    left: auto; // Not centered
+    transform: none; // Remove centering transform
   }
 }
 

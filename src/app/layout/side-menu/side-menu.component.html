@@ -12,6 +12,11 @@
      [style.width]="(isCollapsed$ | async)! ? '3rem' : ((isMobile$ | async)! ? '100vw' : '16rem')">
   <!-- Header -->
   <div class="menu-header">
+    <!-- Mobile Search - shown at top of menu when open -->
+    @if ((isMobile$ | async) && !(isCollapsed$ | async)!) {
+      <app-search [isMobile]="true" />
+    }
+    
     <h1 class="menu-title" [class.hidden]="(isCollapsed$ | async)!">
       Menu
     </h1>

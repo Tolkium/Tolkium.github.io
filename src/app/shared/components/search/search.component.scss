@@ -1,0 +1,421 @@
+.search-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+// Desktop styles
+:host.desktop {
+  .search-container {
+    position: fixed;
+    top: 1rem;
+    // Default: start after collapsed menu (3rem)
+    left: calc(3rem + 1rem);
+    right: 5rem;
+    z-index: 50;
+    width: auto;
+    max-width: none;
+    gap: 0.75rem; // Gap between trigger and dropdown
+  }
+  
+  // When menu is expanded, start after expanded menu (16rem)
+  &:not(.menu-collapsed) .search-container {
+    left: calc(16rem + 1rem);
+  }
+
+  .search-trigger-wrapper {
+    position: fixed;
+    top: 1rem;
+    right: calc(1rem + 3rem + 0.5rem);
+    z-index: 50;
+    width: auto;
+  }
+
+  .search-trigger {
+    background: var(--color-bg-light);
+    backdrop-filter: blur(8px);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--color-text-light);
+    width: auto;
+    min-width: auto;
+
+    .dark & {
+      background: var(--color-bg-dark);
+      color: var(--color-text-dark);
+    }
+
+    &:hover {
+      background-color: var(--hover-bg-color);
+      color: var(--hover-text-color);
+    }
+
+    &:active:not(.has-input) {
+      transform: scale(0.95);
+    }
+
+    .search-icon {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  // When search is opened
+  &.active {
+    .search-container {
+      // Default: start after collapsed menu (3rem)
+      left: calc(3rem + 1rem);
+      right: 5rem;
+      transition: all 0.2s ease;
+    }
+    
+    // When menu is expanded, start after expanded menu (16rem)
+    &:not(.menu-collapsed) .search-container {
+      left: calc(16rem + 1rem);
+    }
+
+    .search-trigger-wrapper {
+      position: relative;
+      width: 100%;
+      top: auto;
+      left: auto;
+      right: auto;
+    }
+
+    .search-trigger {
+      // Change to relative position when opened so it's part of the flex container
+      position: relative;
+      width: 100%;
+      min-width: auto;
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: flex-start;
+      
+      // ALL CORNERS ROUNDED
+      border-radius: 0.5rem;
+      
+      background: var(--color-bg-light);
+      background-clip: padding-box; // Ensure background respects border-radius
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(51, 65, 85, 0.2);
+      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+      
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      
+      // Force proper rendering with hardware acceleration
+      transform: translateZ(0);
+      will-change: width, padding;
+      isolation: isolate; // Create new stacking context
+
+      // NO transition on border-radius - keep it instant
+      transition: width 0.2s ease, padding 0.2s ease, background 0.2s ease, backdrop-filter 0.2s ease, box-shadow 0.2s ease;
+
+      .dark & {
+        background: var(--color-bg-dark);
+        background-clip: padding-box;
+        border-color: rgba(203, 213, 225, 0.2);
+        border-radius: 0.5rem;
+      }
+
+      // Inline input inside the button
+      &.has-input {
+        cursor: default;
+        
+        .search-input-inline {
+          flex: 1;
+          border: none;
+          background: transparent;
+          outline: none;
+          font-size: 0.9rem;
+          color: var(--color-text-light);
+          padding: 0;
+          min-width: 0;
+
+          .dark & {
+            color: var(--color-text-dark);
+          }
+
+          &::placeholder {
+            color: var(--color-text-light);
+            opacity: 0.4;
+
+            .dark & {
+              color: var(--color-text-dark);
+            }
+          }
+        }
+
+        .clear-btn-inline {
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          padding: 0.25rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--color-text-light);
+          opacity: 0.5;
+          transition: all 0.2s ease;
+          border-radius: 0.25rem;
+          flex-shrink: 0;
+
+          .dark & {
+            color: var(--color-text-dark);
+          }
+
+          &:hover {
+            opacity: 0.8;
+            background-color: var(--hover-bg-color);
+            color: var(--hover-text-color);
+          }
+
+          .clear-icon {
+            width: 1rem;
+            height: 1rem;
+          }
+        }
+
+        .search-icon {
+          flex-shrink: 0;
+        }
+      }
+    }
+  }
+
+  .search-dropdown {
+    position: relative; // Changed from absolute to relative to use flexbox gap
+    width: 100%;
+    background: var(--color-bg-light);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(51, 65, 85, 0.2);
+    border-radius: 0.5rem;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+    z-index: 1000;
+    animation: slideDown 0.2s ease;
+    overflow: hidden;
+
+    .dark & {
+      background: var(--color-bg-dark);
+      border-color: rgba(203, 213, 225, 0.2);
+    }
+  }
+
+}
+
+// Mobile styles
+:host.mobile {
+  .search-container {
+    position: absolute;
+    top: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100; // Ensure it's above menu sections and other elements
+    pointer-events: auto; // Ensure clicks work
+    width: auto; // Let it size to content
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    align-items: center; // Center children horizontally
+  }
+
+  .search-trigger {
+    // Small icon button style - similar to theme button
+    width: 2rem;
+    height: 2rem;
+    background: var(--color-bg-light);
+    backdrop-filter: blur(8px);
+    border: none;
+    padding: 0;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center; // Center the icon
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--color-text-light);
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+    flex-shrink: 0;
+    position: relative; // Relative to search-container
+
+    .dark & {
+      background: var(--color-bg-dark);
+      color: var(--color-text-dark);
+    }
+
+    &:hover {
+      background-color: var(--hover-bg-color);
+      color: var(--hover-text-color);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    .search-icon {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+
+  // When search is opened on mobile
+  &.active {
+    .search-container {
+      // Keep container centered
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100vw - 2rem); // Full width minus padding
+      max-width: 100%;
+    }
+
+    .search-trigger {
+      // Keep button centered within container
+      align-self: center;
+      margin: 0 auto;
+    }
+  }
+
+  // Dropdown styling when opened on mobile
+  .search-dropdown {
+    display: block; // Show when conditionally rendered
+    width: 100%;
+    background: var(--color-bg-light);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(51, 65, 85, 0.2);
+    border-radius: 0.5rem;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+    z-index: 1000;
+    max-height: 60vh;
+    animation: slideDown 0.2s ease;
+    margin-top: 0.5rem; // Gap between button and dropdown
+
+    .dark & {
+      background: var(--color-bg-dark);
+      border-color: rgba(203, 213, 225, 0.2);
+    }
+  }
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  
+  // Ensure proper vertical alignment of all elements
+  .input-icon,
+  .search-input,
+  .clear-btn {
+    vertical-align: middle;
+  }
+}
+
+.input-icon {
+  position: absolute;
+  left: 1.25rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--color-text-light);
+  opacity: 0.5;
+  pointer-events: none;
+  top: 50%;
+  transform: translateY(-50%); // Vertically center the icon
+
+  .dark & {
+    color: var(--color-text-dark);
+  }
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.5rem 2.5rem 0.5rem 2.75rem;
+  border: none;
+  border-radius: 0;
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+  background: transparent;
+  outline: none;
+  transition: none;
+
+  .dark & {
+    color: var(--color-text-dark);
+  }
+
+  &:focus {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  &::placeholder {
+    color: var(--color-text-light);
+    opacity: 0.4;
+
+    .dark & {
+      color: var(--color-text-dark);
+    }
+  }
+}
+
+.clear-btn {
+  position: absolute;
+  right: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%); // Vertically center the button
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-light);
+  opacity: 0.5;
+  transition: all 0.2s ease;
+  border-radius: 0.25rem;
+
+  .dark & {
+    color: var(--color-text-dark);
+  }
+
+  &:hover {
+    opacity: 0.8;
+    background-color: var(--hover-bg-color);
+    color: var(--hover-text-color);
+  }
+
+  .clear-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  :host.desktop .search-dropdown {
+    width: calc(100vw - 2rem);
+    right: 1rem;
+  }
+}
+

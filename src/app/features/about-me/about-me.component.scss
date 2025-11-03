@@ -29,7 +29,6 @@
 .glitch-button {
   position: relative;
 
-  // Remove normal state animation
   &::before,
   &::after {
     content: none;

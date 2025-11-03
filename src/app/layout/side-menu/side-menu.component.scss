@@ -76,27 +76,47 @@
 // Menu header
 .menu-header {
   padding: 1rem;
-  height: 4rem;
+  height: auto;
+  min-height: 4rem;
   position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0.5rem;
+
+  // Ensure search doesn't affect layout on desktop
+  app-search {
+    width: 100%;
+    margin-bottom: 0.25rem;
+  }
 
   @media (max-width: 767px) {
-    height: 3rem;
+    min-height: 3rem;
     padding: 0.5rem;
+    padding-top: 2.5rem; // Make room for menu toggle and search button at top
+    align-items: stretch; // Stretch to allow absolute positioning of children
+    
+    app-search {
+      width: auto; // Don't force full width, let it position itself
+      margin-bottom: 0;
+    }
   }
 }
 
 .menu-title {
   position: absolute;
   left: 1rem;
+  top: 1rem;
   font-size: 1.25rem;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   color: var(--color-text-light);
   transition: width 0.3s ease-in-out, opacity 0.2s ease-in-out;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
 
   .dark & {
     color: var(--color-text-dark);
@@ -121,10 +141,17 @@
   height: 2.5rem;
   transition: all 0.3s ease-in-out;
   color: var(--color-text-light);
+  flex-shrink: 0; // Prevent shrinking
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
 
-  .menu-container:not([style*="width: 3rem"]) & {
+  .menu-container[style*="width: 3rem"] & {
     position: absolute;
-    right: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 1rem;
+    right: auto;
   }
 
   .dark & {
@@ -139,7 +166,11 @@
   @media (max-width: 767px) {
     width: 2rem;
     height: 2rem;
-    margin: 0 auto;
+    position: absolute;
+    right: 0.5rem;
+    top: 0.5rem;
+    left: auto;
+    transform: none;
   }
 }
 

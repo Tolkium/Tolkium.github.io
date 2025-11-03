@@ -1,4 +1,5 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { TECHNICAL_SKILLS, SOFT_SKILLS } from '../../models/skills.model';
 
 @Component({
     selector: 'app-about-me',
@@ -10,36 +11,9 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 export class AboutMeComponent {
   title = 'About Me';
 
-  softSkills = [
-    'Problem Solving',
-    'Fast Learner',
-    'Agile',
-    'Team Player',
-    'Creativity',
-    'Solution Design'
-  ];
-
-  technicalSkills = [
-    'Angular',
-    'JavaScript',
-    'TypeScript',
-    'HTML & SCSS',
-    'Web Development',
-    'Software Design Patterns',
-    'SOLID Design Principles',
-    'Bootstrap',
-    'Git',
-    'Azure DevOps',
-    'Docker',
-    'Nx',
-    'Unit Testing',
-    'RXJS',
-    'NodeJS',
-    'NestJS',
-    'OpenAI API',
-    'Python',
-    'And More...'
-  ];
+  // Skills are sourced from centralized skills.model.ts
+  softSkills = SOFT_SKILLS;
+  technicalSkills = [...TECHNICAL_SKILLS, 'And More...'];
 
   public goToLinkedIn(): void {
     window.open('https://www.linkedin.com/in/marek-sipos/', '_blank');

@@ -148,6 +148,8 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
               cancelAnimationFrame(this.animationId);
               this.animationId = 0;
             }
+            // Calculate connections before rendering static frame
+            this.calculateConnectionsForStaticRender();
             // Clear and render static frame
             this.ctx.clearRect(0, 0, this.canvasRef.nativeElement.width, this.canvasRef.nativeElement.height);
             this.drawScene();
@@ -232,6 +234,8 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
           this.animate(performance.now());
         });
       } else {
+        // Calculate connections before rendering initial static frame
+        this.calculateConnectionsForStaticRender();
         // Render initial static frame when animation is disabled
         this.ctx.clearRect(0, 0, this.canvasRef.nativeElement.width, this.canvasRef.nativeElement.height);
         this.drawScene();
@@ -298,6 +302,8 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
 
     // If animation is disabled, re-render the static frame after resize
     if (!this.isAnimationEnabled && this.ctx) {
+      // Recalculate connections after resize for static render
+      this.calculateConnectionsForStaticRender();
       this.ctx.clearRect(0, 0, canvas.width, canvas.height);
       this.drawScene();
     }
@@ -488,6 +494,28 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
         this.ctx.arc(point.x, point.y, this.config.POINTS_SIZE, 0, Math.PI * 2);
         this.ctx.fillStyle = point.color;
         this.ctx.fill();
+      });
+    });
+  }
+
+  /**
+   * Calculates connections for static rendering when animation is disabled.
+   * This ensures points have proper connection counts for color blending.
+   */
+  private calculateConnectionsForStaticRender(): void {
+    // Reset all connections
+    this.points.forEach(point => {
+      point.connections = 0;
+    });
+
+    // Calculate connections based on proximity
+    this.points.forEach((point, i) => {
+      this.points.slice(i + 1).forEach(otherPoint => {
+        const distance = this.physicsService.getDistance(point, otherPoint);
+        if (distance < this.config.CONNECTION_RADIUS) {
+          point.connections++;
+          otherPoint.connections++;
+        }
       });
     });
   }

@@ -1,18 +1,32 @@
-<div #overlay class="performance-overlay" [class.minimized]="isMinimized" [class.dark-mode]="isDarkMode" [class.light-mode]="!isDarkMode">
+<div class="performance-overlay" appDraggable 
+  [class.minimized]="isMinimized()" 
+  [class.dark-mode]="isDarkMode()" 
+  [class.light-mode]="!isDarkMode()"
+  [style.--theme-color]="themeColor()"
+  [style.--theme-color-rgb]="themeColorRgb()"
+  [style.--bg-start]="backgroundColors().bgStart"
+  [style.--bg-end]="backgroundColors().bgEnd"
+  [style.--bg-accent-rgb]="backgroundColors().accentRgb"
+  [style.--bg-card-rgb]="backgroundColors().cardRgb"
+  [style.--bg-rgb]="backgroundColors().bgRgb">
   <!-- Glassmorphic container -->
   <div class="glass-container">
     <!-- Header -->
     <div class="perf-header">
       <div class="header-content">
         <div class="title-section">
-          <div class="status-indicator" [style.background]="statusColor"></div>
+          <div class="status-indicator" [style.background]="statusColor()"></div>
           <h3 class="title">Performance Monitor</h3>
         </div>
         <div class="header-actions">
-          <button class="icon-btn" (click)="toggleMinimize()" [attr.aria-label]="isMinimized ? 'Expand' : 'Minimize'">
+          <button class="icon-btn" (click)="toggleMinimize()" [attr.aria-label]="isMinimized() ? 'Expand' : 'Minimize'">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path *ngIf="!isMinimized" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              <path *ngIf="isMinimized" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+              @if (!isMinimized()) {
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              }
+              @if (isMinimized()) {
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+              }
             </svg>
           </button>
           <button class="icon-btn close-btn" (click)="close()" aria-label="Close">
@@ -25,181 +39,233 @@
     </div>
 
     <!-- Content -->
-    <div class="perf-content" *ngIf="!isMinimized && metrics">
+    @if (!isMinimized() && metrics()) {
+      <div class="perf-content">
       <!-- FPS Section -->
       <div class="metric-section">
         <div class="metric-header">
           <span class="metric-label">FPS</span>
-          <span class="metric-value" [class.critical]="metrics.fps < 24" [class.warning]="metrics.fps >= 24 && metrics.fps < 45">
-            {{ metrics.fps }}
-          </span>
+          @if (metrics()) {
+            <span class="metric-value" [class.critical]="metrics()!.fps < 24" [class.warning]="metrics()!.fps >= 24 && metrics()!.fps < 45">
+              {{ metrics()!.fps }}
+            </span>
+          }
         </div>
-        <canvas #fpsChart class="mini-chart" width="300" height="35"></canvas>
+        <canvas appChart class="mini-chart" width="300" height="35" 
+          [data]="fpsChartData()" 
+          [color]="themeColor()" 
+          [minValue]="0" 
+          [maxValue]="fpsChartMax()"></canvas>
         <div class="metric-info">
           <span class="info-text">Target: 60</span>
         </div>
       </div>
 
       <!-- Memory Section -->
-      <div class="metric-section" *ngIf="metrics.memory">
-        <div class="metric-header">
-          <span class="metric-label">Memory</span>
-          <span class="metric-value" [class.critical]="metrics.memory.usagePercent > 90" [class.warning]="metrics.memory.usagePercent > 75">
-            {{ formatBytes(metrics.memory.usedMB) }}
-          </span>
+      @if (metrics()?.memory) {
+        <div class="metric-section">
+          <div class="metric-header">
+            <span class="metric-label">Memory</span>
+            <span class="metric-value" [class.critical]="metrics()!.memory!.usagePercent > 90" [class.warning]="metrics()!.memory!.usagePercent > 75">
+              {{ formatBytes(metrics()!.memory!.usedMB) }}
+            </span>
+          </div>
+          <canvas appChart class="mini-chart" width="300" height="35" 
+            [data]="memoryChartData()" 
+            [color]="'#f29f67'" 
+            [minValue]="0" 
+            [maxValue]="memoryChartMax()"></canvas>
+          <div class="metric-info">
+            <span class="info-text">{{ formatPercent(metrics()!.memory!.usagePercent) }} / {{ formatBytes(metrics()!.memory!.limitMB) }}</span>
+          </div>
         </div>
-        <canvas #memoryChart class="mini-chart" width="300" height="35"></canvas>
-        <div class="metric-info">
-          <span class="info-text">{{ formatPercent(metrics.memory.usagePercent) }} / {{ formatBytes(metrics.memory.limitMB) }}</span>
-        </div>
-      </div>
+      }
 
       <!-- Memory N/A -->
-      <div class="metric-section metric-na" *ngIf="!metrics.memory">
-        <div class="metric-header">
-          <span class="metric-label">Memory</span>
-          <span class="metric-value">N/A</span>
+      @if (!metrics()?.memory) {
+        <div class="metric-section metric-na">
+          <div class="metric-header">
+            <span class="metric-label">Memory</span>
+            <span class="metric-value">N/A</span>
+          </div>
+          <div class="metric-info">
+            <span class="info-text">Chrome/Edge only</span>
+          </div>
         </div>
-        <div class="metric-info">
-          <span class="info-text">Chrome/Edge only</span>
-        </div>
-      </div>
+      }
 
       <!-- CPU Section -->
-      <div class="metric-section">
-        <div class="metric-header">
-          <span class="metric-label">CPU (Est.)</span>
-          <span class="metric-value" [class.critical]="metrics.cpu.estimatedUsage > 90" [class.warning]="metrics.cpu.estimatedUsage > 75">
-            {{ metrics.cpu.estimatedUsage }}%
-          </span>
+      @if (metrics()) {
+        <div class="metric-section">
+          <div class="metric-header">
+            <span class="metric-label">CPU (Est.)</span>
+            <span class="metric-value" [class.critical]="metrics()!.cpu.estimatedUsage > 90" [class.warning]="metrics()!.cpu.estimatedUsage > 75">
+              {{ metrics()!.cpu.estimatedUsage }}%
+            </span>
+          </div>
+          <canvas appChart class="mini-chart" width="300" height="35" 
+            [data]="cpuChartData()" 
+            [color]="'#00ffff'" 
+            [minValue]="0" 
+            [maxValue]="cpuChartMax()"></canvas>
+          <div class="metric-info">
+            <span class="info-text">Frame: {{ metrics()!.cpu.averageFrameTime }}ms</span>
+            @if (metrics()!.cpu.longTaskCount > 0) {
+              <span class="info-text">Tasks: {{ metrics()!.cpu.longTaskCount }}</span>
+            }
+          </div>
         </div>
-        <canvas #cpuChart class="mini-chart" width="300" height="35"></canvas>
-        <div class="metric-info">
-          <span class="info-text">Frame: {{ metrics.cpu.averageFrameTime }}ms</span>
-          <span class="info-text" *ngIf="metrics.cpu.longTaskCount > 0">Tasks: {{ metrics.cpu.longTaskCount }}</span>
-        </div>
-      </div>
+      }
 
       <!-- Angular Change Detection Section -->
-      <div class="metric-section angular-section">
-        <div class="metric-header">
-          <span class="metric-label">
-            <svg class="inline-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-            </svg>
-            Change Detection
-          </span>
-          <span class="metric-value" [class.warning]="metrics.angular.changeDetectionTime > 16" [class.critical]="metrics.angular.changeDetectionTime > 32">
-            {{ metrics.angular.changeDetectionCycles }}
-          </span>
+      @if (metrics()) {
+        <div class="metric-section angular-section">
+          <div class="metric-header">
+            <span class="metric-label">
+              <svg class="inline-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+              Change Detection
+            </span>
+            <span class="metric-value" [class.warning]="metrics()!.angular.changeDetectionTime > 16" [class.critical]="metrics()!.angular.changeDetectionTime > 32">
+              {{ metrics()!.angular.changeDetectionCycles }}
+            </span>
+          </div>
+          <canvas appChart class="mini-chart" width="300" height="35" 
+            [data]="changeDetectionChartData()" 
+            [color]="themeColor()" 
+            [minValue]="0" 
+            [maxValue]="changeDetectionChartMax()"></canvas>
+          <div class="metric-info">
+            <span class="info-text">CD: {{ metrics()!.angular.changeDetectionTime.toFixed(1) }}ms</span>
+            @if (metrics()!.angular.changeDetectionTime > 16) {
+              <span class="info-text warning-text">⚠️ Slow</span>
+            }
+          </div>
         </div>
-        <canvas #changeDetectionChart class="mini-chart" width="300" height="35"></canvas>
-        <div class="metric-info">
-          <span class="info-text">CD: {{ metrics.angular.changeDetectionTime.toFixed(1) }}ms</span>
-          <span class="info-text" *ngIf="metrics.angular.changeDetectionTime > 16" class="warning-text">⚠️ Slow</span>
-        </div>
-      </div>
+      }
 
       <!-- DOM & Browser Stats Section -->
-      <div class="metric-section stats-grid">
-        <div class="stat-item">
-          <span class="stat-label">DOM Nodes</span>
-          <span class="stat-value">{{ metrics.dom.nodeCount }}</span>
+      @if (metrics()) {
+        <div class="metric-section stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">DOM Nodes</span>
+            <span class="stat-value">{{ metrics()!.dom.nodeCount }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Event Listeners</span>
+            <span class="stat-value">{{ metrics()!.dom.listenerCount }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Active Effects</span>
+            <span class="stat-value">{{ metrics()!.activeEffects }}/3</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">CPU Threads</span>
+            <span class="stat-value">{{ hardwareConcurrency() }}</span>
+          </div>
         </div>
-        <div class="stat-item">
-          <span class="stat-label">Event Listeners</span>
-          <span class="stat-value">{{ metrics.dom.listenerCount }}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Active Effects</span>
-          <span class="stat-value">{{ metrics.activeEffects }}/3</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">CPU Threads</span>
-          <span class="stat-value">{{ hardwareConcurrency }}</span>
-        </div>
-      </div>
+      }
 
       <!-- Angular Stats Section -->
-      <div class="metric-section stats-grid angular-stats">
-        <div class="stat-item">
-          <span class="stat-label">
-            <svg class="tiny-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-            </svg>
-            Components
-          </span>
-          <span class="stat-value angular-highlight">{{ metrics.angular.componentCount }}</span>
+      @if (metrics()) {
+        <div class="metric-section stats-grid angular-stats">
+          <div class="stat-item">
+            <span class="stat-label">
+              <svg class="tiny-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+              </svg>
+              Components
+            </span>
+            <span class="stat-value angular-highlight">{{ metrics()!.angular.componentCount }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Zone Tasks</span>
+            <span class="stat-value angular-highlight">{{ metrics()!.angular.zoneTasksExecuted }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Events Fired</span>
+            <span class="stat-value angular-highlight">{{ metrics()!.angular.eventListenersTriggered }}</span>
+          </div>
+          @if (metrics()!.angular.lastRouteChangeTime > 0) {
+            <div class="stat-item">
+              <span class="stat-label">Route Load</span>
+              <span class="stat-value angular-highlight">{{ metrics()!.angular.lastRouteChangeTime.toFixed(0) }}ms</span>
+            </div>
+          }
         </div>
-        <div class="stat-item">
-          <span class="stat-label">Zone Tasks</span>
-          <span class="stat-value angular-highlight">{{ metrics.angular.zoneTasksExecuted }}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Events Fired</span>
-          <span class="stat-value angular-highlight">{{ metrics.angular.eventListenersTriggered }}</span>
-        </div>
-        <div class="stat-item" *ngIf="metrics.angular.lastRouteChangeTime > 0">
-          <span class="stat-label">Route Load</span>
-          <span class="stat-value angular-highlight">{{ metrics.angular.lastRouteChangeTime.toFixed(0) }}ms</span>
-        </div>
-      </div>
+      }
 
       <!-- Network Stats Section -->
-      <div class="metric-section stats-grid">
-        <div class="stat-item">
-          <span class="stat-label">Network Requests</span>
-          <span class="stat-value">{{ metrics.network.requestCount }}</span>
+      @if (metrics()) {
+        <div class="metric-section stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">Network Requests</span>
+            <span class="stat-value">{{ networkMetrics().requestCount }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Transferred</span>
+            <span class="stat-value">{{ networkMetrics().transferredKB }} KB</span>
+          </div>
         </div>
-        <div class="stat-item">
-          <span class="stat-label">Transferred</span>
-          <span class="stat-value">{{ metrics.network.transferredKB }} KB</span>
-        </div>
-      </div>
+      }
 
       <!-- Paint Metrics -->
-      <div class="metric-section stats-grid" *ngIf="metrics.paint.fcp || metrics.paint.lcp">
-        <div class="stat-item" *ngIf="metrics.paint.fcp">
-          <span class="stat-label">FCP</span>
-          <span class="stat-value">{{ (metrics.paint.fcp / 1000).toFixed(2) }}s</span>
+      @if (paintMetrics().fcp || paintMetrics().lcp) {
+        <div class="metric-section stats-grid">
+          @if (paintMetrics().fcp) {
+            <div class="stat-item">
+              <span class="stat-label">FCP</span>
+              <span class="stat-value">{{ (paintMetrics().fcp! / 1000).toFixed(2) }}s</span>
+            </div>
+          }
+          @if (paintMetrics().lcp) {
+            <div class="stat-item">
+              <span class="stat-label">LCP</span>
+              <span class="stat-value">{{ (paintMetrics().lcp! / 1000).toFixed(2) }}s</span>
+            </div>
+          }
         </div>
-        <div class="stat-item" *ngIf="metrics.paint.lcp">
-          <span class="stat-label">LCP</span>
-          <span class="stat-value">{{ (metrics.paint.lcp / 1000).toFixed(2) }}s</span>
-        </div>
-      </div>
+      }
 
       <!-- Current Route -->
-      <div class="metric-section">
-        <div class="route-info">
-          <span class="route-label">Route:</span>
-          <span class="route-path">{{ metrics.currentRoute }}</span>
+      @if (metrics()) {
+        <div class="metric-section">
+          <div class="route-info">
+            <span class="route-label">Route:</span>
+            <span class="route-path">{{ metrics()!.currentRoute }}</span>
+          </div>
         </div>
-      </div>
+      }
 
       <!-- Keyboard Shortcut Hint -->
       <div class="shortcut-hint">
         <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> to toggle
       </div>
-    </div>
+      </div>
+    }
 
     <!-- Minimized State -->
-    <div class="perf-minimized" *ngIf="isMinimized && metrics">
-      <div class="mini-stats">
-        <div class="mini-stat" [style.color]="metrics.fps < 30 ? '#ef4444' : '#10b981'">
-          <span class="mini-label">FPS</span>
-          <span class="mini-value">{{ metrics.fps }}</span>
-        </div>
-        <div class="mini-stat" *ngIf="metrics.memory">
-          <span class="mini-label">MEM</span>
-          <span class="mini-value">{{ metrics.memory.usedMB.toFixed(0) }}MB</span>
-        </div>
-        <div class="mini-stat">
-          <span class="mini-label">CPU</span>
-          <span class="mini-value">{{ metrics.cpu.estimatedUsage }}%</span>
+    @if (isMinimized() && metrics()) {
+      <div class="perf-minimized">
+        <div class="mini-stats">
+          <div class="mini-stat" [style.color]="safeMetrics().fps < 30 ? '#ef4444' : '#10b981'">
+            <span class="mini-label">FPS</span>
+            <span class="mini-value">{{ safeMetrics().fps }}</span>
+          </div>
+          @if (safeMetrics().memory) {
+            <div class="mini-stat">
+              <span class="mini-label">MEM</span>
+              <span class="mini-value">{{ safeMetrics().memory!.usedMB.toFixed(0) }}MB</span>
+            </div>
+          }
+          <div class="mini-stat">
+            <span class="mini-label">CPU</span>
+            <span class="mini-value">{{ safeMetrics().cpu.estimatedUsage }}%</span>
+          </div>
         </div>
       </div>
-    </div>
+    }
 
     <!-- Holographic border effect -->
     <div class="holographic-border"></div>

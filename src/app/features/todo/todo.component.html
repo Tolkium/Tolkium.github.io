@@ -1,0 +1,272 @@
+<div class="relative z-10">
+  <div class="container mx-auto px-2 py-2 md:py-0 md:px-0 max-w-4xl">
+    <header class="bg-gradient-to-br from-[#f59656]/80 to-[#f59656]/80 dark:from-[#8833cc]/70 dark:to-[#8833cc]/70 text-white p-4 md:p-8 rounded-lg shadow-lg mb-4 md:mb-4 transition-colors duration-200 backdrop-blur-sm">
+      <div class="text-center">
+        <h1 class="text-4xl font-bold mb-3 font-outfit">TODO List</h1>
+        <p class="text-lg text-indigo-100 font-inter">Stay organized and productive</p>
+      </div>
+    </header>
+
+    <main class="space-y-4">
+      <!-- Stats Section -->
+      <section class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-lg shadow-md backdrop-blur-sm">
+        <div class="grid grid-cols-3 gap-4">
+          <div class="text-center">
+            <div class="text-3xl font-bold text-[#f29f67] dark:text-[#8833cc] font-outfit">{{ stats().total }}</div>
+            <div class="text-sm text-slate-600 dark:text-slate-400 font-inter mt-1">Total</div>
+          </div>
+          <div class="text-center">
+            <div class="text-3xl font-bold text-green-600 dark:text-green-400 font-outfit">{{ stats().completed }}</div>
+            <div class="text-sm text-slate-600 dark:text-slate-400 font-inter mt-1">Completed</div>
+          </div>
+          <div class="text-center">
+            <div class="text-3xl font-bold text-orange-600 dark:text-orange-400 font-outfit">{{ stats().active }}</div>
+            <div class="text-sm text-slate-600 dark:text-slate-400 font-inter mt-1">Active</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Add Todo Section -->
+      <section 
+        class="add-todo-section bg-white/50 dark:bg-slate-800/50 rounded-lg shadow-md backdrop-blur-sm"
+        [class.is-expanded]="showAddForm() && !isClosing()" 
+        [class.is-closing]="isClosing()"
+      >
+        <!-- Button wrapper - always in DOM -->
+        <div class="add-todo-button-wrapper">
+          <button
+            type="button"
+            (click)="toggleAddForm()"
+            class="add-todo-button"
+            aria-label="Add new task"
+          >
+            <ng-icon [name]="icons.PLUS" class="add-plus-icon"></ng-icon>
+          </button>
+        </div>
+        
+        <!-- Form wrapper - always in DOM -->
+        <div class="todo-form-wrapper">
+          @if (showAddForm() || isClosing()) {
+            <form 
+              [formGroup]="newTodoForm" 
+              (ngSubmit)="addTodo()"
+              class="todo-form-content space-y-4"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-[#f29f67]/90 dark:text-[#8833cc]/70 font-outfit">Add New Task</h2>
+                <button
+                  type="button"
+                  (click)="toggleAddForm()"
+                  class="p-1.5 text-slate-600 dark:text-slate-400 hover:text-[#f29f67] dark:hover:text-[#8833cc] transition-colors duration-200 rounded-md hover:bg-slate-100 dark:hover:bg-slate-600 flex items-center justify-center"
+                  aria-label="Close add form"
+                >
+                  <ng-icon [name]="icons.X_CIRCLE" class="w-4 h-4"></ng-icon>
+                </button>
+              </div>
+
+              <div>
+                <input
+                  type="text"
+                  formControlName="title"
+                  placeholder="Task title..."
+                  class="w-full px-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#f29f67] dark:focus:ring-[#8833cc] transition-all font-inter"
+                  [class.border-red-500]="newTodoForm.get('title')?.invalid && newTodoForm.get('title')?.touched"
+                />
+                @if (newTodoForm.get('title')?.invalid && newTodoForm.get('title')?.touched) {
+                  <p class="text-red-500 text-xs mt-1 font-inter">Title is required</p>
+                }
+              </div>
+
+              <div>
+                <textarea
+                  formControlName="description"
+                  placeholder="Description (optional)..."
+                  rows="3"
+                  class="w-full px-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#f29f67] dark:focus:ring-[#8833cc] transition-all font-inter resize-none"
+                ></textarea>
+              </div>
+
+              <div class="flex flex-wrap gap-4">
+                <div class="flex-1 min-w-[200px]">
+                  <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 font-inter">Priority</label>
+                  <select
+                    formControlName="priority"
+                    class="w-full px-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#f29f67] dark:focus:ring-[#8833cc] font-inter"
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
+                <div class="flex-1 min-w-[200px]">
+                  <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 font-inter">Due Date (optional)</label>
+                  <input
+                    type="date"
+                    formControlName="dueDate"
+                    class="w-full px-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#f29f67] dark:focus:ring-[#8833cc] font-inter"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                [disabled]="newTodoForm.invalid"
+                class="w-full md:w-auto px-6 py-2 bg-[#f29f67] hover:bg-[#f59656] dark:bg-[#8833cc] dark:hover:bg-[#7c2eb8] text-white rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center gap-2 font-inter disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ng-icon [name]="icons.PLUS" class="w-5 h-5"></ng-icon>
+                Add Task
+              </button>
+            </form>
+          }
+        </div>
+      </section>
+
+      <!-- Filter Section -->
+      <section class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-lg shadow-md backdrop-blur-sm">
+        <div class="flex gap-2 flex-wrap">
+          @for (filterOption of filterOptions(); track filterOption.value) {
+            <button
+              type="button"
+              (click)="setFilter(filterOption.value)"
+              [class]="getFilterButtonClass(filterOption.value)"
+            >
+              @if (filterOption.icon) {
+                <ng-icon [name]="filterOption.icon" class="w-4 h-4"></ng-icon>
+              }
+              {{ filterOption.label }}
+            </button>
+          }
+        </div>
+      </section>
+
+      <!-- Todo List -->
+      <section class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-lg shadow-md backdrop-blur-sm">
+        @if (filteredTodos().length === 0) {
+          <div class="text-center py-12">
+            <ng-icon [name]="icons.CHECK_CIRCLE" class="w-16 h-16 mx-auto mb-4 text-slate-400 dark:text-slate-500"></ng-icon>
+            <p class="text-slate-600 dark:text-slate-400 font-inter text-lg">No tasks found</p>
+          </div>
+        } @else {
+          <div class="space-y-3">
+            @for (todo of filteredTodos(); track todo.id) {
+              <div 
+                [class.opacity-60]="todo.completed"
+                [class]="getTodoCardClass(todo.priority)"
+              >
+                @if (editingId() === todo.id) {
+                  <form 
+                    [formGroup]="editForm" 
+                    (ngSubmit)="saveEdit()"
+                    class="space-y-3"
+                  >
+                    <input
+                      type="text"
+                      formControlName="title"
+                      class="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#f29f67] dark:focus:ring-[#8833cc] font-inter"
+                      [class.border-red-500]="editForm.get('title')?.invalid && editForm.get('title')?.touched"
+                    />
+                    @if (editForm.get('title')?.invalid && editForm.get('title')?.touched) {
+                      <p class="text-red-500 text-xs font-inter">Title is required</p>
+                    }
+                    <textarea
+                      formControlName="description"
+                      placeholder="Description..."
+                      rows="2"
+                      class="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#f29f67] dark:focus:ring-[#8833cc] font-inter resize-none"
+                    ></textarea>
+                    <div class="flex gap-2">
+                      <button
+                        type="submit"
+                        [disabled]="editForm.invalid"
+                        class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded transition-colors duration-200 font-inter text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        (click)="cancelEdit()"
+                        class="px-3 py-1.5 bg-slate-500 hover:bg-slate-600 text-white rounded transition-colors duration-200 font-inter text-sm"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        (click)="deleteTodo(todo.id)"
+                        class="px-3 py-1.5 bg-slate-500 hover:bg-red-500 text-white rounded transition-colors duration-200 font-inter text-sm flex items-center gap-1"
+                      >
+                        <ng-icon [name]="icons.TRASH" class="w-3.5 h-3.5"></ng-icon>
+                        Delete
+                      </button>
+                    </div>
+                  </form>
+                } @else {
+                  <div class="flex items-start gap-3">
+                    <button
+                      type="button"
+                      (click)="toggleTodo(todo.id)"
+                      class="mt-1 flex-shrink-0"
+                      aria-label="Toggle completion"
+                    >
+                      <ng-icon 
+                        [name]="todo.completed ? icons.CHECK_CIRCLE_SOLID : icons.CHECK_CIRCLE" 
+                        [class]="todo.completed ? 'text-green-500' : 'text-slate-400'"
+                        class="w-6 h-6"
+                      ></ng-icon>
+                    </button>
+                    <div class="flex-1 min-w-0">
+                      <h3 
+                        [class.line-through]="todo.completed"
+                        class="text-lg font-semibold text-slate-800 dark:text-slate-200 font-outfit mb-1"
+                      >
+                        {{ todo.title }}
+                      </h3>
+                      @if (todo.description) {
+                        <p class="text-slate-600 dark:text-slate-400 text-sm font-inter mb-2">{{ todo.description }}</p>
+                      }
+                      <div class="flex flex-wrap gap-2 items-center">
+                        <span 
+                          [class]="getPriorityColor(todo.priority)"
+                          class="px-2 py-1 rounded text-xs font-semibold font-inter capitalize"
+                        >
+                          {{ todo.priority }}
+                        </span>
+                        @if (todo.dueDate) {
+                          <span class="text-xs text-slate-500 dark:text-slate-400 font-inter">
+                            Due: {{ todo.dueDate.toLocaleDateString() }}
+                          </span>
+                        }
+                        <span class="text-xs text-slate-500 dark:text-slate-400 font-inter">
+                          Created: {{ todo.createdAt.toLocaleDateString() }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="flex gap-1 flex-shrink-0">
+                      <button
+                        type="button"
+                        (click)="startEditing(todo)"
+                        class="p-1.5 text-slate-600 dark:text-slate-400 hover:text-[#f29f67] dark:hover:text-[#8833cc] transition-colors duration-200 rounded-md hover:bg-slate-100 dark:hover:bg-slate-600 flex items-center justify-center"
+                        aria-label="Edit task"
+                        title="Edit task"
+                      >
+                        <ng-icon [name]="icons.PENCIL_SQUARE" class="w-4 h-4"></ng-icon>
+                      </button>
+                      <button
+                        type="button"
+                        (click)="deleteTodo(todo.id)"
+                        class="p-1.5 text-slate-600 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors duration-200 rounded-md hover:bg-slate-100 dark:hover:bg-slate-600 flex items-center justify-center"
+                        aria-label="Delete task"
+                        title="Delete task"
+                      >
+                        <ng-icon [name]="icons.TRASH" class="w-4 h-4"></ng-icon>
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </section>
+    </main>
+  </div>
+</div>

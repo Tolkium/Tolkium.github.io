@@ -17,6 +17,21 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/settings/settings.component').then(m => m.SettingsComponent)
   },
+  {
+    path: 'gallery',
+    loadComponent: () =>
+      import('./features/gallery/gallery.component').then(m => m.GalleryComponent)
+  },
+  {
+    path: 'todo',
+    loadComponent: () =>
+      import('./features/todo/todo.component').then(m => m.TodoComponent)
+  },
+  {
+    path: 'calendar',
+    loadComponent: () =>
+      import('./features/calendar/calendar.component').then(m => m.CalendarComponent)
+  },
   // Add other routes as needed
   { path: '**', redirectTo: 'about' }
 ];

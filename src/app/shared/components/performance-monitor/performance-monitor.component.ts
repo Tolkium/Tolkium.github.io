@@ -3,321 +3,240 @@ import {
   OnInit, 
   OnDestroy, 
   ChangeDetectionStrategy, 
-  ChangeDetectorRef,
-  ElementRef,
-  ViewChild,
-  AfterViewInit,
   inject,
-  NgZone,
-  PLATFORM_ID,
-  Renderer2
+  computed,
+  signal
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Store } from '@ngrx/store';
-import { Subscription } from 'rxjs';
-import { PerformanceMonitorService, PerformanceMetrics } from '../../../core/services/performance-monitor.service';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { PerformanceMonitorService } from '../../../core/services/performance-monitor.service';
 import { togglePerformanceMonitor } from '../../../core/store/ui.actions';
 import { selectPerformanceMonitorThemeColor, selectIsDarkMode } from '../../../core/store/ui.selectors';
+import { ChartDirective } from './directives/chart.directive';
+import { DraggableDirective } from './directives/draggable.directive';
 
 @Component({
   selector: 'app-performance-monitor',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ChartDirective, DraggableDirective],
   templateUrl: './performance-monitor.component.html',
   styleUrls: ['./performance-monitor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PerformanceMonitorComponent implements OnInit, OnDestroy, AfterViewInit {
+export class PerformanceMonitorComponent implements OnInit, OnDestroy {
   private readonly store = inject(Store);
   private readonly perfService = inject(PerformanceMonitorService);
-  private readonly cdr = inject(ChangeDetectorRef);
-  private readonly ngZone = inject(NgZone);
-  private readonly platformId = inject(PLATFORM_ID);
-  private readonly renderer = inject(Renderer2);
 
-  @ViewChild('fpsChart', { static: false }) fpsChartRef?: ElementRef<HTMLCanvasElement>;
-  @ViewChild('memoryChart', { static: false }) memoryChartRef?: ElementRef<HTMLCanvasElement>;
-  @ViewChild('cpuChart', { static: false }) cpuChartRef?: ElementRef<HTMLCanvasElement>;
-  @ViewChild('changeDetectionChart', { static: false }) changeDetectionChartRef?: ElementRef<HTMLCanvasElement>;
-  @ViewChild('overlay', { static: false }) overlayRef?: ElementRef<HTMLDivElement>;
+  // State signals
+  public readonly metrics = toSignal(this.perfService.metrics$, { initialValue: null });
+  public readonly isMinimized = signal(false);
+  public readonly isDarkMode = toSignal(this.store.select(selectIsDarkMode), { initialValue: true });
+  public readonly themeColor = toSignal(this.store.select(selectPerformanceMonitorThemeColor), { initialValue: '#c77dff' });
 
-  public metrics: PerformanceMetrics | null = null;
-  public isMinimized = false;
-  public isCollapsed = false;
-  public themeColor = '#c77dff';
-  public isDarkMode = true; // Default to dark mode
-  
-  public showFPSChart = true;
-  public showMemoryChart = true;
-  public showCPUChart = true;
+  // Computed values
+  public readonly performanceStatus = computed<'good' | 'warning' | 'critical'>(() => 
+    this.perfService.getPerformanceStatus()
+  );
 
-  private subscription?: Subscription;
-  private darkModeSubscription?: Subscription;
-  private uplotInstance: any = null;
-  private uplotLoaded = false;
-
-  // Dragging
-  private isDragging = false;
-  private dragStartX = 0;
-  private dragStartY = 0;
-  private initialX = 0;
-  private initialY = 0;
-
-  public get performanceStatus(): 'good' | 'warning' | 'critical' {
-    return this.perfService.getPerformanceStatus();
+  public readonly statusColor = computed(() => {
+    switch (this.performanceStatus()) {
+      case 'good': return '#10b981';
+      case 'warning': return '#f59e0b';
+      default: return '#ef4444';
   }
+  });
 
-  public get statusColor(): string {
-    const status = this.performanceStatus;
-    if (status === 'good') return '#10b981'; // green
-    if (status === 'warning') return '#f59e0b'; // orange
-    return '#ef4444'; // red
-  }
-
-  public get hardwareConcurrency(): number {
+  public readonly hardwareConcurrency = computed(() => {
+    if (typeof navigator === 'undefined') return 0;
     return navigator.hardwareConcurrency || 0;
-  }
+  });
 
-  ngOnInit(): void {
-    if (!isPlatformBrowser(this.platformId)) {
-      return;
+  // Computed chart data signals for directives
+  // These depend on metrics() signal so they update when new data arrives
+  public readonly fpsChartData = computed(() => {
+    // Track metrics to trigger recomputation when new data arrives
+    this.metrics();
+    return this.perfService.getFPSHistory();
+  });
+  
+  public readonly memoryChartData = computed(() => {
+    this.metrics();
+    return this.perfService.getMemoryHistory();
+  });
+  
+  public readonly cpuChartData = computed(() => {
+    this.metrics();
+    return this.perfService.getCPUHistory();
+  });
+  
+  public readonly changeDetectionChartData = computed(() => {
+    // Track metrics to trigger recomputation when new data arrives
+    this.metrics();
+    return this.perfService.getChangeDetectionHistory();
+    });
+
+  // Computed chart configurations
+  public readonly fpsChartMax = computed(() => 165);
+  public readonly memoryChartMax = computed(() => this.metrics()?.memory?.limitMB ?? 100);
+  public readonly cpuChartMax = computed(() => 100);
+  public readonly changeDetectionChartMax = computed(() => {
+    // Track metrics to get fresh data
+    this.metrics();
+    const data = this.perfService.getChangeDetectionHistory();
+    return Math.max(...data.map(d => d.value), 100);
+  });
+
+  // Theme color as RGB for CSS custom property (used in host binding)
+  public readonly themeColorRgb = computed(() => {
+    const color = this.themeColor();
+    if (!/^#[0-9A-Fa-f]{6}$/.test(color)) return '199, 125, 255'; // default
+    
+    const r = Number.parseInt(color.slice(1, 3), 16);
+    const g = Number.parseInt(color.slice(3, 5), 16);
+    const b = Number.parseInt(color.slice(5, 7), 16);
+    return `${r}, ${g}, ${b}`;
+  });
+
+  // Color utility functions
+  private hexToHsl(hex: string): { h: number; s: number; l: number } {
+    if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+      return { h: 270, s: 100, l: 60 }; // default purple
     }
 
-    this.perfService.startMonitoring();
-    
-    this.subscription = this.perfService.metrics$.subscribe(metrics => {
-      if (metrics) {
-        this.metrics = metrics;
-        this.cdr.markForCheck();
-        
-        // Update charts if loaded
-        if (this.uplotLoaded) {
-          this.updateCharts();
-        }
-      }
-    });
+    const r = Number.parseInt(hex.slice(1, 3), 16) / 255;
+    const g = Number.parseInt(hex.slice(3, 5), 16) / 255;
+    const b = Number.parseInt(hex.slice(5, 7), 16) / 255;
 
-    // Subscribe to dark mode changes immediately
-    this.darkModeSubscription = this.store.select(selectIsDarkMode).subscribe(isDark => {
-      this.isDarkMode = isDark;
-      this.cdr.markForCheck();
-    });
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0, s = 0;
+    const l = (max + min) / 2;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+        case g: h = ((b - r) / d + 2) / 6; break;
+        case b: h = ((r - g) / d + 4) / 6; break;
+  }
+    }
+
+    return {
+      h: Math.round(h * 360),
+      s: Math.round(s * 100),
+      l: Math.round(l * 100)
+    };
   }
 
-  ngAfterViewInit(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-    
-    // Lazy load uplot when component is rendered
-    this.loadUplot();
-    
-    // Set up dragging
-    this.setupDragging();
+  private hslToRgbString(h: number, s: number, l: number, alpha?: number): string {
+    s /= 100;
+    l /= 100;
+    const c = (1 - Math.abs(2 * l - 1)) * s;
+    const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+    const m = l - c / 2;
+    let r = 0, g = 0, b = 0;
 
-    // Apply initial theme color and subscribe to changes
-    this.ngZone.runOutsideAngular(() => {
-      // Small delay to ensure DOM is ready
-      setTimeout(() => {
-        // Subscribe to theme color changes
-        this.store.select(selectPerformanceMonitorThemeColor).subscribe(color => {
-          console.log('[PerfMonitor] Theme color from store:', color);
-          this.themeColor = color;
-          this.applyThemeColor(color);
-          this.cdr.markForCheck();
-        });
-      }, 100);
-    });
+    if (h >= 0 && h < 60) {
+      r = c; g = x; b = 0;
+    } else if (h >= 60 && h < 120) {
+      r = x; g = c; b = 0;
+    } else if (h >= 120 && h < 180) {
+      r = 0; g = c; b = x;
+    } else if (h >= 180 && h < 240) {
+      r = 0; g = x; b = c;
+    } else if (h >= 240 && h < 300) {
+      r = x; g = 0; b = c;
+    } else if (h >= 300 && h < 360) {
+      r = c; g = 0; b = x;
+    }
+
+    r = Math.round((r + m) * 255);
+    g = Math.round((g + m) * 255);
+    b = Math.round((b + m) * 255);
+
+    if (alpha !== undefined) {
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+    return `${r}, ${g}, ${b}`;
+  }
+
+  // Calculate background colors based on theme color
+  // Creates a dark, professional background that complements the theme
+  public readonly backgroundColors = computed(() => {
+    const themeHex = this.themeColor();
+    const hsl = this.hexToHsl(themeHex);
+
+    // Main background: Dark version of theme with adjusted saturation and lightness
+    const bgHue = hsl.h;
+    const bgSaturation = Math.min(hsl.s * 0.35, 40); // Lower saturation for subtlety
+    const bgLightness = 8; // Very dark for professional look
+    
+    const bgStart = this.hslToRgbString(bgHue, bgSaturation, bgLightness);
+    const bgEnd = this.hslToRgbString(bgHue, bgSaturation * 0.7, bgLightness * 0.8);
+
+    // Accent background: Slightly lighter for gradients
+    const accentLightness = 12;
+    const accentSaturation = bgSaturation * 1.2;
+    const accentColor = this.hslToRgbString(bgHue, accentSaturation, accentLightness);
+
+    // Subtle background for cards/sections
+    const cardLightness = 15;
+    const cardSaturation = bgSaturation * 1.1;
+    const cardColor = this.hslToRgbString(bgHue, cardSaturation, cardLightness);
+
+    return {
+      bgStart: `rgba(${bgStart}, 0.92)`,
+      bgEnd: `rgba(${bgEnd}, 0.9)`,
+      accentRgb: accentColor,
+      cardRgb: cardColor,
+      bgRgb: bgStart // For borders and subtle elements
+    };
+  });
+
+  // Helper computed signals for template type safety - always return non-null
+  public readonly networkMetrics = computed((): { requestCount: number; transferredKB: number; activeRequests: number } => {
+    const m = this.metrics();
+    return m?.network ?? { requestCount: 0, transferredKB: 0, activeRequests: 0 };
+  });
+
+  public readonly paintMetrics = computed((): { fcp: number | null; lcp: number | null } => {
+    const m = this.metrics();
+    return m?.paint ?? { fcp: null, lcp: null };
+  });
+
+  // Non-null computed signals for metrics (returns default values when null)
+  public readonly safeMetrics = computed(() => {
+    const m = this.metrics();
+    if (!m) {
+      return {
+        fps: 0,
+        memory: null,
+        dom: { nodeCount: 0, listenerCount: 0 },
+        cpu: { estimatedUsage: 0, longTaskCount: 0, averageFrameTime: 0 },
+        angular: {
+          changeDetectionCycles: 0,
+          changeDetectionTime: 0,
+          componentCount: 0,
+          zoneTasksExecuted: 0,
+          eventListenersTriggered: 0,
+          lastRouteChangeTime: 0
+        },
+        activeEffects: 0,
+        currentRoute: '',
+        timestamp: 0
+      };
+    }
+    return m;
+  });
+
+  ngOnInit(): void {
+    this.perfService.startMonitoring();
   }
 
   ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.darkModeSubscription?.unsubscribe();
     this.perfService.stopMonitoring();
-    
-    if (this.uplotInstance) {
-      this.uplotInstance.destroy();
-    }
-  }
-
-  private async loadUplot(): Promise<void> {
-    try {
-      // Dynamic import for lazy loading
-      const uPlot = await import('uplot');
-      const uPlotModule = (uPlot as any).default || uPlot;
-      
-      this.uplotLoaded = true;
-      this.ngZone.runOutsideAngular(() => {
-        this.initializeCharts(uPlotModule);
-      });
-    } catch (error) {
-      console.error('Failed to load uplot:', error);
-    }
-  }
-
-  private initializeCharts(uPlot: any): void {
-    // Initialize charts with uPlot
-    // For simplicity, we'll use canvas-based mini charts instead
-    setTimeout(() => {
-      this.renderMiniCharts();
-    }, 100);
-  }
-
-  private renderMiniCharts(): void {
-    this.renderFPSChart();
-    this.renderMemoryChart();
-    this.renderCPUChart();
-    this.renderChangeDetectionChart();
-  }
-
-  private updateCharts(): void {
-    this.renderFPSChart();
-    this.renderMemoryChart();
-    this.renderCPUChart();
-    this.renderChangeDetectionChart();
-  }
-
-  private renderFPSChart(): void {
-    if (!this.fpsChartRef) return;
-    
-    const canvas = this.fpsChartRef.nativeElement;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const data = this.perfService.getFPSHistory();
-    this.renderChart(ctx, canvas, data, this.themeColor, 0, 165);
-  }
-
-  private renderMemoryChart(): void {
-    if (!this.memoryChartRef) return;
-    
-    const canvas = this.memoryChartRef.nativeElement;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const data = this.perfService.getMemoryHistory();
-    const maxMem = this.metrics?.memory?.limitMB || 100;
-    this.renderChart(ctx, canvas, data, '#f29f67', 0, maxMem);
-  }
-
-  private renderCPUChart(): void {
-    if (!this.cpuChartRef) return;
-    
-    const canvas = this.cpuChartRef.nativeElement;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const data = this.perfService.getCPUHistory();
-    // CPU uses cyan for differentiation
-    this.renderChart(ctx, canvas, data, '#00ffff', 0, 100);
-  }
-
-  private renderChangeDetectionChart(): void {
-    if (!this.changeDetectionChartRef) return;
-    
-    const canvas = this.changeDetectionChartRef.nativeElement;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const data = this.perfService.getChangeDetectionHistory();
-    const maxCycles = Math.max(...data.map(d => d.value), 100);
-    // Use theme color for change detection chart
-    this.renderChart(ctx, canvas, data, this.themeColor, 0, maxCycles);
-  }
-
-  private renderChart(
-    ctx: CanvasRenderingContext2D, 
-    canvas: HTMLCanvasElement, 
-    data: { timestamp: number, value: number }[],
-    color: string,
-    minValue: number,
-    maxValue: number
-  ): void {
-    const width = canvas.width;
-    const height = canvas.height;
-    const padding = 2;
-
-    // Clear canvas
-    ctx.clearRect(0, 0, width, height);
-
-    if (data.length < 2) return;
-
-    // Draw gradient background
-    const gradient = ctx.createLinearGradient(0, 0, 0, height);
-    gradient.addColorStop(0, `${color}33`);
-    gradient.addColorStop(1, `${color}00`);
-
-    // Draw line with glow effect
-    ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    ctx.lineJoin = 'round';
-    ctx.shadowBlur = 8;
-    ctx.shadowColor = color;
-
-    const stepX = width / (data.length - 1);
-    
-    data.forEach((point, index) => {
-      const x = index * stepX;
-      const normalizedValue = (point.value - minValue) / (maxValue - minValue);
-      const y = height - (normalizedValue * (height - padding * 2)) - padding;
-      
-      if (index === 0) {
-        ctx.moveTo(x, y);
-      } else {
-        ctx.lineTo(x, y);
-      }
-    });
-
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-
-    // Fill area under line
-    ctx.lineTo(width, height);
-    ctx.lineTo(0, height);
-    ctx.closePath();
-    ctx.fillStyle = gradient;
-    ctx.fill();
-  }
-
-  private setupDragging(): void {
-    if (!this.overlayRef) return;
-    
-    const overlay = this.overlayRef.nativeElement;
-    const header = overlay.querySelector('.perf-header') as HTMLElement;
-    
-    if (!header) return;
-
-    header.style.cursor = 'move';
-
-    const onMouseDown = (e: MouseEvent) => {
-      this.isDragging = true;
-      this.dragStartX = e.clientX;
-      this.dragStartY = e.clientY;
-      
-      const rect = overlay.getBoundingClientRect();
-      this.initialX = rect.left;
-      this.initialY = rect.top;
-      
-      e.preventDefault();
-    };
-
-    const onMouseMove = (e: MouseEvent) => {
-      if (!this.isDragging) return;
-      
-      const deltaX = e.clientX - this.dragStartX;
-      const deltaY = e.clientY - this.dragStartY;
-      
-      overlay.style.left = `${this.initialX + deltaX}px`;
-      overlay.style.top = `${this.initialY + deltaY}px`;
-      overlay.style.right = 'auto';
-    };
-
-    const onMouseUp = () => {
-      this.isDragging = false;
-    };
-
-    header.addEventListener('mousedown', onMouseDown);
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
   }
 
   public close(): void {
@@ -325,7 +244,7 @@ export class PerformanceMonitorComponent implements OnInit, OnDestroy, AfterView
   }
 
   public toggleMinimize(): void {
-    this.isMinimized = !this.isMinimized;
+    this.isMinimized.update(value => !value);
   }
 
   public formatBytes(bytes: number): string {
@@ -336,43 +255,7 @@ export class PerformanceMonitorComponent implements OnInit, OnDestroy, AfterView
     return `${value.toFixed(1)}%`;
   }
 
-  private applyThemeColor(color: string): void {
-    if (!this.overlayRef) {
-      console.error('[PerfMonitor] Overlay ref not available yet');
-      return;
-    }
-    
-    const overlay = this.overlayRef.nativeElement;
-    
-    // Convert hex to RGB for CSS variables
-    const r = parseInt(color.slice(1, 3), 16);
-    const g = parseInt(color.slice(3, 5), 16);
-    const b = parseInt(color.slice(5, 7), 16);
-    
-    console.log(`[PerfMonitor] ===== APPLYING THEME COLOR =====`);
-    console.log(`[PerfMonitor] Color: ${color}`);
-    console.log(`[PerfMonitor] RGB: (${r}, ${g}, ${b})`);
-    console.log(`[PerfMonitor] Overlay element:`, overlay);
-    
-    // Set CSS variables directly on the element style
-    overlay.style.setProperty('--theme-color', color);
-    overlay.style.setProperty('--theme-color-rgb', `${r}, ${g}, ${b}`);
-    
-    // Verify the variables were set
-    const computedStyle = getComputedStyle(overlay);
-    const themeColor = computedStyle.getPropertyValue('--theme-color');
-    const themeColorRgb = computedStyle.getPropertyValue('--theme-color-rgb');
-    
-    console.log(`[PerfMonitor] Computed --theme-color: "${themeColor}"`);
-    console.log(`[PerfMonitor] Computed --theme-color-rgb: "${themeColorRgb}"`);
-    console.log(`[PerfMonitor] ===================================`);
-    
-    // Re-render charts with new color
-    if (this.uplotLoaded) {
-      this.ngZone.runOutsideAngular(() => {
-        setTimeout(() => this.updateCharts(), 50);
-      });
-    }
-  }
 }
+
+
 

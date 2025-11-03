@@ -1,0 +1,127 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+::ng-deep .add-plus-icon svg {
+  stroke-width: 3 !important;
+}
+
+.add-todo-section {
+  position: relative;
+  overflow: hidden;
+  height: 100px;
+  transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.add-todo-section.is-expanded {
+  height: auto;
+  max-height: 800px;
+}
+
+.add-todo-section.is-closing {
+  height: 100px;
+}
+
+// Button wrapper - always in DOM
+.add-todo-button-wrapper {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  opacity: 1;
+  transition: opacity 0.5s ease 0.2s;
+  pointer-events: auto;
+  z-index: 1;
+}
+
+.add-todo-section.is-expanded .add-todo-button-wrapper {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.add-todo-section.is-closing .add-todo-button-wrapper {
+  opacity: 1;
+  transition: opacity 0.5s ease 0.3s;
+  pointer-events: auto;
+}
+
+// Form wrapper - always in DOM
+.todo-form-wrapper {
+  position: relative;
+  padding: 1.5rem;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.add-todo-section.is-expanded .todo-form-wrapper {
+  opacity: 1;
+  transition: opacity 0.5s ease 0.2s;
+  pointer-events: auto;
+}
+
+.add-todo-section.is-closing .todo-form-wrapper {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+// Form content
+.todo-form-content {
+  padding-bottom: 0;
+  
+  > * + * {
+    margin-top: 1rem;
+  }
+  
+  > button:last-child {
+    margin-bottom: 1.5rem;
+  }
+}
+
+// Plus button
+.add-todo-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease-out;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+  
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.add-plus-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: rgb(148, 163, 184);
+  transition: color 0.2s ease-out;
+}
+
+.add-todo-button:hover .add-plus-icon {
+  color: rgb(100, 116, 139);
+}
+
+@media (prefers-color-scheme: dark) {
+  .add-plus-icon {
+    color: rgb(100, 116, 139);
+  }
+  
+  .add-todo-button:hover .add-plus-icon {
+    color: rgb(148, 163, 184);
+  }
+}

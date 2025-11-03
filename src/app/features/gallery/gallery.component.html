@@ -1,0 +1,131 @@
+<div class="relative z-10">
+  <div class="container mx-auto px-2 py-2 md:py-0 md:px-0 max-w-6xl">
+    <header class="bg-gradient-to-br from-[#f59656]/80 to-[#f59656]/80 dark:from-[#8833cc]/70 dark:to-[#8833cc]/70 text-white p-4 md:p-8 rounded-lg shadow-lg mb-4 md:mb-4 transition-colors duration-200 backdrop-blur-sm">
+      <div class="text-center">
+        <h1 class="text-4xl font-bold mb-3 font-outfit">Gallery</h1>
+        <p class="text-lg text-indigo-100 font-inter">Browse your collection of images</p>
+      </div>
+    </header>
+
+    <main class="space-y-4">
+      <!-- Search and Filter Section -->
+      <section class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-lg shadow-md backdrop-blur-sm">
+        <form [formGroup]="searchForm" class="flex flex-col md:flex-row gap-4">
+          <!-- Search Input -->
+          <div class="flex-1 relative">
+            <ng-icon 
+              [name]="icons.MAGNIFYING_GLASS" 
+              class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 dark:text-slate-400 w-5 h-5"
+            ></ng-icon>
+            <input 
+              type="text" 
+              formControlName="query"
+              placeholder="Search images..."
+              class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#f29f67] dark:focus:ring-[#8833cc] transition-all font-inter"
+            />
+          </div>
+
+          <!-- Category Filter -->
+          <div class="flex gap-2 flex-wrap">
+            @for (category of categories(); track category) {
+              <button
+                type="button"
+                (click)="setCategory(category)"
+                [class]="getCategoryButtonClass(category)"
+              >
+                {{ category }}
+              </button>
+            }
+          </div>
+        </form>
+      </section>
+
+      <!-- Images Grid -->
+      <section class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-lg shadow-md backdrop-blur-sm">
+        @if (filteredImages().length === 0) {
+          <div class="text-center py-12">
+            <ng-icon 
+              [name]="icons.PHOTO" 
+              class="w-16 h-16 mx-auto mb-4 text-slate-400 dark:text-slate-500"
+            ></ng-icon>
+            <p class="text-slate-600 dark:text-slate-400 font-inter text-lg">No images found</p>
+          </div>
+        } @else {
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            @for (image of filteredImages(); track image.id) {
+              <div 
+                (click)="selectImage(image)"
+                class="relative group cursor-pointer rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
+                role="button"
+                tabindex="0"
+                (keydown.enter)="selectImage(image)"
+                (keydown.space)="selectImage(image)"
+              >
+                <img 
+                  [src]="image.url" 
+                  [alt]="image.title"
+                  class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
+                  loading="lazy"
+                  (error)="onImageError($event, image)"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
+                    <h3 class="font-bold text-lg font-outfit mb-1">{{ image.title }}</h3>
+                    @if (image.description) {
+                      <p class="text-sm text-white/90 font-inter line-clamp-2">{{ image.description }}</p>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+    </main>
+  </div>
+
+  <!-- Image Modal -->
+  @if (selectedImage(); as image) {
+    <div 
+      (click)="closeModal()"
+      class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+    >
+      <div 
+        (click)="$event.stopPropagation()"
+        class="bg-white dark:bg-slate-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto shadow-2xl"
+      >
+        <div class="relative">
+          <button
+            type="button"
+            (click)="closeModal()"
+            class="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 flex items-center justify-center transition-colors duration-200"
+            aria-label="Close modal"
+          >
+            <ng-icon [name]="icons.X_MARK" class="w-5 h-5"></ng-icon>
+          </button>
+          <img 
+            [src]="image.url" 
+            [alt]="image.title"
+            class="w-full h-auto max-h-[70vh] object-contain"
+            (error)="onImageError($event, image)"
+          />
+        </div>
+        <div class="p-6">
+          <h2 id="modal-title" class="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-2 font-outfit">
+            {{ image.title }}
+          </h2>
+          @if (image.description) {
+            <p class="text-slate-600 dark:text-slate-400 mb-4 font-inter">{{ image.description }}</p>
+          }
+          <div class="flex gap-4 text-sm text-slate-500 dark:text-slate-400 font-inter">
+            <span class="px-3 py-1 bg-slate-200 dark:bg-slate-700 rounded-full">{{ image.category }}</span>
+            <span>{{ image.uploadedAt.toLocaleDateString() }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

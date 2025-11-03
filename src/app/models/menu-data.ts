@@ -3,7 +3,7 @@ import { MenuSection } from './menu-section';
 // Temporarily saved menu sections (icons as inline SVG). To be wired after Angular upgrade.
 export const MENU_SECTIONS: MenuSection[] = [
   {
-    title: 'ACTIVITY DATA & TARGETS',
+    title: 'NAVIGATION',
     items: [
       {
         iconName: 'heroHome',
@@ -18,12 +18,12 @@ export const MENU_SECTIONS: MenuSection[] = [
       {
         iconName: 'heroPhoto',
         label: 'Gallery',
-        route: '/hierarchy'
+        route: '/gallery'
       },
       {
         iconName: 'heroSquares2x2',
         label: 'TODO list',
-        route: '/departments'
+        route: '/todo'
       },
       {
         iconName: 'heroCalendarDays',
@@ -38,7 +38,7 @@ export const MENU_SECTIONS: MenuSection[] = [
     ]
   },
   {
-    title: 'MASTERS',
+    title: 'TOOLS',
     items: [
       {
         iconName: 'heroCommandLine',
@@ -84,7 +84,7 @@ export const MENU_SECTIONS: MenuSection[] = [
     ]
   },
   {
-    title: 'USERS & ROLES',
+    title: 'PROFILE & SETTINGS',
     items: [
       {
         iconName: 'heroArrowDownTray',

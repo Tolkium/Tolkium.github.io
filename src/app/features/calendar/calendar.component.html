@@ -1,0 +1,359 @@
+<div class="relative z-10">
+  <div class="container mx-auto px-2 py-2 md:py-0 md:px-0 max-w-6xl">
+    <header class="bg-gradient-to-br from-[#f59656]/80 to-[#f59656]/80 dark:from-[#8833cc]/70 dark:to-[#8833cc]/70 text-white p-4 md:p-8 rounded-lg shadow-lg mb-4 md:mb-4 transition-colors duration-200 backdrop-blur-sm">
+      <div class="text-center">
+        <h1 class="text-4xl font-bold mb-3 font-outfit">Personal Calendar</h1>
+        <p class="text-lg text-indigo-100 font-inter">Manage your schedule and events</p>
+      </div>
+    </header>
+
+    <main class="space-y-4">
+      <!-- Calendar Navigation -->
+      <section class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-lg shadow-md backdrop-blur-sm">
+        <div class="flex items-center justify-between mb-4">
+          <button
+            (click)="previousMonth()"
+            class="p-3 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors duration-200 bg-white dark:bg-slate-700 shadow-sm hover:shadow-md"
+            aria-label="Previous month"
+            title="Previous month"
+          >
+            <ng-icon [name]="heroChevronLeft" class="w-6 h-6 text-slate-700 dark:text-slate-300"></ng-icon>
+          </button>
+          
+          <div class="flex items-center gap-4">
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200 font-outfit">{{ monthName() }}</h2>
+            <button
+              (click)="goToToday()"
+              class="px-4 py-2 bg-[#f29f67] hover:bg-[#f59656] dark:bg-[#8833cc] dark:hover:bg-[#7c2eb8] text-white rounded-lg font-semibold transition-colors duration-200 font-inter text-sm shadow-sm hover:shadow-md"
+            >
+              Today
+            </button>
+          </div>
+          
+          <button
+            (click)="nextMonth()"
+            class="p-3 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors duration-200 bg-white dark:bg-slate-700 shadow-sm hover:shadow-md"
+            aria-label="Next month"
+            title="Next month"
+          >
+            <ng-icon [name]="heroChevronRight" class="w-6 h-6 text-slate-700 dark:text-slate-300"></ng-icon>
+          </button>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div class="grid grid-cols-7 gap-2">
+          <!-- Day headers -->
+          @for (dayIndex of [0, 1, 2, 3, 4, 5, 6]; track dayIndex) {
+            <div class="text-center font-semibold text-slate-600 dark:text-slate-400 py-2 font-inter text-sm">
+              {{ getDayName(dayIndex) }}
+            </div>
+          }
+
+          <!-- Calendar days -->
+          @for (day of calendarDays(); track day ? day.getTime() : $index) {
+            @if (day) {
+              <div
+                (click)="selectDate(day)"
+                [class.bg-[#f29f67]/20]="isSelected(day)"
+                [class.dark:bg-[#8833cc]/20]="isSelected(day)"
+                [class.border-2]="isSelected(day)"
+                [class.border-[#f29f67]]="isSelected(day)"
+                [class.dark:border-[#8833cc]]="isSelected(day)"
+                [class.ring-2]="isToday(day)"
+                [class.ring-[#f29f67]]="isToday(day)"
+                [class.dark:ring-[#8833cc]]="isToday(day)"
+                class="min-h-[80px] p-2 bg-white dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors duration-200 border border-slate-200 dark:border-slate-600"
+              >
+                <div class="flex items-center justify-between mb-1">
+                  <span 
+                    [class.font-bold]="isToday(day)"
+                    [class.text-[#f29f67]]="isToday(day)"
+                    [class.dark:text-[#8833cc]]="isToday(day)"
+                    [class.text-slate-700]="!isToday(day)"
+                    [class.dark:text-slate-300]="!isToday(day)"
+                    class="text-sm font-inter"
+                  >
+                    {{ day.getDate() }}
+                  </span>
+                  @if (getEventsForDate(day).length > 0) {
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-inter">
+                      {{ getEventsForDate(day).length }}
+                    </span>
+                  }
+                </div>
+                <div class="space-y-1">
+                  @for (event of getEventsForDate(day).slice(0, 2); track event.id) {
+                    <div
+                      (click)="goToEvent(event); $event.stopPropagation()"
+                      [style.backgroundColor]="event.color + '20'"
+                      [style.border-left-color]="event.color"
+                      class="text-xs p-1 rounded border-l-2 truncate font-inter cursor-pointer hover:opacity-80 transition-opacity duration-200"
+                      [class.text-slate-700]="true"
+                      [class.dark:text-slate-300]="true"
+                      [title]="event.title"
+                    >
+                      {{ event.title }}
+                    </div>
+                  }
+                  @if (getEventsForDate(day).length > 2) {
+                    <div class="text-xs text-slate-500 dark:text-slate-400 font-inter px-1">
+                      +{{ getEventsForDate(day).length - 2 }} more
+                    </div>
+                  }
+                </div>
+              </div>
+            } @else {
+              <div class="min-h-[80px]"></div>
+            }
+          }
+        </div>
+      </section>
+
+      <!-- Selected Date Events & Add Event Button -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <!-- Selected Date Events -->
+        <section class="lg:col-span-2 bg-white/50 dark:bg-slate-800/50 p-6 rounded-lg shadow-md backdrop-blur-sm">
+          @if (selectedDate()) {
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-xl font-bold text-[#f29f67]/90 dark:text-[#8833cc]/70 font-outfit">
+                Events on {{ selectedDate()!.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}
+              </h2>
+              <button
+                (click)="openEventModal(selectedDate()!)"
+                class="px-4 py-2 bg-[#f29f67] hover:bg-[#f59656] dark:bg-[#8833cc] dark:hover:bg-[#7c2eb8] text-white rounded-lg font-semibold transition-colors duration-200 flex items-center gap-2 font-inter text-sm"
+              >
+                <ng-icon [name]="heroPlus" class="w-4 h-4"></ng-icon>
+                Add Event
+              </button>
+            </div>
+
+            @if (selectedDateEvents().length === 0) {
+              <div class="text-center py-8">
+                <ng-icon [name]="heroCalendarDays" class="w-12 h-12 mx-auto mb-3 text-slate-400 dark:text-slate-500"></ng-icon>
+                <p class="text-slate-600 dark:text-slate-400 font-inter">No events scheduled for this date</p>
+              </div>
+            } @else {
+              <div class="space-y-3">
+                @for (event of selectedDateEvents(); track event.id) {
+                  <div 
+                    [style.border-left-color]="event.color"
+                    class="bg-white dark:bg-slate-700 p-4 rounded-lg shadow-sm border-l-4 hover:shadow-md transition-shadow duration-200"
+                  >
+                    <div class="flex items-start justify-between">
+                      <div class="flex-1 cursor-pointer" (click)="goToEvent(event)">
+                        <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200 font-outfit mb-1">
+                          {{ event.title }}
+                        </h3>
+                        @if (event.description) {
+                          <p class="text-slate-600 dark:text-slate-400 text-sm font-inter mb-2">
+                            {{ event.description }}
+                          </p>
+                        }
+                        <div class="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400 font-inter">
+                          @if (event.startTime || event.endTime) {
+                            <div class="flex items-center gap-1">
+                              <ng-icon [name]="heroClock" class="w-4 h-4"></ng-icon>
+                              @if (event.startTime && event.endTime) {
+                                <span>{{ event.startTime }} - {{ event.endTime }}</span>
+                              } @else if (event.startTime) {
+                                <span>{{ event.startTime }}</span>
+                              } @else if (event.endTime) {
+                                <span>{{ event.endTime }}</span>
+                              }
+                            </div>
+                          }
+                        </div>
+                      </div>
+                      <div class="flex gap-2 shrink-0 ml-2">
+                        <button
+                          (click)="editEvent(event); $event.stopPropagation()"
+                          class="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:text-[#f29f67] dark:hover:text-[#8833cc] hover:bg-slate-100 dark:hover:bg-slate-600 transition-all duration-200 flex items-center justify-center min-w-[2.5rem] min-h-[2.5rem]"
+                          aria-label="Edit event"
+                          type="button"
+                          title="Edit event"
+                        >
+                          <ng-icon [name]="heroPencilSquare" class="w-5 h-5"></ng-icon>
+                        </button>
+                        <button
+                          (click)="deleteEvent(event.id); $event.stopPropagation()"
+                          class="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:text-red-500 dark:hover:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-600 transition-all duration-200 flex items-center justify-center min-w-[2.5rem] min-h-[2.5rem]"
+                          aria-label="Delete event"
+                          type="button"
+                          title="Delete event"
+                        >
+                          <ng-icon [name]="heroTrash" class="w-5 h-5"></ng-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          } @else {
+            <div class="text-center py-8">
+              <ng-icon [name]="heroCalendarDays" class="w-12 h-12 mx-auto mb-3 text-slate-400 dark:text-slate-500"></ng-icon>
+              <p class="text-slate-600 dark:text-slate-400 font-inter">Select a date to view events</p>
+            </div>
+          }
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-lg shadow-md backdrop-blur-sm">
+          <h2 class="text-xl font-bold text-[#f29f67]/90 dark:text-[#8833cc]/70 mb-4 font-outfit">Quick Actions</h2>
+          <button
+            (click)="openEventModal()"
+            class="w-full px-4 py-3 bg-[#f29f67] hover:bg-[#f59656] dark:bg-[#8833cc] dark:hover:bg-[#7c2eb8] text-white rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center gap-2 font-inter mb-4"
+          >
+            <ng-icon [name]="heroPlus" class="w-5 h-5"></ng-icon>
+            Create New Event
+          </button>
+          
+          <div class="space-y-2">
+            <h3 class="font-semibold text-slate-700 dark:text-slate-300 font-inter text-sm">Upcoming Events</h3>
+            @if (upcomingEvents().length === 0) {
+              <p class="text-sm text-slate-500 dark:text-slate-400 font-inter">No upcoming events</p>
+            } @else {
+              @for (event of upcomingEvents(); track event.id) {
+                <div 
+                  (click)="goToEvent(event)"
+                  class="p-2 bg-white dark:bg-slate-700 rounded text-sm font-inter cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors duration-200"
+                >
+                  <div 
+                    [style.color]="event.color"
+                    class="font-semibold truncate"
+                  >
+                    {{ event.title }}
+                  </div>
+                  <div class="text-xs text-slate-500 dark:text-slate-400">
+                    {{ event.date.toLocaleDateString() }}
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Event Modal -->
+  @if (showEventModal()) {
+    <div 
+      (click)="closeEventModal()"
+      class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div 
+        (click)="$event.stopPropagation()"
+        class="bg-white dark:bg-slate-800 rounded-lg max-w-md w-full p-6 shadow-2xl"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200 font-outfit">
+            {{ editingEvent() ? 'Edit Event' : 'New Event' }}
+          </h2>
+          <button
+            (click)="closeEventModal()"
+            class="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors duration-200"
+            aria-label="Close modal"
+          >
+            <ng-icon [name]="heroXMark" class="w-6 h-6 text-slate-600 dark:text-slate-400"></ng-icon>
+          </button>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 font-inter">
+              Title *
+            </label>
+            <input
+              type="text"
+              [value]="eventTitle()"
+              (input)="eventTitle.set($any($event.target).value)"
+              placeholder="Event title..."
+              class="w-full px-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#f29f67] dark:focus:ring-[#8833cc] font-inter"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 font-inter">
+              Description
+            </label>
+            <textarea
+              [value]="eventDescription()"
+              (input)="eventDescription.set($any($event.target).value)"
+              placeholder="Event description..."
+              rows="3"
+              class="w-full px-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#f29f67] dark:focus:ring-[#8833cc] font-inter resize-none"
+            ></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 font-inter">
+              Date *
+            </label>
+            <input
+              type="date"
+              [value]="eventDate()"
+              (input)="eventDate.set($any($event.target).value)"
+              class="w-full px-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#f29f67] dark:focus:ring-[#8833cc] font-inter"
+            />
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 font-inter">
+                Start Time
+              </label>
+              <input
+                type="time"
+                [value]="eventStartTime()"
+                (input)="eventStartTime.set($any($event.target).value)"
+                class="w-full px-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#f29f67] dark:focus:ring-[#8833cc] font-inter"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 font-inter">
+                End Time
+              </label>
+              <input
+                type="time"
+                [value]="eventEndTime()"
+                (input)="eventEndTime.set($any($event.target).value)"
+                class="w-full px-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#f29f67] dark:focus:ring-[#8833cc] font-inter"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 font-inter">
+              Color
+            </label>
+            <input
+              type="color"
+              [value]="eventColor()"
+              (input)="eventColor.set($any($event.target).value)"
+              class="w-full h-12 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg cursor-pointer"
+            />
+          </div>
+
+          <div class="flex gap-3 pt-4">
+            <button
+              (click)="saveEvent()"
+              class="flex-1 px-4 py-2 bg-[#f29f67] hover:bg-[#f59656] dark:bg-[#8833cc] dark:hover:bg-[#7c2eb8] text-white rounded-lg font-semibold transition-colors duration-200 font-inter"
+            >
+              {{ editingEvent() ? 'Update' : 'Create' }}
+            </button>
+            <button
+              (click)="closeEventModal()"
+              class="flex-1 px-4 py-2 bg-slate-500 hover:bg-slate-600 text-white rounded-lg font-semibold transition-colors duration-200 font-inter"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+

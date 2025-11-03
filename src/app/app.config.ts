@@ -37,7 +37,20 @@ import {
   heroChartBar,
   heroCpuChip,
   heroCircleStack,
+  heroTrash,
+  heroPencilSquare,
+  heroPlus,
+  heroCheckCircle,
+  heroXCircle,
+  heroFunnel,
+  heroCheckBadge,
+  heroMagnifyingGlass,
+  heroXMark,
+  heroChevronLeft,
+  heroChevronRight,
+  heroClock,
 } from '@ng-icons/heroicons/outline';
+import { heroCheckCircleSolid } from '@ng-icons/heroicons/solid';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -81,6 +94,19 @@ export const appConfig: ApplicationConfig = {
       heroChartBar,
       heroCpuChip,
       heroCircleStack,
+      heroTrash,
+      heroPencilSquare,
+      heroPlus,
+      heroCheckCircle,
+      heroXCircle,
+      heroFunnel,
+      heroCheckBadge,
+      heroMagnifyingGlass,
+      heroXMark,
+      heroChevronLeft,
+      heroChevronRight,
+      heroClock,
+      heroCheckCircleSolid,
     })
   ],
 };

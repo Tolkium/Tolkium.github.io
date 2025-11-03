@@ -7,12 +7,13 @@ import { SideMenuComponent } from './layout/side-menu/side-menu.component';
 import { DarkModeToggleComponent } from './layout/dark-mode-toggle/dark-mode-toggle.component';
 import { PerformanceMonitorComponent } from './shared/components/performance-monitor/performance-monitor.component';
 import { BackgroundAnimationComponent } from './shared/components/background-animation/background-animation.component';
+import { SearchComponent } from './shared/components/search/search.component';
 import * as UiSelectors from './core/store/ui.selectors';
 import * as UiActions from './core/store/ui.actions';
 
 @Component({
     selector: 'app-root',
-    imports: [CommonModule, RouterOutlet, SideMenuComponent, DarkModeToggleComponent, PerformanceMonitorComponent, BackgroundAnimationComponent],
+    imports: [CommonModule, RouterOutlet, SideMenuComponent, DarkModeToggleComponent, PerformanceMonitorComponent, BackgroundAnimationComponent, SearchComponent],
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush

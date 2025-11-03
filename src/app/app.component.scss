@@ -24,6 +24,25 @@
   }
 }
 
+.desktop-controls {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 50;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  
+  // Search component handles its own positioning
+  app-search {
+    position: fixed;
+    top: 1rem;
+    left: calc(3rem + 1rem);
+    right: 5rem;
+    width: auto;
+  }
+}
+
 .main-content {
   height: 100vh;
   overflow-y: auto;

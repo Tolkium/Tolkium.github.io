@@ -6,6 +6,11 @@
 
   <app-side-menu/>
 
+  <!-- Desktop Search - Full width minus menu -->
+  @if (!(isMobile$ | async)) {
+    <app-search />
+  }
+
   <!-- Desktop Dark Mode Toggle - Fixed position, persistent across routes -->
   @if (!(isMobile$ | async)) {
     <app-dark-mode-toggle />

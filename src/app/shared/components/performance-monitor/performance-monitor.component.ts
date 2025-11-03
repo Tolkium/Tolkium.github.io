@@ -189,8 +189,8 @@ export class PerformanceMonitorComponent implements OnInit, OnDestroy {
       const cardColor = this.hslToRgbString(bgHue, cardSaturation, cardLightness);
 
       return {
-        bgStart: `rgba(${bgStart}, 0.92)`,
-        bgEnd: `rgba(${bgEnd}, 0.9)`,
+        bgStart: `rgba(${bgStart}, 0.2)`,
+        bgEnd: `rgba(${bgEnd}, 0.18)`,
         accentRgb: accentColor,
         cardRgb: cardColor,
         bgRgb: bgStart // For borders and subtle elements
@@ -215,8 +215,8 @@ export class PerformanceMonitorComponent implements OnInit, OnDestroy {
       const cardColor = this.hslToRgbString(bgHue, cardSaturation, cardLightness);
 
       return {
-        bgStart: `rgba(${bgStart}, 0.95)`,
-        bgEnd: `rgba(${bgEnd}, 0.93)`,
+        bgStart: `rgba(${bgStart}, 0.2)`,
+        bgEnd: `rgba(${bgEnd}, 0.18)`,
         accentRgb: accentColor,
         cardRgb: cardColor,
         bgRgb: bgStart // For borders and subtle elements

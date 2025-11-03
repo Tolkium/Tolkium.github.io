@@ -30,7 +30,7 @@
       var(--bg-start, rgba(20, 5, 30, 0.92)) 0%,
       var(--bg-end, rgba(15, 5, 25, 0.9)) 100%
     );
-    backdrop-filter: blur(25px) saturate(150%);
+    backdrop-filter: blur(5px) saturate(105%);
     border-radius: 10px;
     border: 1px solid rgba(var(--theme-color-rgb), 0.4);
     overflow: hidden;
@@ -84,8 +84,8 @@
     padding: 10px 12px;
     background: linear-gradient(
       135deg,
-      rgba(var(--bg-card-rgb), 0.7) 0%,
-      rgba(var(--bg-accent-rgb), 0.3) 100%
+      rgba(var(--bg-card-rgb), 0.18) 0%,
+      rgba(var(--bg-accent-rgb), 0.07) 100%
     );
     border-bottom: 1px solid rgba(var(--theme-color-rgb), 0.3);
     z-index: 2;
@@ -193,12 +193,12 @@
       padding: 5px 6px;
       background: linear-gradient(
         135deg,
-        rgba(var(--bg-card-rgb), 0.4) 0%,
-        rgba(var(--bg-accent-rgb), 0.15) 100%
+        rgba(var(--bg-card-rgb), 0.08) 0%,
+        rgba(var(--bg-accent-rgb), 0.03) 100%
       );
       border-radius: 5px;
       border: 1px solid rgba(var(--theme-color-rgb), 0.2);
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(2px);
     position: relative;
     overflow: hidden;
     transition: none;
@@ -232,8 +232,8 @@
       border-color: rgba(var(--theme-color-rgb), 0.2);
       background: linear-gradient(
         135deg,
-        rgba(var(--bg-card-rgb), 0.5) 0%,
-        rgba(var(--bg-accent-rgb), 0.2) 100%
+        rgba(var(--bg-card-rgb), 0.1) 0%,
+        rgba(var(--bg-accent-rgb), 0.04) 100%
       );
 
       &:hover {
@@ -247,8 +247,8 @@
     border-color: rgba(var(--theme-color-rgb), 0.15);
     background: linear-gradient(
       135deg,
-      rgba(var(--bg-card-rgb), 0.3) 0%,
-      rgba(var(--bg-accent-rgb), 0.15) 100%
+      rgba(var(--bg-card-rgb), 0.06) 0%,
+      rgba(var(--bg-accent-rgb), 0.03) 100%
     );
 
     &:hover {
@@ -492,28 +492,75 @@
   // Background colors are now calculated dynamically via backgroundColors() computed signal
   // so we don't need to override .glass-container anymore
   
+  // Significantly reduce backdrop blur for better transparency in light mode
+  .glass-container {
+    backdrop-filter: blur(5px) saturate(105%) !important;
+  }
+  
+  // Reduce opacity of metric sections in light mode
+  .metric-section {
+    backdrop-filter: blur(2px) !important;
+    background: linear-gradient(
+      135deg,
+      rgba(var(--bg-card-rgb), 0.08) 0%,
+      rgba(var(--bg-accent-rgb), 0.03) 100%
+    ) !important;
+    
+    &.angular-section {
+      background: linear-gradient(
+        135deg,
+        rgba(var(--bg-card-rgb), 0.1) 0%,
+        rgba(var(--bg-accent-rgb), 0.04) 100%
+      ) !important;
+    }
+  }
+  
+  .angular-stats {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--bg-card-rgb), 0.06) 0%,
+      rgba(var(--bg-accent-rgb), 0.03) 100%
+    ) !important;
+  }
+  
+  .perf-header {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--bg-card-rgb), 0.18) 0%,
+      rgba(var(--bg-accent-rgb), 0.07) 100%
+    ) !important;
+    
+    .status-indicator {
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 4px rgba(255, 255, 255, 0.6) !important;
+    }
+    
+    .title {
+      text-shadow: 0 0 12px rgba(var(--theme-color-rgb), 0.6), 0 1px 2px rgba(255, 255, 255, 0.8) !important;
+    }
+  }
+  
   .metric-label,
   .stat-label,
   .route-label,
   .metric-info,
   .mini-label {
-    color: rgba(0, 0, 0, 0.7) !important;
-    text-shadow: 0 0 2px rgba(255, 255, 255, 0.5) !important;
+    color: rgba(var(--theme-color-rgb), 0.8) !important;
+    text-shadow: 0 0 2px rgba(255, 255, 255, 0.8), 0 1px 2px rgba(var(--theme-color-rgb), 0.3) !important;
   }
   
   .metric-value,
   .stat-value,
   .route-path,
   .mini-value {
-    color: rgba(0, 0, 0, 0.9) !important;
-    text-shadow: 0 0 4px rgba(var(--theme-color-rgb), 0.3) !important;
+    color: rgba(var(--theme-color-rgb), 0.95) !important;
+    text-shadow: 0 0 4px rgba(var(--theme-color-rgb), 0.4), 0 1px 2px rgba(255, 255, 255, 0.6) !important;
   }
   
   .shortcut-hint {
-    color: rgba(0, 0, 0, 0.65) !important;
+    color: rgba(var(--theme-color-rgb), 0.75) !important;
     
     kbd {
-      color: rgba(0, 0, 0, 0.85) !important;
+      color: rgba(var(--theme-color-rgb), 0.9) !important;
       background: rgba(255, 255, 255, 0.6) !important;
     }
   }

@@ -169,7 +169,6 @@ export class SearchComponent {
     }
   });
 
-  // Reactive search results - just read from service
   readonly results = computed(() => {
     // Track debounced query to trigger updates
     this.debouncedQuery$();

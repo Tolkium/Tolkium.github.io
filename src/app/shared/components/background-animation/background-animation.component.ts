@@ -621,6 +621,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
         });
       }
     } else if (newCount < oldCount) {
+      // Remove excess particles
       this.points = this.points.slice(0, newCount);
     }
   }

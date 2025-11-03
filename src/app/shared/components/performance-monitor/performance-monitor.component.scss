@@ -489,13 +489,8 @@
 
 // Light mode adjustments - override the dark defaults
 .performance-overlay.light-mode {
-  .glass-container {
-    background: linear-gradient(
-      135deg,
-      rgba(240, 240, 250, 0.95) 0%,
-      rgba(230, 230, 245, 0.93) 100%
-    ) !important;
-  }
+  // Background colors are now calculated dynamically via backgroundColors() computed signal
+  // so we don't need to override .glass-container anymore
   
   .metric-label,
   .stat-label,

@@ -163,36 +163,65 @@ export class PerformanceMonitorComponent implements OnInit, OnDestroy {
   }
 
   // Calculate background colors based on theme color
-  // Creates a dark, professional background that complements the theme
+  // Creates a theme-aware background that complements the theme
   public readonly backgroundColors = computed(() => {
     const themeHex = this.themeColor();
     const hsl = this.hexToHsl(themeHex);
+    const darkMode = this.isDarkMode();
 
-    // Main background: Dark version of theme with adjusted saturation and lightness
-    const bgHue = hsl.h;
-    const bgSaturation = Math.min(hsl.s * 0.35, 40); // Lower saturation for subtlety
-    const bgLightness = 8; // Very dark for professional look
-    
-    const bgStart = this.hslToRgbString(bgHue, bgSaturation, bgLightness);
-    const bgEnd = this.hslToRgbString(bgHue, bgSaturation * 0.7, bgLightness * 0.8);
+    if (darkMode) {
+      // Dark mode: Dark version of theme with adjusted saturation and lightness
+      const bgHue = hsl.h;
+      const bgSaturation = Math.min(hsl.s * 0.35, 40); // Lower saturation for subtlety
+      const bgLightness = 8; // Very dark for professional look
+      
+      const bgStart = this.hslToRgbString(bgHue, bgSaturation, bgLightness);
+      const bgEnd = this.hslToRgbString(bgHue, bgSaturation * 0.7, bgLightness * 0.8);
 
-    // Accent background: Slightly lighter for gradients
-    const accentLightness = 12;
-    const accentSaturation = bgSaturation * 1.2;
-    const accentColor = this.hslToRgbString(bgHue, accentSaturation, accentLightness);
+      // Accent background: Slightly lighter for gradients
+      const accentLightness = 12;
+      const accentSaturation = bgSaturation * 1.2;
+      const accentColor = this.hslToRgbString(bgHue, accentSaturation, accentLightness);
 
-    // Subtle background for cards/sections
-    const cardLightness = 15;
-    const cardSaturation = bgSaturation * 1.1;
-    const cardColor = this.hslToRgbString(bgHue, cardSaturation, cardLightness);
+      // Subtle background for cards/sections
+      const cardLightness = 15;
+      const cardSaturation = bgSaturation * 1.1;
+      const cardColor = this.hslToRgbString(bgHue, cardSaturation, cardLightness);
 
-    return {
-      bgStart: `rgba(${bgStart}, 0.92)`,
-      bgEnd: `rgba(${bgEnd}, 0.9)`,
-      accentRgb: accentColor,
-      cardRgb: cardColor,
-      bgRgb: bgStart // For borders and subtle elements
-    };
+      return {
+        bgStart: `rgba(${bgStart}, 0.92)`,
+        bgEnd: `rgba(${bgEnd}, 0.9)`,
+        accentRgb: accentColor,
+        cardRgb: cardColor,
+        bgRgb: bgStart // For borders and subtle elements
+      };
+    } else {
+      // Light mode: Light version of theme
+      const bgHue = hsl.h;
+      const bgSaturation = Math.min(hsl.s * 0.2, 20); // Lower saturation for subtlety
+      const bgLightness = 96; // Very light for professional look
+      
+      const bgStart = this.hslToRgbString(bgHue, bgSaturation, bgLightness);
+      const bgEnd = this.hslToRgbString(bgHue, bgSaturation * 0.8, bgLightness * 0.97);
+
+      // Accent background: Slightly darker for gradients
+      const accentLightness = 92;
+      const accentSaturation = bgSaturation * 1.5;
+      const accentColor = this.hslToRgbString(bgHue, accentSaturation, accentLightness);
+
+      // Subtle background for cards/sections
+      const cardLightness = 95;
+      const cardSaturation = bgSaturation * 1.3;
+      const cardColor = this.hslToRgbString(bgHue, cardSaturation, cardLightness);
+
+      return {
+        bgStart: `rgba(${bgStart}, 0.95)`,
+        bgEnd: `rgba(${bgEnd}, 0.93)`,
+        accentRgb: accentColor,
+        cardRgb: cardColor,
+        bgRgb: bgStart // For borders and subtle elements
+      };
+    }
   });
 
   // Helper computed signals for template type safety - always return non-null

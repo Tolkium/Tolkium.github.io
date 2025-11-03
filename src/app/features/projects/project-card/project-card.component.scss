@@ -53,7 +53,6 @@
     border: 1px solid rgba(255, 255, 255, 0.12);
   }
 
-  // Holographic gradient overlay (subtle) - RE-ENABLED TEST
   &::before {
     content: "";
     position: absolute;
@@ -85,7 +84,6 @@
     }
   }
 
-  // Sparkle/shimmer effect (very subtle) - RE-ENABLED TEST
   &::after {
     content: "";
     position: absolute;
@@ -201,7 +199,6 @@
   }
 }
 
-// Remove old effects
 .card-shine,
 .holographic-effect {
   display: none;

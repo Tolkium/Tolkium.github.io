@@ -109,3 +109,14 @@ export const setMinClusterSizeValue = createAction('[UI] Set Min Cluster Size', 
 
 // Reset all animation settings to defaults
 export const resetAnimationSettings = createAction('[UI] Reset Animation Settings');
+
+// Magnetic behavior extensions
+export const setMagneticMode = createAction('[UI] Set Magnetic Mode', props<{ mode: 'classic' | 'inverse' | 'fluctuating' }>());
+export const setMagneticMinStrengthValue = createAction('[UI] Set Magnetic Min Strength', props<{ value: number }>());
+export const setMagneticMaxStrengthValue = createAction('[UI] Set Magnetic Max Strength', props<{ value: number }>());
+export const setMagneticInverseCoefficientValue = createAction('[UI] Set Magnetic Inverse Coefficient', props<{ value: number }>());
+export const setMagneticFluctuationSpeedValue = createAction('[UI] Set Magnetic Fluctuation Speed', props<{ value: number }>()); 
+export const togglePolygonStabilizer = createAction('[UI] Toggle Polygon Stabilizer');
+export const setPolygonStabilizer = createAction('[UI] Set Polygon Stabilizer', props<{ enablePolygonStabilizer: boolean }>());
+export const setPolygonTargetSpacingValue = createAction('[UI] Set Polygon Target Spacing', props<{ value: number }>());
+export const setPolygonStrengthValue = createAction('[UI] Set Polygon Strength', props<{ value: number }>());

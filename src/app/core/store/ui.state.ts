@@ -32,6 +32,15 @@ export interface UiState {
   explosionForce: number;
   clusterCheckInterval: number;
   minClusterSize: number;
+  // Magnetic behavior extensions
+  magneticMode: 'classic' | 'inverse' | 'fluctuating';
+  magneticMinStrength: number;
+  magneticMaxStrength: number;
+  magneticInverseCoefficient: number;
+  magneticFluctuationSpeed: number;
+  enablePolygonStabilizer: boolean;
+  polygonTargetSpacing: number;
+  polygonStrength: number;
 }
 
 // Helper function to load numeric values from localStorage
@@ -93,5 +102,21 @@ export const initialUiState: UiState = {
   clusterThreshold: loadNumberFromStorage('clusterThreshold', 20),
   explosionForce: loadNumberFromStorage('explosionForce', 300),
   clusterCheckInterval: loadNumberFromStorage('clusterCheckInterval', 180),
-  minClusterSize: loadNumberFromStorage('minClusterSize', 8)
+  minClusterSize: loadNumberFromStorage('minClusterSize', 8),
+  // Magnetic behavior extensions defaults
+  magneticMode: (() => {
+    try {
+      const saved = localStorage.getItem('magneticMode');
+      return (saved === 'inverse' || saved === 'fluctuating') ? saved : 'classic';
+    } catch {
+      return 'classic';
+    }
+  })(),
+  magneticMinStrength: loadNumberFromStorage('magneticMinStrength', 0.0001),
+  magneticMaxStrength: loadNumberFromStorage('magneticMaxStrength', 0.003),
+  magneticInverseCoefficient: loadNumberFromStorage('magneticInverseCoefficient', 1.0),
+  magneticFluctuationSpeed: loadNumberFromStorage('magneticFluctuationSpeed', 7.5), // Period in seconds (5-10 range)
+  enablePolygonStabilizer: loadBooleanFromStorage('enablePolygonStabilizer', false),
+  polygonTargetSpacing: loadNumberFromStorage('polygonTargetSpacing', 120),
+  polygonStrength: loadNumberFromStorage('polygonStrength', 0.0008)
 };

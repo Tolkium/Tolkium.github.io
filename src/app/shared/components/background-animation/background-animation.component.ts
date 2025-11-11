@@ -43,7 +43,15 @@ import {
   selectClusterThreshold,
   selectExplosionForce,
   selectClusterCheckInterval,
-  selectMinClusterSize
+  selectMinClusterSize,
+  selectMagneticMode,
+  selectMagneticMinStrength,
+  selectMagneticMaxStrength,
+  selectMagneticInverseCoefficient,
+  selectMagneticFluctuationSpeed,
+  selectEnablePolygonStabilizer,
+  selectPolygonTargetSpacing,
+  selectPolygonStrength
 } from '../../../core/store/ui.selectors';
 import { ParticlePhysicsService } from '../../../core/services/particle-physics.service';
 
@@ -75,6 +83,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
   private isAnimationEnabled = true;
   private lastFrameTime: number = 0;
   private frameCount: number = 0;
+  private currentTimeMs: number = 0;
   
   // Subscriptions
   private resizeSubscription?: Subscription;
@@ -85,6 +94,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
   private dampingSubscription?: Subscription;
   private brownianMotionSubscription?: Subscription;
   private clusterBreakingSubscription?: Subscription;
+  private polygonStabilizerSubscription?: Subscription;
   private scrollTimeout: ReturnType<typeof setTimeout> | undefined;
 
   // Physics toggle states
@@ -93,6 +103,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
   private enableDamping = true;
   private enableBrownianMotion = true;
   private enableClusterBreaking = true;
+  private enablePolygonStabilizer = false;
 
   // Dynamic configuration from store (mutable copy)
   private config = {
@@ -116,7 +127,15 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
     CLUSTER_THRESHOLD: ANIMATION_CONSTANTS.CLUSTER_THRESHOLD,
     EXPLOSION_FORCE: ANIMATION_CONSTANTS.EXPLOSION_FORCE,
     CLUSTER_CHECK_INTERVAL: ANIMATION_CONSTANTS.CLUSTER_CHECK_INTERVAL,
-    MIN_CLUSTER_SIZE: ANIMATION_CONSTANTS.MIN_CLUSTER_SIZE
+    MIN_CLUSTER_SIZE: ANIMATION_CONSTANTS.MIN_CLUSTER_SIZE,
+    // Magnetic behavior extensions
+    MAGNETIC_MODE: 'classic' as 'classic' | 'inverse' | 'fluctuating',
+    MAGNETIC_MIN_STRENGTH: 0.0001,
+    MAGNETIC_MAX_STRENGTH: 0.003,
+    MAGNETIC_INVERSE_COEFFICIENT: 1.0,
+    MAGNETIC_FLUCTUATION_SPEED: 1.0,
+    POLYGON_TARGET_SPACING: 120,
+    POLYGON_STRENGTH: 0.0008
   };
 
   // Subscriptions for config values
@@ -177,6 +196,10 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
         .select(selectEnableClusterBreaking)
         .subscribe(enabled => this.enableClusterBreaking = enabled);
 
+      this.polygonStabilizerSubscription = this.store
+        .select(selectEnablePolygonStabilizer)
+        .subscribe(enabled => this.enablePolygonStabilizer = enabled);
+
       // Subscribe to all config value changes
       this.configSubscriptions.push(
         this.store.select(selectNumPoints).subscribe(v => {
@@ -190,6 +213,13 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
         this.store.select(selectConnectionRadius).subscribe(v => this.config.CONNECTION_RADIUS = v),
         this.store.select(selectMagneticRadius).subscribe(v => this.config.MAGNETIC_RADIUS = v),
         this.store.select(selectMagneticStrength).subscribe(v => this.config.MAGNETIC_STRENGTH = v),
+        this.store.select(selectMagneticMode).subscribe(v => this.config.MAGNETIC_MODE = v),
+        this.store.select(selectMagneticMinStrength).subscribe(v => this.config.MAGNETIC_MIN_STRENGTH = v),
+        this.store.select(selectMagneticMaxStrength).subscribe(v => this.config.MAGNETIC_MAX_STRENGTH = v),
+        this.store.select(selectMagneticInverseCoefficient).subscribe(v => this.config.MAGNETIC_INVERSE_COEFFICIENT = v),
+        this.store.select(selectMagneticFluctuationSpeed).subscribe(v => this.config.MAGNETIC_FLUCTUATION_SPEED = v),
+        this.store.select(selectPolygonTargetSpacing).subscribe(v => this.config.POLYGON_TARGET_SPACING = v),
+        this.store.select(selectPolygonStrength).subscribe(v => this.config.POLYGON_STRENGTH = v),
         this.store.select(selectMinSpeed).subscribe(v => this.config.MIN_SPEED = v),
         this.store.select(selectMaxSpeed).subscribe(v => this.config.MAX_SPEED = v),
         this.store.select(selectPointsSize).subscribe(v => this.config.POINTS_SIZE = v),
@@ -257,6 +287,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
     this.dampingSubscription?.unsubscribe();
     this.brownianMotionSubscription?.unsubscribe();
     this.clusterBreakingSubscription?.unsubscribe();
+    this.polygonStabilizerSubscription?.unsubscribe();
     this.configSubscriptions.forEach(sub => sub.unsubscribe());
   }
 
@@ -327,6 +358,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
     try {
       const deltaTime = timestamp - this.lastFrameTime;
       this.lastFrameTime = timestamp;
+      this.currentTimeMs = timestamp;
 
       // Increment frame counter
       this.frameCount++;
@@ -406,12 +438,48 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
           }
           // Apply magnetic attraction at medium distance (creates clustering)
           else if (this.enableMagneticForce && distance < this.config.MAGNETIC_RADIUS) {
-            this.physicsService.applyMagneticForce(
+            if (this.config.MAGNETIC_MODE === 'classic') {
+              this.physicsService.applyMagneticForce(
+                point,
+                otherPoint,
+                distance,
+                this.config.MAGNETIC_RADIUS,
+                this.config.MAGNETIC_STRENGTH
+              );
+            } else if (this.config.MAGNETIC_MODE === 'inverse') {
+              this.physicsService.applyMagneticForceInverse(
+                point,
+                otherPoint,
+                distance,
+                this.config.MAGNETIC_RADIUS,
+                this.config.MAGNETIC_MIN_STRENGTH,
+                this.config.MAGNETIC_MAX_STRENGTH,
+                this.config.MAGNETIC_INVERSE_COEFFICIENT
+              );
+            } else if (this.config.MAGNETIC_MODE === 'fluctuating') {
+              const dynamicStrength = this.physicsService.computeFluctuatingStrength(
+                this.config.MAGNETIC_MIN_STRENGTH,
+                this.config.MAGNETIC_MAX_STRENGTH,
+                this.config.MAGNETIC_FLUCTUATION_SPEED,
+                this.currentTimeMs
+              );
+              this.physicsService.applyMagneticForce(
+                point,
+                otherPoint,
+                distance,
+                this.config.MAGNETIC_RADIUS,
+                dynamicStrength
+              );
+            }
+          }
+
+          if (this.enablePolygonStabilizer && distance < this.config.CONNECTION_RADIUS) {
+            this.physicsService.applyPolygonStabilizer(
               point,
               otherPoint,
               distance,
-              this.config.MAGNETIC_RADIUS,
-              this.config.MAGNETIC_STRENGTH
+              this.config.POLYGON_TARGET_SPACING,
+              this.config.POLYGON_STRENGTH
             );
           }
         }

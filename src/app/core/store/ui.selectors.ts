@@ -96,3 +96,13 @@ export const selectClusterThreshold = createSelector(selectUiState, (state: UiSt
 export const selectExplosionForce = createSelector(selectUiState, (state: UiState) => state.explosionForce);
 export const selectClusterCheckInterval = createSelector(selectUiState, (state: UiState) => state.clusterCheckInterval);
 export const selectMinClusterSize = createSelector(selectUiState, (state: UiState) => state.minClusterSize);
+
+// Magnetic behavior extensions
+export const selectMagneticMode = createSelector(selectUiState, (state: UiState) => state.magneticMode);
+export const selectMagneticMinStrength = createSelector(selectUiState, (state: UiState) => state.magneticMinStrength);
+export const selectMagneticMaxStrength = createSelector(selectUiState, (state: UiState) => state.magneticMaxStrength);
+export const selectMagneticInverseCoefficient = createSelector(selectUiState, (state: UiState) => state.magneticInverseCoefficient);
+export const selectMagneticFluctuationSpeed = createSelector(selectUiState, (state: UiState) => state.magneticFluctuationSpeed);
+export const selectEnablePolygonStabilizer = createSelector(selectUiState, (state: UiState) => state.enablePolygonStabilizer);
+export const selectPolygonTargetSpacing = createSelector(selectUiState, (state: UiState) => state.polygonTargetSpacing);
+export const selectPolygonStrength = createSelector(selectUiState, (state: UiState) => state.polygonStrength);

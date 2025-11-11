@@ -20,6 +20,14 @@ import {
   selectConnectionRadius,
   selectMagneticRadius,
   selectMagneticStrength,
+  selectMagneticMode,
+  selectMagneticMinStrength,
+  selectMagneticMaxStrength,
+  selectMagneticInverseCoefficient,
+  selectMagneticFluctuationSpeed,
+  selectEnablePolygonStabilizer,
+  selectPolygonTargetSpacing,
+  selectPolygonStrength,
   selectMinSpeed,
   selectMaxSpeed,
   selectPointsSize,
@@ -50,6 +58,14 @@ import {
   setConnectionRadius,
   setMagneticRadius,
   setMagneticStrengthValue,
+  setMagneticMode,
+  setMagneticMinStrengthValue,
+  setMagneticMaxStrengthValue,
+  setMagneticInverseCoefficientValue,
+  setMagneticFluctuationSpeedValue,
+  togglePolygonStabilizer,
+  setPolygonTargetSpacingValue,
+  setPolygonStrengthValue,
   setMinSpeed,
   setMaxSpeed,
   setPointsSize,
@@ -408,6 +424,163 @@ import {
                 </div>
               </div>
 
+              <!-- Magnetic Behavior -->
+              @let magneticEnabled = enableMagneticForce$ | async;
+              <div class="bg-white/60 dark:bg-slate-800/60 rounded-lg p-3 shadow-sm"
+                   [class.opacity-40]="magneticEnabled === false"
+                   [class.pointer-events-none]="magneticEnabled === false">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 font-inter">Magnetic Behavior</h3>
+                  <span class="text-[10px] text-slate-500 dark:text-slate-500 font-inter">Advanced control</span>
+                </div>
+                @if (magneticEnabled === false) {
+                  <div class="mb-2 text-[10px] text-slate-500 dark:text-slate-500 font-inter italic">
+                    Enable Magnetic Attraction to activate these behaviors.
+                  </div>
+                }
+
+                <!-- Mode selection (radio group) -->
+                <div class="flex flex-wrap gap-2 mb-3">
+                  <label class="relative group mode-btn inline-flex items-center gap-2 px-2 py-1 rounded border border-slate-300 dark:border-slate-600 cursor-pointer hover:bg-white/40 dark:hover:bg-slate-700/40 transition-colors"
+                    [ngClass]="{'selected': (magneticMode$ | async) === 'classic'}">
+                    <input type="radio" name="magnetic-mode" class="sr-only"
+                      [checked]="(magneticMode$ | async) === 'classic'"
+                      (change)="onSetMagneticMode('classic')" />
+                    <span class="text-xs text-slate-700 dark:text-slate-300 font-inter">Classic</span>
+                    <div class="absolute left-0 right-0 -bottom-2 translate-y-full opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50">
+                      <div class="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xs p-2 rounded-lg shadow-lg mt-2 border border-slate-300 dark:border-slate-600">
+                        <p class="font-semibold mb-1">Classic magnetic attraction</p>
+                        <p class="text-slate-700 dark:text-slate-300">Force increases as particles get closer. Uses the existing Magnetic Strength slider.</p>
+                      </div>
+                    </div>
+                  </label>
+                  <label class="relative group mode-btn inline-flex items-center gap-2 px-2 py-1 rounded border border-slate-300 dark:border-slate-600 cursor-pointer hover:bg-white/40 dark:hover:bg-slate-700/40 transition-colors"
+                    [ngClass]="{'selected': (magneticMode$ | async) === 'inverse'}">
+                    <input type="radio" name="magnetic-mode" class="sr-only"
+                      [checked]="(magneticMode$ | async) === 'inverse'"
+                      (change)="onSetMagneticMode('inverse')" />
+                    <span class="text-xs text-slate-700 dark:text-slate-300 font-inter">Inverse-distance</span>
+                    <div class="absolute left-0 right-0 -bottom-2 translate-y-full opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50">
+                      <div class="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xs p-2 rounded-lg shadow-lg mt-2 border border-slate-300 dark:border-slate-600">
+                        <p class="font-semibold mb-1">Inverse-distance attraction</p>
+                        <p class="text-slate-700 dark:text-slate-300">Force grows as distance increases (within radius). Control bounds with Min/Max Strength, shape with Inverse Coefficient.</p>
+                      </div>
+                    </div>
+                  </label>
+                  <label class="relative group mode-btn inline-flex items-center gap-2 px-2 py-1 rounded border border-slate-300 dark:border-slate-600 cursor-pointer hover:bg-white/40 dark:hover:bg-slate-700/40 transition-colors"
+                    [ngClass]="{'selected': (magneticMode$ | async) === 'fluctuating'}">
+                    <input type="radio" name="magnetic-mode" class="sr-only"
+                      [checked]="(magneticMode$ | async) === 'fluctuating'"
+                      (change)="onSetMagneticMode('fluctuating')" />
+                    <span class="text-xs text-slate-700 dark:text-slate-300 font-inter">Fluctuating</span>
+                    <div class="absolute left-0 right-0 -bottom-2 translate-y-full opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50">
+                      <div class="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xs p-2 rounded-lg shadow-lg mt-2 border border-slate-300 dark:border-slate-600">
+                        <p class="font-semibold mb-1">Time-fluctuating attraction</p>
+                        <p class="text-slate-700 dark:text-slate-300">Force smoothly oscillates between Min/Max Strength over a 5-10 second period. Adjust the period to control oscillation speed.</p>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+
+                <!-- Common min/max strength used by non-classic modes -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                    <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">Min Strength: {{magneticMinStrength$ | async | number:'1.4-6'}}</label>
+                    <div class="text-[9px] text-slate-500 dark:text-slate-500 font-inter mb-1">Lower bound for magnetic force</div>
+                    <input type="range" min="0.00001" max="0.01" step="0.00001"
+                      [value]="magneticMinStrength$ | async"
+                      (input)="onMagneticMinStrengthChange(+$any($event.target).value)"
+                      class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
+                  </div>
+
+                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                    <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">Max Strength: {{magneticMaxStrength$ | async | number:'1.4-6'}}</label>
+                    <div class="text-[9px] text-slate-500 dark:text-slate-500 font-inter mb-1">Upper bound for magnetic force</div>
+                    <input type="range" min="0.00005" max="0.02" step="0.00005"
+                      [value]="magneticMaxStrength$ | async"
+                      (input)="onMagneticMaxStrengthChange(+$any($event.target).value)"
+                      class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
+                  </div>
+
+                  <!-- Inverse mode coefficient -->
+                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2" *ngIf="(magneticMode$ | async) === 'inverse'">
+                    <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">Inverse Coefficient: {{magneticInverseCoefficient$ | async | number:'1.2-2'}}</label>
+                    <div class="text-[9px] text-slate-500 dark:text-slate-500 font-inter mb-1">How strongly force grows with distance</div>
+                    <input type="range" min="0.2" max="3.0" step="0.05"
+                      [value]="magneticInverseCoefficient$ | async"
+                      (input)="onMagneticInverseCoefficientChange(+$any($event.target).value)"
+                      class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
+                  </div>
+
+                  <!-- Fluctuation period -->
+                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2" *ngIf="(magneticMode$ | async) === 'fluctuating'">
+                    <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">Fluctuation Period: {{magneticFluctuationSpeed$ | async | number:'1.1-1'}}s</label>
+                    <div class="text-[9px] text-slate-500 dark:text-slate-500 font-inter mb-1">Time for one full cycle (5-10 seconds)</div>
+                    <input type="range" min="5" max="10" step="0.5"
+                      [value]="magneticFluctuationSpeed$ | async"
+                      (input)="onMagneticFluctuationSpeedChange(+$any($event.target).value)"
+                      class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
+                  </div>
+                </div>
+
+                <div class="mt-3 border border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-3 bg-white/40 dark:bg-slate-800/40">
+                  <div class="flex items-center justify-between mb-2 gap-3">
+                    <div>
+                      <div class="text-xs font-semibold text-slate-700 dark:text-slate-300 font-inter">Polygon Stabilizer</div>
+                      <div class="text-[10px] text-slate-600 dark:text-slate-400 font-inter">
+                        Keeps connected particles evenly spaced to avoid dense clusters. May soften dramatic explosions at very high strengths.
+                      </div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox"
+                        class="sr-only peer"
+                        [checked]="(enablePolygonStabilizer$ | async) ?? false"
+                        (change)="onTogglePolygonStabilizer($event)" />
+                      <div class="relative w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-600 toggle-bg transition-colors">
+                        <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transform transition-transform"
+                          [class.translate-x-4]="(enablePolygonStabilizer$ | async) ?? false"></div>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-2"
+                       [class.opacity-60]="!((enablePolygonStabilizer$ | async) ?? false)"
+                       [class.pointer-events-none]="!((enablePolygonStabilizer$ | async) ?? false)">
+                    <div class="bg-white/70 dark:bg-slate-800/70 rounded p-2">
+                      <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">
+                        Target Spacing: {{polygonTargetSpacing$ | async | number:'1.0-0'}}px
+                      </label>
+                      <div class="text-[9px] text-slate-500 dark:text-slate-500 font-inter mb-1">
+                        Preferred distance between connected particles
+                      </div>
+                      <input type="range" min="40" max="400" step="5"
+                        [value]="polygonTargetSpacing$ | async"
+                        (input)="onPolygonTargetSpacingChange(+$any($event.target).value)"
+                        class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
+                    </div>
+                    <div class="bg-white/70 dark:bg-slate-800/70 rounded p-2">
+                      <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">
+                        Stabilizer Strength: {{polygonStrength$ | async | number:'1.4-4'}}
+                      </label>
+                      <div class="text-[9px] text-slate-500 dark:text-slate-500 font-inter mb-1">
+                        Higher values enforce spacing but can overpower cluster explosions
+                      </div>
+                      <input type="range" min="0.0002" max="0.005" step="0.0001"
+                        [value]="polygonStrength$ | async"
+                        (input)="onPolygonStrengthChange(+$any($event.target).value)"
+                        class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
+                    </div>
+                  </div>
+
+                  <div class="mt-2 text-[9px] text-amber-600 dark:text-amber-400 font-inter flex items-start gap-1">
+                    <span class="mt-0.5">⚠️</span>
+                    <span>
+                      Use moderate strength when Cluster Breaking is enabled to avoid competing forces.
+                    </span>
+                  </div>
+                </div>
+              </div>
               <!-- Fine-Tune Parameters -->
               <div class="bg-white/60 dark:bg-slate-800/60 rounded-lg p-4 shadow-sm">
                 <div class="flex items-center justify-between mb-3">
@@ -581,6 +754,16 @@ import {
       min-height: 100vh;
     }
 
+    /* Magnetic mode buttons */
+    .mode-btn.selected {
+      background: var(--color-dark-primary-hover);
+      border-color: var(--color-dark-primary);
+      color: white;
+    }
+    .mode-btn.selected span {
+      color: white !important;
+    }
+
     /* Style toggle switches with theme colors - only when checked */
     input[type="checkbox"]:checked ~ .toggle-bg {
       background-color: var(--color-dark-primary) !important;
@@ -655,6 +838,14 @@ export class SettingsComponent {
   readonly connectionRadius$ = this.store.select(selectConnectionRadius).pipe(shareReplay(1));
   readonly magneticRadius$ = this.store.select(selectMagneticRadius).pipe(shareReplay(1));
   readonly magneticStrength$ = this.store.select(selectMagneticStrength).pipe(shareReplay(1));
+  readonly magneticMode$ = this.store.select(selectMagneticMode).pipe(shareReplay(1));
+  readonly magneticMinStrength$ = this.store.select(selectMagneticMinStrength).pipe(shareReplay(1));
+  readonly magneticMaxStrength$ = this.store.select(selectMagneticMaxStrength).pipe(shareReplay(1));
+  readonly magneticInverseCoefficient$ = this.store.select(selectMagneticInverseCoefficient).pipe(shareReplay(1));
+  readonly magneticFluctuationSpeed$ = this.store.select(selectMagneticFluctuationSpeed).pipe(shareReplay(1));
+  readonly enablePolygonStabilizer$ = this.store.select(selectEnablePolygonStabilizer).pipe(shareReplay(1));
+  readonly polygonTargetSpacing$ = this.store.select(selectPolygonTargetSpacing).pipe(shareReplay(1));
+  readonly polygonStrength$ = this.store.select(selectPolygonStrength).pipe(shareReplay(1));
   readonly minSpeed$ = this.store.select(selectMinSpeed).pipe(shareReplay(1));
   readonly maxSpeed$ = this.store.select(selectMaxSpeed).pipe(shareReplay(1));
   readonly pointsSize$ = this.store.select(selectPointsSize).pipe(shareReplay(1));
@@ -791,5 +982,38 @@ export class SettingsComponent {
 
   public onResetAnimationSettings(): void {
     this.store.dispatch(resetAnimationSettings());
+  }
+
+  // Magnetic behavior handlers
+  public onSetMagneticMode(mode: 'classic' | 'inverse' | 'fluctuating'): void {
+    this.store.dispatch(setMagneticMode({ mode }));
+  }
+
+  public onMagneticMinStrengthChange(value: number): void {
+    this.store.dispatch(setMagneticMinStrengthValue({ value }));
+  }
+
+  public onMagneticMaxStrengthChange(value: number): void {
+    this.store.dispatch(setMagneticMaxStrengthValue({ value }));
+  }
+
+  public onMagneticInverseCoefficientChange(value: number): void {
+    this.store.dispatch(setMagneticInverseCoefficientValue({ value }));
+  }
+
+  public onMagneticFluctuationSpeedChange(value: number): void {
+    this.store.dispatch(setMagneticFluctuationSpeedValue({ value }));
+  }
+
+  public onTogglePolygonStabilizer(_event: Event): void {
+    this.store.dispatch(togglePolygonStabilizer());
+  }
+
+  public onPolygonTargetSpacingChange(value: number): void {
+    this.store.dispatch(setPolygonTargetSpacingValue({ value }));
+  }
+
+  public onPolygonStrengthChange(value: number): void {
+    this.store.dispatch(setPolygonStrengthValue({ value }));
   }
 }

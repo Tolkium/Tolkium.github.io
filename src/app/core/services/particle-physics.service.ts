@@ -11,6 +11,80 @@ import { Point } from '../../models/animation.constants';
 export class ParticlePhysicsService {
 
   /**
+   * Compute a fluctuating strength between min and max using a smooth sinusoidal function.
+   * periodSeconds controls the oscillation period (5-10 seconds for one full cycle).
+   */
+  public computeFluctuatingStrength(minStrength: number, maxStrength: number, periodSeconds: number, timeMs: number): number {
+    const clampedPeriod = Math.max(1.0, Math.min(30.0, periodSeconds)); // Clamp to reasonable range
+    const angularFreq = (2 * Math.PI) / clampedPeriod; // Convert period to angular frequency
+    const t = (timeMs / 1000) * angularFreq; // Time in radians
+    const wave = (Math.sin(t) + 1) / 2; // [0,1] smooth oscillation
+    return minStrength + wave * (maxStrength - minStrength);
+  }
+
+  /**
+   * Applies a spring-like force that tries to keep particles around a target spacing.
+   * Helpful for maintaining polygonal structures without collapsing into clusters.
+   */
+  public applyPolygonStabilizer(
+    point: Point,
+    otherPoint: Point,
+    distance: number,
+    targetSpacing: number,
+    strength: number
+  ): void {
+    if (distance <= 0) {
+      return;
+    }
+
+    const dx = otherPoint.x - point.x;
+    const dy = otherPoint.y - point.y;
+    const dirX = dx / distance;
+    const dirY = dy / distance;
+
+    const normalizedDelta = (distance - targetSpacing) / Math.max(1, targetSpacing);
+    // Clamp to avoid extreme forces
+    const clampedDelta = Math.max(-2, Math.min(2, normalizedDelta));
+    const force = clampedDelta * strength;
+
+    point.vx += dirX * force;
+    point.vy += dirY * force;
+    otherPoint.vx -= dirX * force;
+    otherPoint.vy -= dirY * force;
+  }
+
+  /**
+   * Magnetic force variant where force grows as distance increases (within radius),
+   * capped between minStrength and maxStrength and controlled by a coefficient.
+   * coefficient > 1 biases force to grow more with distance; < 1 more linear.
+   */
+  public applyMagneticForceInverse(
+    point: Point,
+    otherPoint: Point,
+    distance: number,
+    magneticRadius: number,
+    minStrength: number,
+    maxStrength: number,
+    coefficient: number
+  ): void {
+    if (distance <= 0 || distance >= magneticRadius) {
+      return;
+    }
+    const normalized = Math.pow(distance / magneticRadius, Math.max(0.01, coefficient));
+    const strength = Math.min(maxStrength, Math.max(minStrength, normalized * (maxStrength - minStrength) + minStrength));
+
+    const dx = otherPoint.x - point.x;
+    const dy = otherPoint.y - point.y;
+    const dirX = dx / distance;
+    const dirY = dy / distance;
+
+    point.vx += dirX * strength;
+    point.vy += dirY * strength;
+    otherPoint.vx -= dirX * strength;
+    otherPoint.vy -= dirY * strength;
+  }
+
+  /**
    * Applies repulsion force between two particles when they are very close.
    * Prevents particles from sticking together permanently.
    * 

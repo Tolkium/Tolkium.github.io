@@ -284,13 +284,53 @@ export const uiReducer = createReducer(
     saveToStorage('minClusterSize', value);
     return { ...state, minClusterSize: value };
   }),
+  // Magnetic behavior extensions
+  on(UiActions.setMagneticMode, (state, { mode }) => {
+    try { localStorage.setItem('magneticMode', mode); } catch {}
+    return { ...state, magneticMode: mode };
+  }),
+  on(UiActions.setMagneticMinStrengthValue, (state, { value }) => {
+    saveToStorage('magneticMinStrength', value);
+    return { ...state, magneticMinStrength: value };
+  }),
+  on(UiActions.setMagneticMaxStrengthValue, (state, { value }) => {
+    saveToStorage('magneticMaxStrength', value);
+    return { ...state, magneticMaxStrength: value };
+  }),
+  on(UiActions.setMagneticInverseCoefficientValue, (state, { value }) => {
+    saveToStorage('magneticInverseCoefficient', value);
+    return { ...state, magneticInverseCoefficient: value };
+  }),
+  on(UiActions.setMagneticFluctuationSpeedValue, (state, { value }) => {
+    saveToStorage('magneticFluctuationSpeed', value);
+    return { ...state, magneticFluctuationSpeed: value };
+  }),
+  on(UiActions.togglePolygonStabilizer, state => {
+    const newValue = !state.enablePolygonStabilizer;
+    saveToStorage('enablePolygonStabilizer', newValue);
+    return { ...state, enablePolygonStabilizer: newValue };
+  }),
+  on(UiActions.setPolygonStabilizer, (state, { enablePolygonStabilizer }) => {
+    saveToStorage('enablePolygonStabilizer', enablePolygonStabilizer);
+    return { ...state, enablePolygonStabilizer };
+  }),
+  on(UiActions.setPolygonTargetSpacingValue, (state, { value }) => {
+    saveToStorage('polygonTargetSpacing', value);
+    return { ...state, polygonTargetSpacing: value };
+  }),
+  on(UiActions.setPolygonStrengthValue, (state, { value }) => {
+    saveToStorage('polygonStrength', value);
+    return { ...state, polygonStrength: value };
+  }),
   // Reset all animation settings
   on(UiActions.resetAnimationSettings, state => {
     // Clear all animation-related localStorage items
     const animKeys = ['numPoints', 'connectionRadius', 'magneticRadius', 'magneticStrength',
       'minSpeed', 'maxSpeed', 'pointsSize', 'lineWidth', 'repulsionRadius', 'repulsionStrength',
       'dampingFactor', 'brownianStrength', 'clusterThreshold', 'explosionForce',
-      'clusterCheckInterval', 'minClusterSize'];
+      'clusterCheckInterval', 'minClusterSize',
+      'magneticMinStrength', 'magneticMaxStrength', 'magneticInverseCoefficient', 'magneticFluctuationSpeed',
+      'enablePolygonStabilizer', 'polygonTargetSpacing', 'polygonStrength'];
     animKeys.forEach(key => {
       try { localStorage.removeItem(key); } catch { /* ignore */ }
     });
@@ -311,7 +351,15 @@ export const uiReducer = createReducer(
       clusterThreshold: 20,
       explosionForce: 300,
       clusterCheckInterval: 180,
-      minClusterSize: 8
+      minClusterSize: 8,
+      // Do not force magneticMode here; keep current choice
+      magneticMinStrength: 0.0001,
+      magneticMaxStrength: 0.003,
+      magneticInverseCoefficient: 1.0,
+      magneticFluctuationSpeed: 7.5, // Period in seconds (5-10 range)
+      enablePolygonStabilizer: false,
+      polygonTargetSpacing: 120,
+      polygonStrength: 0.0008
     };
   })
 );

@@ -73,7 +73,7 @@ export const MENU_SECTIONS: MenuSection[] = [
       {
         iconName: 'heroDevicePhoneMobile',
         label: 'Local Storage Viewer',
-        route: '/SkillMatrix'
+        route: '/local-storage-viewer'
       },
       {
         iconName: 'heroServerStack',

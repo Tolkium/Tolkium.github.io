@@ -1,0 +1,227 @@
+<div class="relative z-10">
+  <div class="container mx-auto px-2 py-2 md:py-0 md:px-0 max-w-6xl">
+    <div class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-lg shadow-md backdrop-blur-sm">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <ng-icon [name]="icons.CIRCLE_STACK" class="w-8 h-8 text-[#f29f67]/90 dark:text-[#8833cc]/70"></ng-icon>
+          <h1 class="text-2xl font-bold text-[#f29f67]/90 dark:text-[#8833cc]/70 font-outfit">Local Storage Viewer</h1>
+        </div>
+        <button
+          (click)="refresh()"
+          class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors font-inter flex items-center gap-2"
+        >
+          <ng-icon [name]="icons.CLIPBOARD_DOCUMENT_LIST" class="w-4 h-4"></ng-icon>
+          Refresh
+        </button>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white/60 dark:bg-slate-800/60 rounded-lg p-4 shadow-sm">
+          <div class="text-xs text-slate-600 dark:text-slate-400 font-inter mb-1">Total Items</div>
+          <div class="text-2xl font-bold text-slate-700 dark:text-slate-300 font-outfit">{{ stats().total }}</div>
+        </div>
+        <div class="bg-white/60 dark:bg-slate-800/60 rounded-lg p-4 shadow-sm">
+          <div class="text-xs text-slate-600 dark:text-slate-400 font-inter mb-1">Total Size</div>
+          <div class="text-2xl font-bold text-slate-700 dark:text-slate-300 font-outfit">{{ stats().totalSizeFormatted }}</div>
+        </div>
+        <div class="bg-white/60 dark:bg-slate-800/60 rounded-lg p-4 shadow-sm">
+          <div class="text-xs text-slate-600 dark:text-slate-400 font-inter mb-1">Storage Used</div>
+          <div class="text-2xl font-bold text-slate-700 dark:text-slate-300 font-outfit">{{ stats().usedPercentage | number:'1.1-1' }}%</div>
+        </div>
+        <div class="bg-white/60 dark:bg-slate-800/60 rounded-lg p-4 shadow-sm">
+          <div class="text-xs text-slate-600 dark:text-slate-400 font-inter mb-1">Filtered Items</div>
+          <div class="text-2xl font-bold text-slate-700 dark:text-slate-300 font-outfit">{{ filteredItems().length }}</div>
+        </div>
+      </div>
+
+      <!-- Actions Bar -->
+      <div class="flex flex-wrap items-center gap-3 mb-6">
+        <!-- Search -->
+        <div class="flex-1 min-w-[200px] relative">
+          <ng-icon [name]="icons.MAGNIFYING_GLASS" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></ng-icon>
+          <input
+            type="text"
+            [value]="searchQuery()"
+            (input)="onSearchChange($event)"
+            placeholder="Search keys or values..."
+            class="w-full pl-10 pr-4 py-2 bg-white/60 dark:bg-slate-800/60 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#f29f67]/50 dark:focus:ring-[#8833cc]/50 font-inter"
+          />
+        </div>
+
+        <!-- Add Button -->
+        <button
+          (click)="toggleAddForm()"
+          class="px-4 py-2 bg-[#f29f67]/90 dark:bg-[#8833cc]/70 text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity font-inter flex items-center gap-2"
+        >
+          <ng-icon [name]="showAddForm() ? icons.X_CIRCLE : icons.CHECK_CIRCLE" class="w-4 h-4"></ng-icon>
+          {{ showAddForm() ? 'Cancel' : 'Add Item' }}
+        </button>
+
+        <!-- Export -->
+        <button
+          (click)="exportAll()"
+          class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors font-inter flex items-center gap-2"
+        >
+          <ng-icon [name]="icons.ARROW_DOWN_TRAY" class="w-4 h-4"></ng-icon>
+          Export
+        </button>
+
+        <!-- Import -->
+        <label class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors font-inter flex items-center gap-2 cursor-pointer">
+          <ng-icon [name]="icons.ARROW_UP_TRAY" class="w-4 h-4 rotate-180"></ng-icon>
+          Import
+          <input
+            type="file"
+            accept=".json"
+            (change)="importData($event)"
+            class="hidden"
+          />
+        </label>
+
+        <!-- Clear All -->
+        <button
+          (click)="clearAll()"
+          class="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors font-inter flex items-center gap-2"
+        >
+          <ng-icon [name]="icons.TRASH" class="w-4 h-4"></ng-icon>
+          Clear All
+        </button>
+      </div>
+
+      <!-- Add Form -->
+      @if (showAddForm()) {
+        <div class="bg-white/60 dark:bg-slate-800/60 rounded-lg p-4 mb-6 shadow-sm border-2 border-[#f29f67]/30 dark:border-[#8833cc]/30">
+          <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 font-inter">Add New Item</h3>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1 font-inter">Key</label>
+              <input
+                type="text"
+                [value]="newKey()"
+                (input)="newKey.set($any($event.target).value)"
+                placeholder="Enter key..."
+                class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#f29f67]/50 dark:focus:ring-[#8833cc]/50 font-inter"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1 font-inter">Value</label>
+              <textarea
+                [value]="newValue()"
+                (input)="newValue.set($any($event.target).value)"
+                placeholder="Enter value (JSON supported)..."
+                rows="4"
+                class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#f29f67]/50 dark:focus:ring-[#8833cc]/50 font-inter font-mono text-sm"
+              ></textarea>
+            </div>
+            <button
+              (click)="addItem()"
+              class="px-4 py-2 bg-[#f29f67]/90 dark:bg-[#8833cc]/70 text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity font-inter"
+            >
+              Add Item
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Items List -->
+      <div class="space-y-3">
+        @if (filteredItems().length === 0) {
+          <div class="text-center py-12 bg-white/60 dark:bg-slate-800/60 rounded-lg">
+            <p class="text-slate-500 dark:text-slate-400 font-inter">
+              {{ searchQuery() ? 'No items match your search.' : 'No items in localStorage.' }}
+            </p>
+          </div>
+        } @else {
+          @for (item of filteredItems(); track item.key) {
+            <div class="bg-white/60 dark:bg-slate-800/60 rounded-lg p-4 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
+              @if (editingKey() === item.key) {
+                <!-- Edit Mode -->
+                <div class="space-y-3">
+                  <div>
+                    <div class="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1 font-inter">Key</div>
+                    <div class="px-3 py-2 bg-slate-100 dark:bg-slate-700 rounded-lg text-slate-700 dark:text-slate-300 font-mono text-sm">
+                      {{ item.key }}
+                    </div>
+                  </div>
+                  <div>
+                    <div class="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1 font-inter">Value</div>
+                    <textarea
+                      [value]="editingValue()"
+                      (input)="editingValue.set($any($event.target).value)"
+                      rows="6"
+                      class="w-full px-3 py-2 bg-white dark:bg-slate-600 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#f29f67]/50 dark:focus:ring-[#8833cc]/50 font-inter font-mono text-sm"
+                    ></textarea>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button
+                      (click)="saveEdit()"
+                      class="px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition-colors font-inter flex items-center gap-2"
+                    >
+                      <ng-icon [name]="icons.CHECK_CIRCLE" class="w-4 h-4"></ng-icon>
+                      Save
+                    </button>
+                    <button
+                      (click)="cancelEdit()"
+                      class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors font-inter flex items-center gap-2"
+                    >
+                      <ng-icon [name]="icons.X_CIRCLE" class="w-4 h-4"></ng-icon>
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              } @else {
+                <!-- View Mode -->
+                <div class="flex items-start justify-between gap-4">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-2">
+                      <div class="px-2 py-1 bg-[#f29f67]/20 dark:bg-[#8833cc]/20 text-[#f29f67] dark:text-[#8833cc] rounded text-xs font-mono font-semibold">
+                        {{ item.key }}
+                      </div>
+                      @if (item.isJson) {
+                        <span class="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded text-xs font-inter">
+                          JSON
+                        </span>
+                      }
+                      <span class="text-xs text-slate-500 dark:text-slate-400 font-inter">
+                        {{ item.sizeFormatted }}
+                      </span>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
+                      <pre class="text-xs text-slate-700 dark:text-slate-300 font-mono whitespace-pre-wrap break-words overflow-x-auto">{{ item.isJson ? formatJson(item.value) : item.value }}</pre>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2 flex-shrink-0">
+                    <button
+                      (click)="copyToClipboard(item.value)"
+                      class="p-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
+                      title="Copy value"
+                    >
+                      <ng-icon [name]="icons.CLIPBOARD_DOCUMENT_LIST" class="w-4 h-4"></ng-icon>
+                    </button>
+                    <button
+                      (click)="startEdit(item)"
+                      class="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                      title="Edit"
+                    >
+                      <ng-icon [name]="icons.PENCIL_SQUARE" class="w-4 h-4"></ng-icon>
+                    </button>
+                    <button
+                      (click)="deleteItem(item.key)"
+                      class="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                      title="Delete"
+                    >
+                      <ng-icon [name]="icons.TRASH" class="w-4 h-4"></ng-icon>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -32,6 +32,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/calendar/calendar.component').then(m => m.CalendarComponent)
   },
+  {
+    path: 'local-storage-viewer',
+    loadComponent: () =>
+      import('./features/local-storage-viewer/local-storage-viewer.component').then(m => m.LocalStorageViewerComponent)
+  },
   // Add other routes as needed
   { path: '**', redirectTo: 'about' }
 ];

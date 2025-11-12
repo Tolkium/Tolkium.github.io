@@ -357,7 +357,7 @@ export const uiReducer = createReducer(
       magneticMaxStrength: 0.003,
       magneticInverseCoefficient: 1.0,
       magneticFluctuationSpeed: 7.5, // Period in seconds (5-10 range)
-      enablePolygonStabilizer: false,
+      enablePolygonStabilizer: true,
       polygonTargetSpacing: 120,
       polygonStrength: 0.0008
     };

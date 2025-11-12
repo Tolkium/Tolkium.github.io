@@ -116,7 +116,7 @@ export const initialUiState: UiState = {
   magneticMaxStrength: loadNumberFromStorage('magneticMaxStrength', 0.003),
   magneticInverseCoefficient: loadNumberFromStorage('magneticInverseCoefficient', 1.0),
   magneticFluctuationSpeed: loadNumberFromStorage('magneticFluctuationSpeed', 7.5), // Period in seconds (5-10 range)
-  enablePolygonStabilizer: loadBooleanFromStorage('enablePolygonStabilizer', false),
+  enablePolygonStabilizer: loadBooleanFromStorage('enablePolygonStabilizer', true),
   polygonTargetSpacing: loadNumberFromStorage('polygonTargetSpacing', 120),
   polygonStrength: loadNumberFromStorage('polygonStrength', 0.0008)
 };

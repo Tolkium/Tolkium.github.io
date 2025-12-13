@@ -32,11 +32,6 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/calendar/calendar.component').then(m => m.CalendarComponent)
   },
-  {
-    path: 'christmas-gift',
-    loadComponent: () =>
-      import('./features/christmas-gift/christmas-gift.component').then(m => m.ChristmasGiftComponent)
-  },
   // Add other routes as needed
   { path: '**', redirectTo: 'about' }
 ];

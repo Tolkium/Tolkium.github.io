@@ -49,6 +49,7 @@ import {
   heroChevronLeft,
   heroChevronRight,
   heroClock,
+  heroGift,
 } from '@ng-icons/heroicons/outline';
 import { heroCheckCircleSolid } from '@ng-icons/heroicons/solid';
 
@@ -106,6 +107,7 @@ export const appConfig: ApplicationConfig = {
       heroChevronLeft,
       heroChevronRight,
       heroClock,
+      heroGift,
       heroCheckCircleSolid,
     })
   ],

@@ -11,6 +11,11 @@ export const MENU_SECTIONS: MenuSection[] = [
         route: '/about'
       },
       {
+        iconName: 'heroGift',
+        label: 'Christmas Gift',
+        route: '/christmas-gift'
+      },
+      {
         iconName: 'heroFolder',
         label: 'Projects',
         route: '/projects'

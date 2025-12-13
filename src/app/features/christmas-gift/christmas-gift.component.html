@@ -1,0 +1,137 @@
+<div class="christmas-gift-container fade-in">
+  <!-- Header Section -->
+  <header class="page-header">
+    <div class="title-wrapper">
+      <ng-icon name="heroGift" class="header-icon"></ng-icon>
+      <h1 class="page-title">Project: Christmas Upgrade</h1>
+    </div>
+    <div class="subtitle">
+      <span class="terminal-prefix">></span> TARGET: {{ productName }}
+    </div>
+  </header>
+
+  <!-- Main Content Grid -->
+  <div class="content-grid">
+    <!-- Left Column: Image & Specs -->
+    <div class="product-card">
+      <div class="image-wrapper">
+        <img [src]="productImage" alt="RTX 5070 Ti" class="product-image">
+        <div class="scan-line"></div>
+        <div class="specs-overlay">
+          <div class="specs-title">SYSTEM DIAGNOSTICS</div>
+          <div class="specs-list">
+            <div *ngFor="let spec of specs" class="spec-item">
+              <span class="spec-label">{{ spec.label }}:</span>
+              <span class="spec-value">{{ spec.value }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="price-tag">
+        <span class="currency">€</span>{{ productPrice | number:'1.2-2' }}
+      </div>
+    </div>
+
+    <!-- Right Column: Progress Road & Actions -->
+    <div class="progress-section">
+      <h2 class="section-title">
+        <span class="terminal-prefix">></span> FUNDING_SEQUENCE_INIT...
+      </h2>
+
+      <!-- Visual Circuit Path "Road" -->
+      <div class="circuit-road">
+        <!-- SVG Path for the connecting line -->
+        <svg class="circuit-svg" preserveAspectRatio="none">
+          <path class="trace-bg" d="M 10 50 Q 250 0 490 50 T 990 50" />
+          <path class="trace-active" [style.stroke-dasharray]="progressPercentage + ', 100'" d="M 10 50 Q 250 0 490 50 T 990 50" />
+        </svg>
+
+        <!-- Milestones Nodes placed along the path (visually approximated for now with flex) -->
+         <div class="milestones-track">
+           <div *ngFor="let m of milestones; let i = index"
+                class="milestone-node"
+                [class.active]="isMilestoneActive(m)"
+                [title]="m.label + ' (' + m.cost + '€)'">
+             <div class="node-dot"></div>
+             <div class="node-label">{{ m.label }}</div>
+           </div>
+         </div>
+      </div>
+
+      <!-- Funding Stats -->
+      <div class="funding-stats">
+        <div class="stat-box">
+          <span class="label">COLLECTED</span>
+          <span class="value highlight">{{ currentAmount | number:'1.2-2' }} €</span>
+        </div>
+        <div class="stat-box">
+          <span class="label">PROGRESS</span>
+          <span class="value">{{ progressPercentage | number:'1.0-0' }}%</span>
+        </div>
+        <div class="stat-box">
+          <span class="label">REMAINING</span>
+          <span class="value">{{ (productPrice - currentAmount) | number:'1.2-2' }} €</span>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <div class="action-wrapper">
+        <button class="btn-primary-nerdy" (click)="openModal()">
+          <ng-icon name="heroCpuChip" class="btn-icon"></ng-icon>
+          <span>INITIALIZE TRANSFER PROTOCOL (Make my Gift true)</span>
+          <ng-icon name="heroSparkles" class="btn-icon-right"></ng-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div *ngIf="isModalOpen()" class="modal-backdrop" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3><span class="terminal-prefix">></span> TRANSFER_PROTOCOL_V1.0</h3>
+        <button class="close-btn" (click)="closeModal()">
+          <ng-icon name="heroXMark"></ng-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="status-alert">
+          <span class="blink">⚠</span> AUTOMATED GATEWAY: <strong>IMPLEMENTATION IN PROGRESS</strong>
+        </div>
+
+        <p class="instruction-text">
+          Automated systems are currently compiling. Please execute <strong>MANUAL OVERRIDE</strong> using the coordinates below:
+        </p>
+
+        <div class="bank-details-card">
+          <div class="detail-row">
+            <span class="label">TARGET BANK:</span>
+            <span class="value monospace">Example Bank Ltd.</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">ACCOUNT HOLDER:</span>
+            <span class="value monospace">Jules the Agent</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">IBAN COORDINATES:</span>
+            <span class="value monospace highlight">XY12 3456 7890 1234 5678</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">BIC/SWIFT:</span>
+            <span class="value monospace">EXAMPLEX</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">REFERENCE:</span>
+            <span class="value monospace">RTX5070-GIFT</span>
+          </div>
+        </div>
+
+        <p class="footer-note">
+          * Transmission of funds confirms support for high-resolution rendering and neural processing units.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

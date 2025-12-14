@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'about', pathMatch: 'full' },
+  { path: '', redirectTo: 'christmas-gift', pathMatch: 'full' },
   {
     path: 'about',
     loadComponent: () =>
@@ -32,6 +32,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/calendar/calendar.component').then(m => m.CalendarComponent)
   },
+  {
+    path: 'christmas-gift',
+    loadComponent: () =>
+      import('./features/christmas-gift/christmas-gift.component').then(m => m.ChristmasGiftComponent)
+  },
   // Add other routes as needed
-  { path: '**', redirectTo: 'about' }
+  { path: '**', redirectTo: 'christmas-gift' }
 ];

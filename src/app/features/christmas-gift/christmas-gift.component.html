@@ -1,0 +1,505 @@
+<div class="relative z-10 min-h-screen pb-8">
+  <div class="container mx-auto px-4 py-6 md:px-6 md:py-8 max-w-7xl">
+    
+    <!-- Hero Header with Gradient Text -->
+    <div class="mb-8">
+      <h1 class="text-5xl md:text-6xl font-bold mb-3 bg-gradient-to-r from-[#f29f67] via-[#8833cc] to-[#3b82f6] bg-clip-text text-transparent font-outfit">
+        Operation RTX 5070 Ti
+      </h1>
+      <p class="text-xl text-slate-600 dark:text-slate-300 font-inter">
+        Building the Ultimate Gaming Experience • Target: 802,90 €
+      </p>
+    </div>
+
+    <!-- Disclaimer Card -->
+    <div class="dashboard-card mb-6 border-l-4 border-[#f29f67] dark:border-[#8833cc]">
+      <div class="flex items-start gap-3">
+        <div class="text-2xl">ℹ️</div>
+        <div class="flex-1">
+          <h3 class="text-sm font-semibold text-slate-800 dark:text-white mb-2 font-outfit">Friendly Disclaimer</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400 font-inter leading-relaxed">
+            This is a voluntary contribution, not a charity. I'm planning to buy this GPU anyway 
+            (electronics prices are estimated to increase significantly in Q1 and Q2 2026), 
+            and I'll be contributing a larger portion myself. This is just a fun way to share 
+            the gift with friends & family. No pressure! 🎮
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Dashboard Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+      
+      <!-- Left Side: Product Showcase (8 columns) -->
+      <div class="lg:col-span-8 space-y-6">
+        
+        <!-- Product Hero Card with Modern Design -->
+        <div class="dashboard-card">
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
+            <div>
+              <h2 class="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white mb-2 font-outfit">
+                GIGABYTE GeForce RTX 5070 Ti
+              </h2>
+              <p class="text-slate-600 dark:text-slate-300 font-inter">WINDFORCE OC SFF 16G • Blackwell Architecture</p>
+            </div>
+            <div class="mt-4 md:mt-0 text-right">
+              <div class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#f29f67] to-[#8833cc] bg-clip-text text-transparent font-outfit">
+                802,90 €
+              </div>
+            </div>
+          </div>
+
+          <!-- GPU Image with HUD Overlay -->
+          <div 
+            class="relative group mb-6 rounded-xl overflow-hidden"
+            (mouseenter)="onImageHover(true)"
+            (mouseleave)="onImageHover(false)"
+          >
+            <div class="relative bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 aspect-[16/9] flex items-center justify-center">
+              @if (!imageError()) {
+                <img 
+                  [src]="gpuImageUrl" 
+                  alt="GIGABYTE RTX 5070 Ti"
+                  class="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                  (error)="onImageError()"
+                />
+              } @else {
+                <div class="flex items-center justify-center h-full">
+                  <div class="text-center">
+                    <div class="text-8xl mb-4">🎮</div>
+                    <p class="text-slate-600 dark:text-slate-300 font-inter">GIGABYTE RTX 5070 Ti</p>
+                  </div>
+                </div>
+              }
+              
+              <!-- HUD Overlay - Bottom 1/4 with fade, maximum compact -->
+              @if (showHUD()) {
+                <div class="absolute bottom-0 left-0 right-0 h-1/4 pointer-events-none z-10 hud-overlay-bottom">
+                  <div class="h-full flex items-end px-1.5 pb-1.5">
+                    <div class="w-full font-mono text-[12px] leading-tight hud-stats-box-transparent">
+                      <!-- Header - Compact title -->
+                      <div class="text-[#f29f67] dark:text-[#8833cc] font-bold mb-1 text-[13px] border-b border-[#f29f67]/40 dark:border-[#8833cc]/40 pb-0.5">
+                        RTX 3080 → RTX 5070 Ti
+                      </div>
+                      
+                      <!-- Visual Specs - Compact -->
+                      <div class="mb-1 text-[11px] flex flex-wrap gap-x-2 gap-y-0.5">
+                        <span class="text-white dark:text-white"><span class="text-[#f29f67] dark:text-[#8833cc]">●</span> {{ gpuSpecs.vram }}</span>
+                        <span class="text-white dark:text-white"><span class="text-[#f29f67] dark:text-[#8833cc]">●</span> {{ gpuSpecs.bandwidth }}</span>
+                        <span class="text-white dark:text-white"><span class="text-[#f29f67] dark:text-[#8833cc]">●</span> 2497 MHz</span>
+                        <span class="text-white dark:text-white"><span class="text-[#f29f67] dark:text-[#8833cc]">●</span> {{ gpuSpecs.architecture }}</span>
+                      </div>
+
+                      <!-- Visual Improvements - Compact with arrows -->
+                      <div class="mb-1 text-[11px] flex flex-wrap gap-x-2 gap-y-0.5">
+                        <span class="text-white dark:text-white font-bold">VRAM <span class="text-green-400 dark:text-green-400">↑{{ upgradeFeatures.vs3080.vram.improvement }}</span></span>
+                        <span class="text-white dark:text-white font-bold">DLSS <span class="text-green-400 dark:text-green-400">{{ upgradeFeatures.vs3080.dlss.improvement }}</span></span>
+                        <span class="text-white dark:text-white font-bold">Tensor <span class="text-green-400 dark:text-green-400">↑{{ upgradeFeatures.vs3080.tensorCores.improvement }}</span></span>
+                        <span class="text-white dark:text-white font-bold">Perf <span class="text-green-400 dark:text-green-400">{{ upgradeFeatures.vs3080.performance.current }}</span></span>
+                      </div>
+
+                      <!-- Visual Features - Icons/Symbols -->
+                      <div class="text-[11px] flex flex-wrap gap-x-1.5 gap-y-0.5">
+                        <span class="text-white dark:text-white">⚡ DLSS 4</span>
+                        <span class="text-white dark:text-white">🎮 Ray Tracing</span>
+                        <span class="text-white dark:text-white">❄️ WINDFORCE</span>
+                        <span class="text-white dark:text-white">🔧 SFF Ready</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Circuit Road Progress -->
+          <div class="mb-6 relative z-10" style="margin-bottom: 80px;">
+            <div class="flex items-center justify-between mb-4 relative z-20">
+              <h3 class="text-lg font-semibold text-slate-800 dark:text-white font-outfit">Assembly Progress</h3>
+              <span class="text-5xl font-bold bg-gradient-to-r from-[#f29f67] to-[#8833cc] bg-clip-text text-transparent font-outfit relative z-20 pulsing-percentage">
+                {{ progressPercentage() | number:'1.0-1' }}%
+              </span>
+            </div>
+            
+            <!-- Space for badge and tooltips -->
+            <div class="h-8 mb-2 relative"></div>
+            
+            <div class="relative h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-visible mb-16">
+              <!-- Progress fill with glow effect -->
+              <div 
+                class="absolute top-0 left-0 h-full bg-gradient-to-r from-[#f29f67] via-[#8833cc] to-[#3b82f6] rounded-full transition-all duration-500 shadow-lg"
+                [style.width.%]="progressPercentage()"
+                [style.box-shadow]="progressPercentage() > 0 ? '0 0 20px rgba(136, 51, 204, 0.5)' : 'none'"
+              ></div>
+              
+              <!-- Milestone nodes on the bar -->
+              <div class="absolute top-1/2 left-0 right-0 transform -translate-y-1/2 h-0">
+                @for (milestone of milestones; track milestone.id) {
+                  @if (milestone.id === currentMilestone().id && progressPercentage() < milestone.percentage) {
+                    <!-- Current/Active milestone - bigger -->
+                    <div 
+                      class="absolute milestone-node milestone-current"
+                      [style.left.%]="milestone.percentage"
+                      [style.transform]="'translate(-50%, -50%)'"
+                    >
+                      <div 
+                        class="w-8 h-8 rounded-full border-3 transition-all duration-300 z-10 relative bg-gradient-to-br from-[#f29f67] to-[#8833cc] border-white dark:border-slate-800 shadow-xl ring-4 ring-[#8833cc]/50 animate-pulse"
+                      >
+                        <div class="absolute inset-0 rounded-full bg-gradient-to-br from-[#f29f67] to-[#8833cc] opacity-75 animate-ping"></div>
+                      </div>
+                      
+                      <!-- Hover tooltip below -->
+                      <div class="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 opacity-0 hover:opacity-100 transition-all duration-300 pointer-events-none z-50 milestone-tooltip">
+                        <div class="bg-slate-800 dark:bg-slate-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl border border-[#8833cc]/50 backdrop-blur-sm">
+                          {{ milestone.name }}
+                          <span class="text-yellow-400 ml-1.5">→</span>
+                        </div>
+                        <!-- Tooltip arrow -->
+                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-slate-800 dark:border-b-slate-900"></div>
+                      </div>
+                    </div>
+                  } @else {
+                    <!-- Regular milestone -->
+                    <div 
+                      class="absolute milestone-node"
+                      [style.left.%]="milestone.percentage"
+                      [style.transform]="'translate(-50%, -50%)'"
+                    >
+                      <div 
+                        class="w-6 h-6 rounded-full border-2 transition-all duration-300 z-10 relative"
+                        [class.bg-gradient-to-br]="progressPercentage() >= milestone.percentage"
+                        [class.from-[#f29f67]]="progressPercentage() >= milestone.percentage"
+                        [class.to-[#8833cc]]="progressPercentage() >= milestone.percentage"
+                        [class.border-transparent]="progressPercentage() >= milestone.percentage"
+                        [class.bg-slate-400]="progressPercentage() < milestone.percentage"
+                        [class.border-slate-400]="progressPercentage() < milestone.percentage"
+                        [class.dark:bg-slate-600]="progressPercentage() < milestone.percentage"
+                        [class.dark:border-slate-500]="progressPercentage() < milestone.percentage"
+                        [class.shadow-lg]="progressPercentage() >= milestone.percentage"
+                        [class.shadow-[#8833cc]/50]="progressPercentage() >= milestone.percentage"
+                      >
+                        @if (progressPercentage() >= milestone.percentage) {
+                          <div class="absolute inset-0 rounded-full bg-gradient-to-br from-[#f29f67] to-[#8833cc] opacity-75"></div>
+                        }
+                      </div>
+                      
+                      <!-- Hover tooltip below -->
+                      <div class="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 opacity-0 hover:opacity-100 transition-all duration-300 pointer-events-none z-50 milestone-tooltip">
+                        <div class="bg-slate-800 dark:bg-slate-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl border border-[#8833cc]/50 backdrop-blur-sm">
+                          {{ milestone.name }}
+                          @if (progressPercentage() >= milestone.percentage) {
+                            <span class="text-green-400 ml-1.5">✓</span>
+                          } @else {
+                            <span class="text-slate-500 ml-1.5">○</span>
+                          }
+                        </div>
+                        <!-- Tooltip arrow -->
+                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-slate-800 dark:border-b-slate-900"></div>
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+              
+              <!-- Last achieved milestone badge on top - always visible -->
+              @if (lastAchievedMilestone()) {
+                <div 
+                  class="absolute top-0 left-0 transform -translate-x-1/2 milestone-badge z-10"
+                  [style.left.%]="lastAchievedMilestone()!.percentage"
+                  [style.top.px]="-45"
+                  [class.milestone-badge-left]="lastAchievedMilestone()!.percentage < 10"
+                  [class.milestone-badge-right]="lastAchievedMilestone()!.percentage > 90"
+                >
+                  <div class="bg-gradient-to-r from-[#f29f67] to-[#8833cc] text-white text-xs px-3 py-1.5 rounded-lg shadow-lg border-2 border-white dark:border-slate-800 font-semibold whitespace-nowrap flex items-center gap-1.5">
+                    <span>✨</span>
+                    <span>{{ lastAchievedMilestone()!.name }}</span>
+                    <span>✓</span>
+                  </div>
+                  <!-- Arrow pointing to bar -->
+                  <div class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-[#8833cc]"></div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Donation Button -->
+          <button
+            (click)="openModal()"
+            class="w-full py-4 px-6 bg-gradient-to-r from-[#8833cc] via-[#f29f67] to-[#8833cc] text-white font-bold text-lg rounded-xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 font-outfit relative overflow-hidden group"
+          >
+            <span class="relative z-10 block group-hover:hidden">Make my Gift true</span>
+            <span class="relative z-10 hidden group-hover:block">Wow, it worked?... Thank you!</span>
+            <div class="absolute inset-0 bg-gradient-to-r from-[#f29f67] via-[#8833cc] to-[#f29f67] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </button>
+        </div>
+
+        <!-- Stats Cards Row -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- Your Growth Card -->
+          <div class="dashboard-card-small">
+            <div class="text-sm text-slate-600 dark:text-slate-400 mb-1 font-inter">Your Growth</div>
+            <div class="text-3xl font-bold text-slate-800 dark:text-white mb-2 font-outfit">{{ chartData.growth }}%</div>
+            <div class="flex items-center gap-1 text-green-600 dark:text-green-400 text-xs">
+              <span>↑</span>
+              <span>+{{ chartData.growth - 20 }}%</span>
+            </div>
+          </div>
+
+          <!-- Total Donors -->
+          <div class="dashboard-card-small">
+            <div class="text-sm text-slate-600 dark:text-slate-400 mb-1 font-inter">Total Donors</div>
+            <div class="text-3xl font-bold text-slate-800 dark:text-white mb-2 font-outfit">{{ chartData.totalDonors }}</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 font-inter">Active contributors</div>
+          </div>
+
+          <!-- Earnings -->
+          <div class="dashboard-card-small">
+            <div class="text-sm text-slate-600 dark:text-slate-400 mb-1 font-inter">Earnings</div>
+            <div class="text-3xl font-bold text-slate-800 dark:text-white mb-2 font-outfit">{{ currentAmount() | number:'1.0-0' }}€</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 font-inter">Raised so far</div>
+          </div>
+
+          <!-- Days Until Goal -->
+          <div class="dashboard-card-small">
+            <div class="text-sm text-slate-600 dark:text-slate-400 mb-1 font-inter">Days Until Goal</div>
+            <div class="text-3xl font-bold text-slate-800 dark:text-white mb-2 font-outfit">{{ daysUntilGoal() }}</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 font-inter">Need to buy earlier</div>
+          </div>
+        </div>
+
+        <!-- Donation Activity Chart -->
+        <div class="dashboard-card">
+          <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-6 font-outfit">Donation Activity</h3>
+          <div class="flex items-end justify-between gap-3" style="height: 200px;">
+            @for (donation of chartData.dailyDonations; track $index) {
+              <div class="flex-1 flex flex-col items-center gap-2 h-full">
+                <div class="relative w-full h-full flex items-end justify-center">
+                  <div 
+                    class="w-full max-w-[70px] mx-auto rounded-t-lg transition-all duration-500 hover:opacity-90 hover:scale-105 shadow-lg"
+                    [style.height.%]="getBarWidth(donation)"
+                    [style.min-height.px]="donation > 0 ? 10 : 0"
+                    [style.background-color]="getBarColor(donation)"
+                  ></div>
+                </div>
+                <div class="flex flex-col items-center gap-0.5">
+                  <span class="text-[12px] font-bold text-slate-700 dark:text-slate-300 text-center">{{ donation }}€</span>
+                  <span class="text-[10px] text-slate-600 dark:text-slate-400 font-inter text-center">{{ chartData.days[$index] }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side: Charts & Metrics (4 columns) -->
+      <div class="lg:col-span-4 space-y-6">
+        
+        <!-- Contributors Visualization - Pie Chart -->
+        <div class="dashboard-card">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-white font-outfit">Contributors</h3>
+            <span class="text-sm text-slate-600 dark:text-slate-400 font-inter">{{ totalContributors() }} total</span>
+          </div>
+          
+          <div class="relative w-full aspect-square max-w-[200px] mx-auto mb-4">
+            <svg class="w-full h-full" viewBox="0 0 100 100" style="transform: rotate(-90deg);">
+              @for (contributor of contributors; track $index) {
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  fill="none"
+                  [attr.stroke]="contributor.color"
+                  [attr.stroke-width]="hoveredContributorIndex() === $index ? '18' : '16'"
+                  stroke-linecap="round"
+                  [attr.stroke-dasharray]="getPieDashArray($index)"
+                  [attr.stroke-dashoffset]="getPieDashOffset($index)"
+                  class="transition-all duration-300 pie-segment cursor-pointer"
+                  [class.opacity-90]="hoveredContributorIndex() === $index"
+                  [class.opacity-100]="hoveredContributorIndex() !== $index"
+                  (mouseenter)="onContributorHover($index)"
+                  (mouseleave)="onContributorHover(null)"
+                />
+              }
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div class="text-center">
+                <div class="text-2xl font-bold text-slate-800 dark:text-white font-outfit">
+                  {{ contributorsTotal() }}€
+                </div>
+                <div class="text-xs text-slate-600 dark:text-slate-400 font-inter">Total</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Hover tooltip (shown only on hover) -->
+          @if (hoveredContributorIndex() !== null) {
+            @let contributor = contributors[hoveredContributorIndex()!];
+            @let index = hoveredContributorIndex()!;
+            <div class="text-center mt-2">
+              <div class="bg-slate-800 dark:bg-slate-900 text-white text-xs px-3 py-2 rounded-lg shadow-xl border border-[#8833cc]/50 inline-block">
+                <div class="font-semibold mb-1">{{ contributor.name === 'Unknown' ? 'Unknown Donation' : contributor.name }}</div>
+                <div class="text-slate-300">Amount: {{ contributor.amount }}€</div>
+                <div class="text-slate-400 text-[10px]">{{ contributor.date }}</div>
+                <div class="text-slate-400 text-[10px] mt-1">{{ getPiePercentage(index) | number:'1.0-1' }}%</div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Goal Velocity Card -->
+        <div class="dashboard-card">
+          <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 font-outfit">Goal Velocity</h3>
+          <div class="text-center">
+            <div class="text-4xl font-bold bg-gradient-to-r from-[#f29f67] to-[#8833cc] bg-clip-text text-transparent font-outfit mb-2">
+              {{ goalVelocity() | number:'1.0-1' }}€
+            </div>
+            <div class="text-sm text-slate-600 dark:text-slate-400 font-inter">per day average</div>
+          </div>
+        </div>
+
+        <!-- Milestone Achievements -->
+        <div class="dashboard-card">
+          <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 font-outfit">Milestone Achievements</h3>
+          <div class="grid grid-cols-3 gap-3">
+            @for (milestone of completedMilestones(); track milestone.id) {
+              <div class="flex flex-col items-center p-3 rounded-lg bg-gradient-to-br from-[#8833cc]/20 to-[#f29f67]/20 dark:from-[#8833cc]/30 dark:to-[#f29f67]/30 border border-[#8833cc]/30 dark:border-[#f29f67]/30">
+                <div class="text-2xl mb-1">✅</div>
+                <div class="text-xs text-center text-slate-700 dark:text-slate-300 font-inter leading-tight">{{ milestone.name }}</div>
+              </div>
+            }
+            @if (completedMilestones().length === 0) {
+              <div class="col-span-3 text-center text-sm text-slate-500 dark:text-slate-400 font-inter py-4">
+                No milestones achieved yet
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Growth Trend Line Chart -->
+        <div class="dashboard-card">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-white font-outfit">Growth Trend</h3>
+            <span class="text-2xl font-bold text-slate-800 dark:text-white font-outfit">{{ chartData.growthTrend[chartData.growthTrend.length - 1] }}k</span>
+          </div>
+          <div class="relative h-24">
+            <svg class="w-full h-full" viewBox="0 0 300 80" preserveAspectRatio="none">
+              <!-- Area under line -->
+              <path
+                [attr.d]="getAreaPath()"
+                fill="url(#areaGradient)"
+                opacity="0.3"
+              />
+              <!-- Line -->
+              <path
+                [attr.d]="getLineChartPath()"
+                fill="none"
+                stroke="url(#lineGradient)"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <defs>
+                <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" style="stop-color:#8833cc;stop-opacity:0.4" />
+                  <stop offset="100%" style="stop-color:#8833cc;stop-opacity:0" />
+                </linearGradient>
+                <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#8833cc;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#f29f67;stop-opacity:1" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="text-xs text-slate-600 dark:text-slate-400 font-inter mt-2">New Followers</div>
+        </div>
+
+        <!-- Recent Milestones -->
+        <div class="dashboard-card">
+          <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 font-outfit">Recent Milestones</h3>
+          <div class="space-y-3">
+            @for (milestone of completedMilestones().slice(-3).reverse(); track milestone.id) {
+              <div class="flex items-center gap-3 p-2 rounded-lg bg-slate-100 dark:bg-slate-700/50">
+                <div class="w-2 h-2 rounded-full bg-gradient-to-r from-[#f29f67] to-[#8833cc]"></div>
+                <span class="text-sm text-slate-800 dark:text-white font-inter">{{ milestone.name }}</span>
+              </div>
+            }
+            @if (completedMilestones().length === 0) {
+              <div class="text-sm text-slate-600 dark:text-slate-400 font-inter">No milestones completed yet</div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Donation Modal -->
+  @if (showModal()) {
+    <div 
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md"
+      (click)="closeModal()"
+    >
+      <div 
+        class="dashboard-card max-w-md w-full mx-4 p-6"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-2xl font-bold bg-gradient-to-r from-[#f29f67] to-[#8833cc] bg-clip-text text-transparent font-outfit">
+            System Update Initiated...
+          </h3>
+          <button 
+            (click)="closeModal()"
+            class="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-xl"
+          >
+            ✕
+          </button>
+        </div>
+        
+        <div>
+          <p class="text-slate-700 dark:text-slate-300 mb-6 font-inter">
+            Automatic payment implementation in progress.
+          </p>
+          
+          <div class="bg-slate-700/50 p-4 rounded-lg mb-4 space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2 font-inter">
+                Name:
+              </label>
+              <code class="block text-base font-mono text-slate-900 dark:text-white break-all bg-slate-100 dark:bg-slate-800/50 p-2 rounded">
+                {{ paymentName }}
+              </code>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2 font-inter">
+                IBAN:
+              </label>
+              <div class="flex items-center gap-2">
+                <code class="flex-1 text-base font-mono text-slate-900 dark:text-white break-all bg-slate-100 dark:bg-slate-800/50 p-2 rounded">
+                  {{ formatIBAN(iban) }}
+                </code>
+                <button
+                  (click)="copyToClipboard(iban)"
+                  class="px-4 py-2 bg-gradient-to-r from-[#8833cc] to-[#f29f67] text-white rounded-lg hover:opacity-90 transition-opacity font-inter text-sm font-semibold"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2 font-inter">
+                BIC/SWIFT:
+              </label>
+              <code class="block text-base font-mono text-slate-900 dark:text-white break-all bg-slate-100 dark:bg-slate-800/50 p-2 rounded">
+                {{ bicSwift }}
+              </code>
+            </div>
+          </div>
+          
+          <div class="text-xs text-slate-600 dark:text-slate-400 font-inter">
+            Thank you for your contribution! Every donation brings us closer to the ultimate gaming setup.
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

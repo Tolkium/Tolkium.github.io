@@ -1,12 +1,22 @@
 import { Component, ChangeDetectionStrategy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgIconComponent } from '@ng-icons/core';
-
-interface Milestone {
-  id: number;
-  name: string;
-  percentage: number;
-}
+import {
+  TOTAL_GOAL,
+  GOAL_DATE,
+  MILESTONES,
+  CONTRIBUTORS,
+  PAYMENT_INFO,
+  GPU_SPECS,
+  UPGRADE_FEATURES,
+  GPU_IMAGE_URL,
+  calculateChartDataFromContributors,
+  type Milestone,
+  type Contributor,
+  type ChartData,
+  type GpuSpecs,
+  type UpgradeFeatures,
+  type PaymentInfo,
+} from '../../models/christmas-gift.model';
 
 interface ChartPoint {
   x: number;
@@ -22,17 +32,16 @@ interface ChartPoint {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChristmasGiftComponent {
-  readonly totalGoal = 802.90;
-  readonly currentAmount = signal(0); // This would come from donations
+  readonly totalGoal = TOTAL_GOAL;
+  readonly currentAmount = signal(190); // Real donations: 20€ (12.12) + 100€ (13.12) + 50€ + 20€ = 190€
   readonly showModal = signal(false);
   readonly showHUD = signal(false);
   readonly imageError = signal(false);
   readonly hoveredContributorIndex = signal<number | null>(null);
+  readonly tooltipPosition = signal<{ x: number; y: number; placement: 'top' | 'bottom' } | null>(null);
   
-  readonly paymentName = 'Marek Šípoš';
-  readonly iban = 'LT303250033127984669';
-  readonly bicSwift = 'REVOLUT21';
-  readonly gpuImageUrl = 'https://www.gigabyte.com/FileUpload/Global/KeyFeature/3868/innergigabyte/images/features-img.png';
+  readonly paymentInfo: PaymentInfo = PAYMENT_INFO;
+  readonly gpuImageUrl = GPU_IMAGE_URL;
 
   readonly progressPercentage = computed(() => {
     return Math.min((this.currentAmount() / this.totalGoal) * 100, 100);
@@ -40,8 +49,7 @@ export class ChristmasGiftComponent {
 
   readonly daysUntilGoal = computed(() => {
     const today = new Date();
-    const goalDate = new Date(2025, 11, 18); // December 18, 2025 (month is 0-indexed, so 11 = December)
-    const diffTime = goalDate.getTime() - today.getTime();
+    const diffTime = GOAL_DATE.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return Math.max(0, diffDays); // Don't show negative days
   });
@@ -70,46 +78,9 @@ export class ChristmasGiftComponent {
     return achieved.length > 0 ? achieved[achieved.length - 1] : null;
   });
 
-  readonly milestones: Milestone[] = [
-    { id: 1, name: 'Anti-Static Bag', percentage: 0 },
-    { id: 2, name: 'Bare PCB', percentage: 6.67 },
-    { id: 3, name: 'Power Delivery (VRMs)', percentage: 13.33 },
-    { id: 4, name: 'Capacitors', percentage: 20.00 },
-    { id: 5, name: 'PCIe 5.0 Interface', percentage: 26.67 },
-    { id: 6, name: 'DisplayPort 2.1b Connectors', percentage: 33.33 },
-    { id: 7, name: 'Rear I/O Bracket', percentage: 40.00 },
-    { id: 8, name: 'Thermal Paste Application', percentage: 46.67 },
-    { id: 9, name: 'VRAM Module 1', percentage: 53.33 },
-    { id: 10, name: 'VRAM Module 2', percentage: 60.00 },
-    { id: 11, name: 'VRAM Module 3', percentage: 66.67 },
-    { id: 12, name: 'The Core: GB203-300-A1', percentage: 73.33 },
-    { id: 13, name: 'Heatpipes & Heatsink', percentage: 80.00 },
-    { id: 14, name: 'Windforce Fans', percentage: 86.67 },
-    { id: 15, name: 'RGB Lighting & Soul', percentage: 100.00 },
-  ];
-
-  // Enhanced chart data for dashboard-style visuals
-  readonly chartData = {
-    // Daily donations for bar chart - 3 days only
-    dailyDonations: [120, 85, 150],
-    days: ['Day 1', 'Day 2', 'Day 3'],
-    
-    // Growth trend for line chart
-    growthTrend: [15, 18, 16, 22, 19, 25, 23, 28, 26, 31],
-    
-    // Overall stats
-    growth: 23.5,
-    totalDonors: 127,
-    totalRaised: 124,
-  };
-
-  readonly contributors = [
-    { name: 'Alex', amount: 50, date: '2024-12-20', color: '#f29f67' },
-    { name: 'Sarah', amount: 75, date: '2024-12-21', color: '#8833cc' },
-    { name: 'Mike', amount: 30, date: '2024-12-21', color: '#3b82f6' },
-    { name: 'Anonymous', amount: 25, date: '2024-12-22', color: '#10b981' },
-    { name: 'Unknown', amount: 120, date: '2024-12-22', color: '#6b7280' },
-  ];
+  readonly milestones: Milestone[] = MILESTONES;
+  readonly contributors: Contributor[] = CONTRIBUTORS;
+  readonly chartData: ChartData = calculateChartDataFromContributors(CONTRIBUTORS);
 
   readonly maxContributorAmount = computed(() => {
     return Math.max(...this.contributors.map(c => c.amount), 1);
@@ -127,32 +98,51 @@ export class ChristmasGiftComponent {
     return (amount / this.maxContributorAmount()) * 100;
   }
 
-  // Pie chart calculations
-  getPieDashArray(index: number): string {
-    const total = this.contributorsTotal();
-    const circumference = 2 * Math.PI * 40; // radius = 40
-    const percentage = this.contributors[index].amount / total;
-    const segmentLength = percentage * circumference;
-    return `${segmentLength} ${circumference}`;
-  }
+  // Pie chart calculations - rewritten from scratch
+  private readonly pieRadius = 40;
+  private readonly pieCircumference = 2 * Math.PI * 40;
 
-  getPieDashOffset(index: number): number {
+  getPiePath(index: number): string {
     const total = this.contributorsTotal();
-    const circumference = 2 * Math.PI * 40; // radius = 40
+    if (total === 0) return '';
+
+    // Calculate start and end angles for this segment
+    let startAngle = -90; // Start from top (-90 degrees)
     
-    // Calculate cumulative offset from all previous segments
-    let cumulativeOffset = 0;
+    // Calculate cumulative angle for all previous segments
     for (let i = 0; i < index; i++) {
       const prevPercentage = this.contributors[i].amount / total;
-      cumulativeOffset += prevPercentage * circumference;
+      startAngle += prevPercentage * 360;
     }
     
-    return cumulativeOffset;
+    // Calculate end angle for this segment
+    const percentage = this.contributors[index].amount / total;
+    const endAngle = startAngle + (percentage * 360);
+    
+    // For the last segment, ensure it closes exactly at 270 degrees (full circle)
+    const finalEndAngle = index === this.contributors.length - 1 ? 270 : endAngle;
+    
+    // Convert angles to radians
+    const startRad = (startAngle * Math.PI) / 180;
+    const endRad = (finalEndAngle * Math.PI) / 180;
+    
+    // Calculate start and end points
+    const x1 = 50 + this.pieRadius * Math.cos(startRad);
+    const y1 = 50 + this.pieRadius * Math.sin(startRad);
+    const x2 = 50 + this.pieRadius * Math.cos(endRad);
+    const y2 = 50 + this.pieRadius * Math.sin(endRad);
+    
+    // Large arc flag (1 if angle > 180 degrees)
+    const largeArcFlag = percentage > 0.5 ? 1 : 0;
+    
+    // Create SVG path for pie segment
+    return `M 50 50 L ${x1} ${y1} A ${this.pieRadius} ${this.pieRadius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
   }
 
   getPiePercentage(index: number): number {
     const total = this.contributorsTotal();
-    return (this.contributors[index].amount / total) * 100;
+    if (total === 0) return 0;
+    return Number(((this.contributors[index].amount / total) * 100).toFixed(2));
   }
 
   readonly maxDonation = computed(() => {
@@ -161,6 +151,17 @@ export class ChristmasGiftComponent {
 
   readonly maxGrowth = computed(() => {
     return Math.max(...this.chartData.growthTrend, 1);
+  });
+
+  readonly maxDonationRate = computed(() => {
+    return Math.max(...this.chartData.donationRateTrend, 1);
+  });
+
+  readonly maxVelocity = computed(() => {
+    const values = this.chartData.velocityTrend;
+    if (values.length === 0) return 1;
+    const maxAbs = Math.max(...values.map(v => Math.abs(v)));
+    return Math.max(maxAbs, 1);
   });
 
   getBarWidth(value: number): number {
@@ -189,18 +190,24 @@ export class ChristmasGiftComponent {
     return this.circleCircumference * (1 - this.progressPercentage() / 100);
   }
 
-  // Line chart path generation
+  // Line chart path generation for velocity trend
   readonly lineChartPoints = computed(() => {
     const width = 300;
     const height = 80;
     const padding = 10;
-    const maxValue = this.maxGrowth();
-    const stepX = (width - padding * 2) / (this.chartData.growthTrend.length - 1);
+    const maxValue = this.maxVelocity();
+    const trendData = this.chartData.velocityTrend;
+    if (trendData.length === 0) return [];
     
-    return this.chartData.growthTrend.map((value, index) => {
+    const stepX = trendData.length > 1 ? (width - padding * 2) / (trendData.length - 1) : width / 2;
+    const midY = height / 2; // Center line (zero point)
+    
+    return trendData.map((value, index) => {
       const x = padding + (index * stepX);
-      const normalizedValue = value / maxValue;
-      const y = height - padding - (normalizedValue * (height - padding * 2));
+      // Normalize value: positive values go up, negative go down
+      // Scale to fit in half the height (above and below center)
+      const normalizedValue = maxValue > 0 ? value / maxValue : 0;
+      const y = midY - (normalizedValue * (height / 2 - padding));
       return { x, y };
     });
   });
@@ -220,11 +227,10 @@ export class ChristmasGiftComponent {
     const points = this.lineChartPoints();
     if (points.length === 0) return '';
     
-    const width = 300;
     const height = 80;
-    const padding = 10;
+    const midY = height / 2; // Center line (zero point)
     
-    let path = `M ${points[0].x} ${height - padding}`;
+    let path = `M ${points[0].x} ${midY}`;
     path += ` L ${points[0].x} ${points[0].y}`;
     
     for (let i = 1; i < points.length; i++) {
@@ -232,38 +238,12 @@ export class ChristmasGiftComponent {
     }
     
     const lastPoint = points[points.length - 1];
-    path += ` L ${lastPoint.x} ${height - padding} Z`;
+    path += ` L ${lastPoint.x} ${midY} Z`;
     return path;
   }
 
-  readonly gpuSpecs = {
-    architecture: 'Blackwell GB203',
-    vram: '16GB GDDR7 (Samsung)',
-    bus: '256-bit',
-    bandwidth: '896 GB/s',
-    tgp: '300W',
-  };
-
-  readonly upgradeFeatures = {
-    vs3080: {
-      vram: { current: '16GB GDDR7', previous: '10GB GDDR6X', improvement: '+60%' },
-      bandwidth: { current: '896 GB/s', previous: '760 GB/s', improvement: '+18%' },
-      dlss: { current: 'DLSS 4', previous: 'DLSS 2', improvement: '2x Gen' },
-      architecture: { current: 'Blackwell', previous: 'Ampere', improvement: '2 Gen' },
-      tensorCores: { current: '5th Gen', previous: '3rd Gen', improvement: '+67%' },
-      rayTracing: { current: '4th Gen', previous: '2nd Gen', improvement: '2x Gen' },
-      performance: { current: '~2.5x', previous: 'Baseline', improvement: 'RTX 3080' },
-      memorySpeed: { current: '28 Gbps', previous: '19 Gbps', improvement: '+47%' },
-    },
-    keyFeatures: [
-      { label: 'DLSS 4', desc: 'Multi Frame Generation' },
-      { label: 'WINDFORCE', desc: 'Server-grade thermal gel' },
-      { label: 'SFF-Ready', desc: 'Compact form factor' },
-      { label: 'Hawk Fan', desc: '+53.6% air pressure' },
-      { label: 'Dual BIOS', desc: 'Performance/Silent' },
-      { label: '4th Gen RT', desc: 'Mega Geometry' },
-    ]
-  };
+  readonly gpuSpecs: GpuSpecs = GPU_SPECS;
+  readonly upgradeFeatures: UpgradeFeatures = UPGRADE_FEATURES;
 
   openModal(): void {
     this.showModal.set(true);
@@ -277,8 +257,46 @@ export class ChristmasGiftComponent {
     this.showHUD.set(hovering);
   }
 
-  onContributorHover(index: number | null): void {
+  onContributorHover(index: number | null, event?: MouseEvent): void {
     this.hoveredContributorIndex.set(index);
+    if (index !== null && event) {
+      // Use requestAnimationFrame to ensure accurate positioning
+      requestAnimationFrame(() => {
+        // Calculate tooltip position with viewport bounds checking
+        const tooltipWidth = 180; // Approximate tooltip width
+        const tooltipHeight = 100; // Approximate tooltip height
+        const padding = 15;
+        
+        let x = event.clientX + 15;
+        let y = event.clientY - 10;
+        let placement: 'top' | 'bottom' = 'top';
+        
+        // Check if tooltip would go off right edge
+        if (x + tooltipWidth > window.innerWidth - padding) {
+          x = event.clientX - tooltipWidth - 15;
+        }
+        
+        // Check if tooltip would go off left edge
+        if (x < padding) {
+          x = padding;
+        }
+        
+        // Check if tooltip would go off top edge (show below instead)
+        if (y - tooltipHeight < padding) {
+          y = event.clientY + 15;
+          placement = 'bottom';
+        }
+        
+        // Check if tooltip would go off bottom edge
+        if (y + tooltipHeight > window.innerHeight - padding) {
+          y = window.innerHeight - tooltipHeight - padding;
+        }
+        
+        this.tooltipPosition.set({ x, y, placement });
+      });
+    } else {
+      this.tooltipPosition.set(null);
+    }
   }
 
   copyToClipboard(text: string): void {

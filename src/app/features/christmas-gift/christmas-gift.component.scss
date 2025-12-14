@@ -411,3 +411,195 @@
     opacity: 1;
   }
 }
+
+// Rotating Subtitle Styles
+.rotating-subtitle {
+  position: relative;
+  min-height: 1.5em;
+  display: inline-block;
+}
+
+.rotating-text {
+  display: inline-block;
+  // Ensure animations restart when content changes
+  will-change: transform, opacity;
+  // Force animation restart by removing and re-adding animation
+  animation: none;
+}
+
+// Animation Variant 0: Fade In/Out
+.text-animation-variant-0 .rotating-text[data-variant="0"][data-key]:not([data-key=""]) {
+  animation: fadeInOut 0.8s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Animation Variant 1: Slide Left
+.text-animation-variant-1 .rotating-text[data-variant="1"][data-key]:not([data-key=""]) {
+  animation: slideLeft 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// Animation Variant 2: Scale & Rotate
+.text-animation-variant-2 .rotating-text[data-variant="2"][data-key]:not([data-key=""]) {
+  animation: scaleRotate 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes scaleRotate {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(-10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+// Animation Variant 3: Flip Vertical
+.text-animation-variant-3 .rotating-text[data-variant="3"][data-key]:not([data-key=""]) {
+  animation: flipVertical 0.8s ease-in-out;
+  transform-style: preserve-3d;
+}
+
+@keyframes flipVertical {
+  0% {
+    opacity: 0;
+    transform: rotateX(90deg);
+  }
+  100% {
+    opacity: 1;
+    transform: rotateX(0deg);
+  }
+}
+
+// Animation Variant 4: Bounce In
+.text-animation-variant-4 .rotating-text[data-variant="4"][data-key]:not([data-key=""]) {
+  animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.3);
+  }
+  50% {
+    transform: translateY(10px) scale(1.1);
+  }
+  70% {
+    transform: translateY(-5px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Animation Variant 5: Glow Pulse
+.text-animation-variant-5 .rotating-text[data-variant="5"][data-key]:not([data-key=""]) {
+  animation: glowPulse 0.8s ease-in-out;
+}
+
+@keyframes glowPulse {
+  0% {
+    opacity: 0;
+    text-shadow: 0 0 0 rgba(136, 51, 204, 0);
+  }
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 20px rgba(136, 51, 204, 0.8), 0 0 30px rgba(242, 159, 103, 0.6);
+  }
+}
+
+// Animation Variant 6: Slide Up with Fade
+.text-animation-variant-6 .rotating-text[data-variant="6"][data-key]:not([data-key=""]) {
+  animation: slideUpFade 0.8s ease-out;
+}
+
+@keyframes slideUpFade {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+// Animation Variant 7: Zoom & Fade
+.text-animation-variant-7 .rotating-text[data-variant="7"][data-key]:not([data-key=""]) {
+  animation: zoomFade 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes zoomFade {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// Animation Variant 8: Wipe Right
+.text-animation-variant-8 .rotating-text[data-variant="8"][data-key]:not([data-key=""]) {
+  animation: wipeRight 0.8s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes wipeRight {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0% 0 0);
+  }
+}
+
+// Animation Variant 9: Elastic Stretch
+.text-animation-variant-9 .rotating-text[data-variant="9"][data-key]:not([data-key=""]) {
+  animation: elasticStretch 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes elasticStretch {
+  0% {
+    opacity: 0;
+    transform: scaleX(0) scaleY(0.5);
+  }
+  30% {
+    transform: scaleX(1.2) scaleY(0.8);
+  }
+  50% {
+    transform: scaleX(0.9) scaleY(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleX(1) scaleY(1);
+  }
+}

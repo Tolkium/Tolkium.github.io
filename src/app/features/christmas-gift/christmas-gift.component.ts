@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, effect, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   TOTAL_GOAL,
@@ -31,7 +31,7 @@ interface ChartPoint {
   styleUrls: ['./christmas-gift.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ChristmasGiftComponent {
+export class ChristmasGiftComponent implements OnDestroy {
   readonly totalGoal = TOTAL_GOAL;
   readonly currentAmount = signal(190); // Real donations: 20€ (12.12) + 100€ (13.12) + 50€ + 20€ = 190€
   readonly showModal = signal(false);
@@ -39,6 +39,68 @@ export class ChristmasGiftComponent {
   readonly imageError = signal(false);
   readonly hoveredContributorIndex = signal<number | null>(null);
   readonly tooltipPosition = signal<{ x: number; y: number; placement: 'top' | 'bottom' } | null>(null);
+  
+  /**
+   * Text rotation system - 6 alternative gift messages
+   * These messages rotate every 5 seconds with Elastic Stretch animation
+   */
+  readonly textAlternatives = [
+    'If you were thinking of getting me a gift, here\'s what I\'d love instead',
+    'If you were considering a gift, I\'ve found the perfect one',
+    'Looking for a gift idea? I\'ve got you covered',
+    'Skip the guesswork—here\'s my gift wish list',
+    'Should you be considering a gift, I have a suggestion',
+    'If you were planning to surprise me, surprise—I found it first'
+  ];
+  
+  private readonly TEXT_COUNT = 6; // Number of text alternatives
+  
+  /**
+   * Single variant (variant 8: Elastic Stretch animation)
+   * textIndex: Current index in the textAlternatives array
+   * textKey: Key used to force animation restart on text change
+   */
+  readonly textIndex = signal(8 % this.TEXT_COUNT);
+  readonly textKey = signal(0); // Key to force re-render and animation restart
+  private textRotationInterval: any = null;
+  
+  /**
+   * Get current text for variant 8
+   * @param variantIndex - Variant index (always 8 in this implementation)
+   * @returns Current text from alternatives array
+   */
+  getCurrentText(variantIndex: number): string {
+    return this.textAlternatives[this.textIndex()];
+  }
+  
+  /**
+   * Get animation class for variant 8 (Elastic Stretch)
+   * @param variantIndex - Variant index (always 8)
+   * @returns CSS class name for the animation
+   */
+  getAnimationClass(variantIndex: number): string {
+    return `text-animation-variant-8`;
+  }
+  
+  /**
+   * Get text key for variant 8
+   * Used to track text changes and force animation restart
+   * @param variantIndex - Variant index (always 8)
+   * @returns Current text key value
+   */
+  getTextKey(variantIndex: number): number {
+    return this.textKey();
+  }
+  
+  /**
+   * Get unique animation key that combines variant and text key
+   * This ensures animations restart when text changes
+   * @param variantIndex - Variant index (always 8)
+   * @returns Unique key string for animation tracking
+   */
+  getAnimationKey(variantIndex: number): string {
+    return `8-${this.textKey()}`;
+  }
   
   readonly paymentInfo: PaymentInfo = PAYMENT_INFO;
   readonly gpuImageUrl = GPU_IMAGE_URL;
@@ -312,5 +374,47 @@ export class ChristmasGiftComponent {
 
   onImageError(): void {
     this.imageError.set(true);
+  }
+
+  constructor() {
+    /**
+     * Initialize text rotation for variant 8 (Elastic Stretch animation)
+     * Text changes every 5 seconds, cycling through all 6 alternatives
+     */
+    const intervalTime = 5000; // Change text every 5 seconds
+    
+    // Set up the interval to rotate text
+    this.textRotationInterval = setInterval(() => {
+      // Update to next text in the array (wraps around after last item)
+      this.textIndex.update(index => (index + 1) % this.TEXT_COUNT);
+      // Update key to trigger Angular change detection
+      this.textKey.update(key => key + 1);
+      
+      /**
+       * Force CSS animation restart using requestAnimationFrame
+       * CSS animations don't automatically restart when content changes,
+       * so we temporarily remove and re-add the animation style
+       */
+      requestAnimationFrame(() => {
+        const element = document.querySelector(`[data-variant="8"]`);
+        if (element) {
+          // Temporarily remove animation to reset it
+          (element as HTMLElement).style.animation = 'none';
+          // Re-add animation in next frame to trigger restart
+          requestAnimationFrame(() => {
+            (element as HTMLElement).style.animation = '';
+          });
+        }
+      });
+    }, intervalTime);
+  }
+
+  /**
+   * Cleanup: Clear the text rotation interval when component is destroyed
+   */
+  ngOnDestroy(): void {
+    if (this.textRotationInterval) {
+      clearInterval(this.textRotationInterval);
+    }
   }
 }

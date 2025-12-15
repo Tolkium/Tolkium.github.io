@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, computed, effect, OnDestroy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   TOTAL_GOAL,
@@ -39,6 +39,7 @@ export class ChristmasGiftComponent implements OnDestroy {
   readonly imageError = signal(false);
   readonly hoveredContributorIndex = signal<number | null>(null);
   readonly tooltipPosition = signal<{ x: number; y: number; placement: 'top' | 'bottom' } | null>(null);
+  readonly chartVariant = signal<'glow' | 'rough'>('glow'); // Toggle between glow center and rough circle
   
   /**
    * Text rotation system - 6 alternative gift messages
@@ -63,44 +64,6 @@ export class ChristmasGiftComponent implements OnDestroy {
   readonly textIndex = signal(8 % this.TEXT_COUNT);
   readonly textKey = signal(0); // Key to force re-render and animation restart
   private textRotationInterval: any = null;
-  
-  /**
-   * Get current text for variant 8
-   * @param variantIndex - Variant index (always 8 in this implementation)
-   * @returns Current text from alternatives array
-   */
-  getCurrentText(variantIndex: number): string {
-    return this.textAlternatives[this.textIndex()];
-  }
-  
-  /**
-   * Get animation class for variant 8 (Elastic Stretch)
-   * @param variantIndex - Variant index (always 8)
-   * @returns CSS class name for the animation
-   */
-  getAnimationClass(variantIndex: number): string {
-    return `text-animation-variant-8`;
-  }
-  
-  /**
-   * Get text key for variant 8
-   * Used to track text changes and force animation restart
-   * @param variantIndex - Variant index (always 8)
-   * @returns Current text key value
-   */
-  getTextKey(variantIndex: number): number {
-    return this.textKey();
-  }
-  
-  /**
-   * Get unique animation key that combines variant and text key
-   * This ensures animations restart when text changes
-   * @param variantIndex - Variant index (always 8)
-   * @returns Unique key string for animation tracking
-   */
-  getAnimationKey(variantIndex: number): string {
-    return `8-${this.textKey()}`;
-  }
   
   readonly paymentInfo: PaymentInfo = PAYMENT_INFO;
   readonly gpuImageUrl = GPU_IMAGE_URL;
@@ -163,6 +126,8 @@ export class ChristmasGiftComponent implements OnDestroy {
   // Pie chart calculations - rewritten from scratch
   private readonly pieRadius = 40;
   private readonly pieCircumference = 2 * Math.PI * 40;
+  private readonly innerRadius = 25; // For donut chart (rough circle variant)
+  private readonly roughness = 2; // Amount of roughness for irregular border
 
   getPiePath(index: number): string {
     const total = this.contributorsTotal();
@@ -199,6 +164,105 @@ export class ChristmasGiftComponent implements OnDestroy {
     
     // Create SVG path for pie segment
     return `M 50 50 L ${x1} ${y1} A ${this.pieRadius} ${this.pieRadius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
+  }
+
+  // Get rough circle path for donut chart variant
+  getRoughCirclePath(index: number): string {
+    const total = this.contributorsTotal();
+    if (total === 0) return '';
+
+    // Calculate start and end angles for this segment
+    let startAngle = -90; // Start from top (-90 degrees)
+    
+    // Calculate cumulative angle for all previous segments
+    for (let i = 0; i < index; i++) {
+      const prevPercentage = this.contributors[i].amount / total;
+      startAngle += prevPercentage * 360;
+    }
+    
+    // Calculate end angle for this segment
+    const percentage = this.contributors[index].amount / total;
+    const endAngle = startAngle + (percentage * 360);
+    
+    // For the last segment, ensure it closes exactly at 270 degrees (full circle)
+    const finalEndAngle = index === this.contributors.length - 1 ? 270 : endAngle;
+    
+    // Generate rough outer arc
+    const outerPath = this.generateRoughArc(50, 50, this.pieRadius, startAngle, finalEndAngle);
+    
+    // Generate rough inner arc (reversed)
+    const innerPath = this.generateRoughArc(50, 50, this.innerRadius, finalEndAngle, startAngle, true);
+    
+    return `${outerPath} ${innerPath} Z`;
+  }
+
+  // Simple seeded random function for deterministic roughness
+  private seededRandom(seed: number): number {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  }
+
+  // Generate a rough/irregular arc path
+  private generateRoughArc(cx: number, cy: number, radius: number, startAngle: number, endAngle: number, reverse: boolean = false): string {
+    const numPoints = Math.max(12, Math.ceil(Math.abs(endAngle - startAngle) / 8)); // More points for smoother but still rough
+    const points: { x: number; y: number }[] = [];
+    
+    const angleStep = (endAngle - startAngle) / numPoints;
+    
+    for (let i = 0; i <= numPoints; i++) {
+      const angle = startAngle + (angleStep * i);
+      const rad = (angle * Math.PI) / 180;
+      
+      // Use seeded random based on angle for deterministic but rough effect
+      const seed = angle * 100 + radius;
+      const randomOffset = (this.seededRandom(seed) - 0.5) * this.roughness;
+      const currentRadius = radius + randomOffset;
+      
+      const x = cx + currentRadius * Math.cos(rad);
+      const y = cy + currentRadius * Math.sin(rad);
+      points.push({ x, y });
+    }
+    
+    // Build path with smooth curves for organic rough look
+    let path = '';
+    if (reverse) {
+      // Reverse order for inner arc
+      path = `M ${points[points.length - 1].x} ${points[points.length - 1].y}`;
+      for (let i = points.length - 2; i >= 0; i--) {
+        if (i === points.length - 2) {
+          path += ` L ${points[i].x} ${points[i].y}`;
+        } else {
+          const cp1x = points[i + 1].x;
+          const cp1y = points[i + 1].y;
+          const cp2x = (points[i + 1].x + points[i].x) / 2;
+          const cp2y = (points[i + 1].y + points[i].y) / 2;
+          path += ` Q ${cp1x} ${cp1y} ${cp2x} ${cp2y}`;
+        }
+        if (i === 0) {
+          path += ` L ${points[i].x} ${points[i].y}`;
+        }
+      }
+    } else {
+      path = `M ${points[0].x} ${points[0].y}`;
+      for (let i = 1; i < points.length; i++) {
+        if (i === 1) {
+          path += ` L ${points[i].x} ${points[i].y}`;
+        } else {
+          const cp1x = (points[i - 1].x + points[i].x) / 2;
+          const cp1y = (points[i - 1].y + points[i].y) / 2;
+          path += ` Q ${points[i - 1].x} ${points[i - 1].y} ${cp1x} ${cp1y}`;
+        }
+        if (i === points.length - 1) {
+          path += ` L ${points[i].x} ${points[i].y}`;
+        }
+      }
+    }
+    
+    return path;
+  }
+
+  toggleChartVariant(): void {
+    this.chartVariant.update(v => v === 'glow' ? 'rough' : 'glow');
   }
 
   getPiePercentage(index: number): number {
@@ -376,12 +440,40 @@ export class ChristmasGiftComponent implements OnDestroy {
     this.imageError.set(true);
   }
 
+  /**
+   * Get animation class for variant 8 (Elastic Stretch)
+   * @param variant - Variant index (always 8)
+   * @returns CSS class name for the animation
+   */
+  getAnimationClass(variant: number): string {
+    return `text-animation-variant-8`;
+  }
+
+  /**
+   * Get unique animation key that combines variant and text key
+   * This ensures animations restart when text changes
+   * @param variant - Variant index (always 8)
+   * @returns Unique key string for animation tracking
+   */
+  getAnimationKey(variant: number): string {
+    return `8-${this.textKey()}`;
+  }
+
+  /**
+   * Get current text for variant 8
+   * @param variant - Variant index (always 8 in this implementation)
+   * @returns Current text from alternatives array
+   */
+  getCurrentText(variant: number): string {
+    return this.textAlternatives[this.textIndex()];
+  }
+
   constructor() {
     /**
      * Initialize text rotation for variant 8 (Elastic Stretch animation)
-     * Text changes every 5 seconds, cycling through all 6 alternatives
+     * Text changes every 8 seconds, cycling through all 6 alternatives
      */
-    const intervalTime = 5000; // Change text every 5 seconds
+    const intervalTime = 8000; // Change text every 8 seconds (slower rotation)
     
     // Set up the interval to rotate text
     this.textRotationInterval = setInterval(() => {

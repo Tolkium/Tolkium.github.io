@@ -33,7 +33,6 @@ interface ChartPoint {
 })
 export class ChristmasGiftComponent implements OnDestroy {
   readonly totalGoal = TOTAL_GOAL;
-  readonly currentAmount = signal(190); // Real donations: 20€ (12.12) + 100€ (13.12) + 50€ + 20€ = 190€
   readonly showModal = signal(false);
   readonly showHUD = signal(false);
   readonly imageError = signal(false);
@@ -117,6 +116,11 @@ export class ChristmasGiftComponent implements OnDestroy {
 
   readonly contributorsTotal = computed(() => {
     return this.contributors.reduce((sum, c) => sum + c.amount, 0);
+  });
+
+  // Calculate current amount from contributors (always in sync with data)
+  readonly currentAmount = computed(() => {
+    return this.contributorsTotal();
   });
 
   getContributorBarWidth(amount: number): number {

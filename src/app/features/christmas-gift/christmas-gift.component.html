@@ -25,7 +25,7 @@
     <!-- Hero Header with Gradient Text -->
     <div class="mb-1">
       <h1 class="text-5xl md:text-6xl font-bold mb-0 leading-tight bg-gradient-to-r from-[#f29f67] via-[#8833cc] to-[#3b82f6] bg-clip-text text-transparent font-outfit">
-        Operation RTX 5070 Ti
+        Operation Christmas Gift
       </h1>
       <!-- 
         Animation Variant 8: Elastic Stretch
@@ -331,26 +331,26 @@
           <div class="relative w-full aspect-square max-w-[200px] mx-auto mb-4">
             <svg class="w-full h-full" viewBox="0 0 100 100">
               @for (contributor of contributors; track $index) {
-                <path
-                  [attr.d]="getPiePath($index)"
-                  [attr.fill]="contributor.color"
-                  [attr.stroke]="hoveredContributorIndex() === $index ? 'white' : 'transparent'"
-                  [attr.stroke-width]="hoveredContributorIndex() === $index ? '2' : '0'"
-                  class="transition-all duration-300 pie-segment cursor-pointer"
-                  [class.opacity-90]="hoveredContributorIndex() === $index"
-                  [class.opacity-100]="hoveredContributorIndex() !== $index"
-                  [class.scale-105]="hoveredContributorIndex() === $index"
+                <g 
+                  class="pie-segment-group cursor-pointer"
                   (mouseenter)="onContributorHover($index, $event)"
                   (mousemove)="onContributorHover($index, $event)"
                   (mouseleave)="onContributorHover(null)"
-                />
+                >
+                  <path
+                    [attr.d]="getPiePath($index)"
+                    [attr.fill]="contributor.color"
+                    class="pie-segment"
+                    [class.pie-segment-hovered]="hoveredContributorIndex() === $index"
+                  />
+                </g>
               }
               <!-- Center circle to create donut/hollow effect -->
               <circle cx="50" cy="50" r="30" class="pie-center-circle"/>
             </svg>
             <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div class="text-center">
-                <div class="text-2xl font-bold text-slate-800 dark:text-white font-outfit">
+                <div class="text-2xl font-bold bg-gradient-to-r from-[#f29f67] to-[#8833cc] bg-clip-text text-transparent font-outfit">
                   {{ contributorsTotal() }}€
                 </div>
                 <div class="text-xs text-slate-600 dark:text-slate-400 font-inter">Total</div>
@@ -367,36 +367,6 @@
               {{ goalVelocity() | number:'1.0-1' }}€
             </div>
             <div class="text-sm text-slate-600 dark:text-slate-400 font-inter">per day average</div>
-          </div>
-        </div>
-
-        <!-- Milestone Achievements -->
-        <div class="dashboard-card">
-          <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 font-outfit">Milestone Achievements</h3>
-          <div class="overflow-x-auto">
-            <table class="w-full">
-              <thead>
-                <tr class="border-b border-slate-200 dark:border-slate-700">
-                  <th class="text-left py-2 px-3 text-xs font-semibold text-slate-600 dark:text-slate-400 font-inter uppercase tracking-wider">Milestone</th>
-                  <th class="text-right py-2 px-3 text-xs font-semibold text-slate-600 dark:text-slate-400 font-inter uppercase tracking-wider">Progress</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (milestone of completedMilestones(); track milestone.id) {
-                  <tr class="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                    <td class="py-3 px-3 text-sm text-slate-800 dark:text-slate-200 font-inter">{{ milestone.name }}</td>
-                    <td class="py-3 px-3 text-sm text-right text-slate-600 dark:text-slate-400 font-inter">{{ milestone.percentage | number:'1.0-0' }}%</td>
-                  </tr>
-                }
-                @if (completedMilestones().length === 0) {
-                  <tr>
-                    <td colspan="2" class="py-8 text-center text-sm text-slate-500 dark:text-slate-400 font-inter">
-                      No milestones achieved yet
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
           </div>
         </div>
 
@@ -454,6 +424,36 @@
             <span>Ahead</span>
             <span>Velocity Trend</span>
             <span>Behind</span>
+          </div>
+        </div>
+
+        <!-- Milestone Achievements -->
+        <div class="dashboard-card">
+          <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 font-outfit">Milestone Achievements</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-slate-200 dark:border-slate-700">
+                  <th class="text-left py-2 px-3 text-xs font-semibold text-slate-600 dark:text-slate-400 font-inter uppercase tracking-wider">Milestone</th>
+                  <th class="text-right py-2 px-3 text-xs font-semibold text-slate-600 dark:text-slate-400 font-inter uppercase tracking-wider">Progress</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (milestone of completedMilestones(); track milestone.id) {
+                  <tr class="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <td class="py-3 px-3 text-sm text-slate-800 dark:text-slate-200 font-inter">{{ milestone.name }}</td>
+                    <td class="py-3 px-3 text-sm text-right text-slate-600 dark:text-slate-400 font-inter">{{ milestone.percentage | number:'1.0-0' }}%</td>
+                  </tr>
+                }
+                @if (completedMilestones().length === 0) {
+                  <tr>
+                    <td colspan="2" class="py-8 text-center text-sm text-slate-500 dark:text-slate-400 font-inter">
+                      No milestones achieved yet
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           </div>
         </div>
 

@@ -345,13 +345,29 @@
 }
 
 // Pie chart styles
-.pie-segment {
-  transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
-  transform-origin: center;
+.pie-segment-group {
+  transition: filter 0.25s ease-out;
   
   &:hover {
-    opacity: 0.9;
-    filter: brightness(1.1);
+    // Subtle shadow for depth
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
+  }
+}
+
+.pie-segment {
+  transition: opacity 0.25s ease-out, 
+              filter 0.25s ease-out;
+  opacity: 0.95;
+  
+  &.pie-segment-hovered {
+    opacity: 1 !important;
+    // Enhanced brightness and saturation for better visibility
+    filter: brightness(1.35) saturate(1.25);
+  }
+  
+  .pie-segment-group:hover & {
+    opacity: 1 !important;
+    filter: brightness(1.35) saturate(1.25);
   }
 }
 

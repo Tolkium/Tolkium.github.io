@@ -82,9 +82,10 @@ export const MILESTONES: Milestone[] = [
 export const CONTRIBUTORS: Contributor[] = [
   { name: 'Šimon', amount: 30, date: '2025-12-12', color: '#f29f67' },
   { name: 'Šimon', amount: 100, date: '2025-12-13', color: '#f29f67' },
-  { name: 'Anonymous family member', amount: 50, date: '2025-12-14', color: '#8833cc' },
-  { name: 'Anonymous family member', amount: 20, date: '2025-12-14', color: '#3b82f6' },
-  { name: 'Friend', amount: 50, date: '2025-12-15', color: '#10b981' },
+  { name: 'Family member M', amount: 100, date: '2025-12-14', color: '#8833cc' },
+  { name: 'Family member S', amount: 20, date: '2025-12-14', color: '#3b82f6' },
+  { name: 'Ace Friend', amount: 50, date: '2025-12-15', color: '#10b981' },
+  { name: 'Wordsmith Friend', amount: 20, date: '2025-12-16', color: '#e74c3c' },
 ];
 
 export const PAYMENT_INFO: PaymentInfo = {

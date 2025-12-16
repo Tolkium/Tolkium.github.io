@@ -59,7 +59,7 @@ export interface PaymentInfo {
 
 // Constants
 export const TOTAL_GOAL = 802.90;
-export const GOAL_DATE = new Date(2025, 11, 18); // December 18, 2025
+export const GOAL_DATE = new Date(2025, 11, 19); // December 19, 2025
 
 export const MILESTONES: Milestone[] = [
   { id: 1, name: 'Anti-Static Bag', percentage: 0 },

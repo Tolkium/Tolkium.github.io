@@ -83,9 +83,12 @@ export const CONTRIBUTORS: Contributor[] = [
   { name: 'Šimon', amount: 30, date: '2025-12-12', color: '#f29f67' },
   { name: 'Šimon', amount: 100, date: '2025-12-13', color: '#f29f67' },
   { name: 'Family member M', amount: 100, date: '2025-12-14', color: '#8833cc' },
-  { name: 'Family member S', amount: 20, date: '2025-12-14', color: '#3b82f6' },
+  { name: 'Family member S', amount: 30, date: '2025-12-14', color: '#3b82f6' },
+{ name: 'Family member P', amount: 100, date: '2025-12-18', color: '#3b12f6' },
+{ name: 'Family member N', amount: 100, date: '2025-12-20', color: '#3b82a6' },
   { name: 'Ace Friend', amount: 50, date: '2025-12-15', color: '#10b981' },
-  { name: 'Wordsmith Friend', amount: 20, date: '2025-12-16', color: '#e74c3c' },
+{ name: 'Ace Friend', amount: 50, date: '2025-12-15', color: '#10c921' },
+  { name: 'First OP Friend', amount: 10, date: '2025-12-20', color: '#e74c3c' },
 ];
 
 export const PAYMENT_INFO: PaymentInfo = {

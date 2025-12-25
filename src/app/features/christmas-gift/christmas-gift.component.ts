@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, computed, OnDestroy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   TOTAL_GOAL,
@@ -17,6 +17,11 @@ import {
   type UpgradeFeatures,
   type PaymentInfo,
 } from '../../models/christmas-gift.model';
+import {
+  type Language,
+  type GiftTranslations,
+  TRANSLATIONS
+} from './translations/gift-translations';
 
 interface ChartPoint {
   x: number;
@@ -31,7 +36,8 @@ interface ChartPoint {
   styleUrls: ['./christmas-gift.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ChristmasGiftComponent implements OnDestroy {
+export class ChristmasGiftComponent {
+  private readonly destroyRef = inject(DestroyRef);
   readonly totalGoal = TOTAL_GOAL;
   readonly showModal = signal(false);
   readonly showHUD = signal(false);
@@ -39,22 +45,29 @@ export class ChristmasGiftComponent implements OnDestroy {
   readonly hoveredContributorIndex = signal<number | null>(null);
   readonly tooltipPosition = signal<{ x: number; y: number; placement: 'top' | 'bottom' } | null>(null);
   readonly chartVariant = signal<'glow' | 'rough'>('glow'); // Toggle between glow center and rough circle
-  
+
+  // Translation system - auto-detect browser language
+  readonly currentLanguage = signal<Language>(this.detectBrowserLanguage());
+  readonly t = computed<GiftTranslations>(() => TRANSLATIONS[this.currentLanguage()]);
+
+  private detectBrowserLanguage(): Language {
+    const browserLang = navigator?.language || navigator?.languages?.[0] || 'en';
+    return browserLang.toLowerCase().startsWith('sk') ? 'sk' : 'en';
+  }
+
+  toggleLanguage(): void {
+    this.currentLanguage.update(lang => lang === 'en' ? 'sk' : 'en');
+  }
+
   /**
    * Text rotation system - 6 alternative gift messages
    * These messages rotate every 5 seconds with Elastic Stretch animation
+   * Now uses translations based on current language
    */
-  readonly textAlternatives = [
-    'If you were thinking of getting me a gift, here\'s what I\'d love instead',
-    'If you were considering a gift, I\'ve found the perfect one',
-    'Looking for a gift idea? I\'ve got you covered',
-    'Skip the guesswork—here\'s my gift wish list',
-    'Should you be considering a gift, I have a suggestion',
-    'If you were planning to surprise me, surprise—I found it first'
-  ];
-  
+  readonly textAlternatives = computed(() => this.t().textAlternatives);
+
   private readonly TEXT_COUNT = 6; // Number of text alternatives
-  
+
   /**
    * Single variant (variant 8: Elastic Stretch animation)
    * textIndex: Current index in the textAlternatives array
@@ -62,8 +75,8 @@ export class ChristmasGiftComponent implements OnDestroy {
    */
   readonly textIndex = signal(8 % this.TEXT_COUNT);
   readonly textKey = signal(0); // Key to force re-render and animation restart
-  private textRotationInterval: any = null;
-  
+  private textRotationInterval: ReturnType<typeof setInterval> | null = null;
+
   readonly paymentInfo: PaymentInfo = PAYMENT_INFO;
   readonly gpuImageUrl = GPU_IMAGE_URL;
 
@@ -123,6 +136,69 @@ export class ChristmasGiftComponent implements OnDestroy {
     return this.contributorsTotal();
   });
 
+  // Calculate amount and percentage contributed by "Šimon" (me)
+  readonly myContributionAmount = computed(() => {
+    return this.contributors
+      .filter(c => c.name === 'Šimon')
+      .reduce((sum, c) => sum + c.amount, 0);
+  });
+
+  readonly myContributionPercentage = computed(() => {
+    return (this.myContributionAmount() / this.totalGoal) * 100;
+  });
+
+  // Calculate amount and percentage contributed by others
+  readonly othersContributionAmount = computed(() => {
+    return this.contributors
+      .filter(c => c.name !== 'Šimon')
+      .reduce((sum, c) => sum + c.amount, 0);
+  });
+
+  readonly othersContributionPercentage = computed(() => {
+    return (this.othersContributionAmount() / this.totalGoal) * 100;
+  });
+
+  // Find top contributor by summing all contributions per person (excluding Šimon)
+  readonly topContributor = computed(() => {
+    const grouped = this.groupedContributors().filter(c => c.name !== 'Šimon');
+    let topName = '';
+    let topAmount = 0;
+    
+    grouped.forEach(c => {
+      if (c.amount > topAmount) {
+        topAmount = c.amount;
+        topName = c.name;
+      }
+    });
+    
+    return { name: topName, amount: topAmount };
+  });
+
+  // Count of unique contributors to thank (excluding Šimon)
+  readonly thankYouCount = computed(() => {
+    return this.groupedContributors().filter(c => c.name !== 'Šimon').length;
+  });
+
+  // Group contributors by name, summing their amounts
+  readonly groupedContributors = computed(() => {
+    const groups = new Map<string, { name: string; amount: number; color: string }>();
+    
+    this.contributors.forEach(c => {
+      const existing = groups.get(c.name);
+      if (existing) {
+        existing.amount += c.amount;
+      } else {
+        groups.set(c.name, { name: c.name, amount: c.amount, color: c.color });
+      }
+    });
+    
+    return Array.from(groups.values());
+  });
+
+  readonly uniqueContributorsCount = computed(() => {
+    return this.groupedContributors().length;
+  });
+
   getContributorBarWidth(amount: number): number {
     return (amount / this.maxContributorAmount()) * 100;
   }
@@ -134,69 +210,71 @@ export class ChristmasGiftComponent implements OnDestroy {
   private readonly roughness = 2; // Amount of roughness for irregular border
 
   getPiePath(index: number): string {
+    const grouped = this.groupedContributors();
     const total = this.contributorsTotal();
     if (total === 0) return '';
 
     // Calculate start and end angles for this segment
     let startAngle = -90; // Start from top (-90 degrees)
-    
+
     // Calculate cumulative angle for all previous segments
     for (let i = 0; i < index; i++) {
-      const prevPercentage = this.contributors[i].amount / total;
+      const prevPercentage = grouped[i].amount / total;
       startAngle += prevPercentage * 360;
     }
-    
+
     // Calculate end angle for this segment
-    const percentage = this.contributors[index].amount / total;
+    const percentage = grouped[index].amount / total;
     const endAngle = startAngle + (percentage * 360);
-    
+
     // For the last segment, ensure it closes exactly at 270 degrees (full circle)
-    const finalEndAngle = index === this.contributors.length - 1 ? 270 : endAngle;
-    
+    const finalEndAngle = index === grouped.length - 1 ? 270 : endAngle;
+
     // Convert angles to radians
     const startRad = (startAngle * Math.PI) / 180;
     const endRad = (finalEndAngle * Math.PI) / 180;
-    
+
     // Calculate start and end points
     const x1 = 50 + this.pieRadius * Math.cos(startRad);
     const y1 = 50 + this.pieRadius * Math.sin(startRad);
     const x2 = 50 + this.pieRadius * Math.cos(endRad);
     const y2 = 50 + this.pieRadius * Math.sin(endRad);
-    
+
     // Large arc flag (1 if angle > 180 degrees)
     const largeArcFlag = percentage > 0.5 ? 1 : 0;
-    
+
     // Create SVG path for pie segment
     return `M 50 50 L ${x1} ${y1} A ${this.pieRadius} ${this.pieRadius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
   }
 
   // Get rough circle path for donut chart variant
   getRoughCirclePath(index: number): string {
+    const grouped = this.groupedContributors();
     const total = this.contributorsTotal();
     if (total === 0) return '';
 
     // Calculate start and end angles for this segment
     let startAngle = -90; // Start from top (-90 degrees)
-    
+
     // Calculate cumulative angle for all previous segments
     for (let i = 0; i < index; i++) {
-      const prevPercentage = this.contributors[i].amount / total;
+      const prevPercentage = grouped[i].amount / total;
       startAngle += prevPercentage * 360;
     }
-    
+
     // Calculate end angle for this segment
-    const percentage = this.contributors[index].amount / total;
+    const percentage = grouped[index].amount / total;
     const endAngle = startAngle + (percentage * 360);
-    
+
     // For the last segment, ensure it closes exactly at 270 degrees (full circle)
-    const finalEndAngle = index === this.contributors.length - 1 ? 270 : endAngle;
-    
+    const finalEndAngle = index === grouped.length - 1 ? 270 : endAngle;
+
     // Generate rough outer arc
     const outerPath = this.generateRoughArc(50, 50, this.pieRadius, startAngle, finalEndAngle);
-    
+
     // Generate rough inner arc (reversed)
     const innerPath = this.generateRoughArc(50, 50, this.innerRadius, finalEndAngle, startAngle, true);
-    
+
     return `${outerPath} ${innerPath} Z`;
   }
 
@@ -210,23 +288,23 @@ export class ChristmasGiftComponent implements OnDestroy {
   private generateRoughArc(cx: number, cy: number, radius: number, startAngle: number, endAngle: number, reverse: boolean = false): string {
     const numPoints = Math.max(12, Math.ceil(Math.abs(endAngle - startAngle) / 8)); // More points for smoother but still rough
     const points: { x: number; y: number }[] = [];
-    
+
     const angleStep = (endAngle - startAngle) / numPoints;
-    
+
     for (let i = 0; i <= numPoints; i++) {
       const angle = startAngle + (angleStep * i);
       const rad = (angle * Math.PI) / 180;
-      
+
       // Use seeded random based on angle for deterministic but rough effect
       const seed = angle * 100 + radius;
       const randomOffset = (this.seededRandom(seed) - 0.5) * this.roughness;
       const currentRadius = radius + randomOffset;
-      
+
       const x = cx + currentRadius * Math.cos(rad);
       const y = cy + currentRadius * Math.sin(rad);
       points.push({ x, y });
     }
-    
+
     // Build path with smooth curves for organic rough look
     let path = '';
     if (reverse) {
@@ -261,7 +339,7 @@ export class ChristmasGiftComponent implements OnDestroy {
         }
       }
     }
-    
+
     return path;
   }
 
@@ -270,9 +348,10 @@ export class ChristmasGiftComponent implements OnDestroy {
   }
 
   getPiePercentage(index: number): number {
+    const grouped = this.groupedContributors();
     const total = this.contributorsTotal();
     if (total === 0) return 0;
-    return Number(((this.contributors[index].amount / total) * 100).toFixed(2));
+    return Number(((grouped[index].amount / total) * 100).toFixed(2));
   }
 
   readonly maxDonation = computed(() => {
@@ -301,7 +380,7 @@ export class ChristmasGiftComponent implements OnDestroy {
   getBarColor(value: number): string {
     // Simple color based on value - no gradient
     const percentage = (value / this.maxDonation()) * 100;
-    
+
     if (percentage < 30) {
       // Small values: purple
       return '#8833cc';
@@ -328,10 +407,10 @@ export class ChristmasGiftComponent implements OnDestroy {
     const maxValue = this.maxVelocity();
     const trendData = this.chartData.velocityTrend;
     if (trendData.length === 0) return [];
-    
+
     const stepX = trendData.length > 1 ? (width - padding * 2) / (trendData.length - 1) : width / 2;
     const midY = height / 2; // Center line (zero point)
-    
+
     return trendData.map((value, index) => {
       const x = padding + (index * stepX);
       // Normalize value: positive values go up, negative go down
@@ -345,7 +424,7 @@ export class ChristmasGiftComponent implements OnDestroy {
   getLineChartPath(): string {
     const points = this.lineChartPoints();
     if (points.length === 0) return '';
-    
+
     let path = `M ${points[0].x} ${points[0].y}`;
     for (let i = 1; i < points.length; i++) {
       path += ` L ${points[i].x} ${points[i].y}`;
@@ -356,17 +435,17 @@ export class ChristmasGiftComponent implements OnDestroy {
   getAreaPath(): string {
     const points = this.lineChartPoints();
     if (points.length === 0) return '';
-    
+
     const height = 80;
     const midY = height / 2; // Center line (zero point)
-    
+
     let path = `M ${points[0].x} ${midY}`;
     path += ` L ${points[0].x} ${points[0].y}`;
-    
+
     for (let i = 1; i < points.length; i++) {
       path += ` L ${points[i].x} ${points[i].y}`;
     }
-    
+
     const lastPoint = points[points.length - 1];
     path += ` L ${lastPoint.x} ${midY} Z`;
     return path;
@@ -396,32 +475,32 @@ export class ChristmasGiftComponent implements OnDestroy {
         const tooltipWidth = 180; // Approximate tooltip width
         const tooltipHeight = 100; // Approximate tooltip height
         const padding = 15;
-        
+
         let x = event.clientX + 15;
         let y = event.clientY - 10;
         let placement: 'top' | 'bottom' = 'top';
-        
+
         // Check if tooltip would go off right edge
         if (x + tooltipWidth > window.innerWidth - padding) {
           x = event.clientX - tooltipWidth - 15;
         }
-        
+
         // Check if tooltip would go off left edge
         if (x < padding) {
           x = padding;
         }
-        
+
         // Check if tooltip would go off top edge (show below instead)
         if (y - tooltipHeight < padding) {
           y = event.clientY + 15;
           placement = 'bottom';
         }
-        
+
         // Check if tooltip would go off bottom edge
         if (y + tooltipHeight > window.innerHeight - padding) {
           y = window.innerHeight - tooltipHeight - padding;
         }
-        
+
         this.tooltipPosition.set({ x, y, placement });
       });
     } else {
@@ -430,9 +509,7 @@ export class ChristmasGiftComponent implements OnDestroy {
   }
 
   copyToClipboard(text: string): void {
-    navigator.clipboard.writeText(text).then(() => {
-      console.log('Copied to clipboard');
-    });
+    navigator.clipboard.writeText(text);
   }
 
   formatIBAN(iban: string): string {
@@ -469,23 +546,27 @@ export class ChristmasGiftComponent implements OnDestroy {
    * @returns Current text from alternatives array
    */
   getCurrentText(variant: number): string {
-    return this.textAlternatives[this.textIndex()];
+    return this.textAlternatives()[this.textIndex()];
   }
 
   constructor() {
-    /**
-     * Initialize text rotation for variant 8 (Elastic Stretch animation)
-     * Text changes every 8 seconds, cycling through all 6 alternatives
-     */
+    this.initTextRotation();
+  }
+
+  /**
+   * Initialize text rotation for variant 8 (Elastic Stretch animation)
+   * Text changes every 8 seconds, cycling through all 6 alternatives
+   */
+  private initTextRotation(): void {
     const intervalTime = 8000; // Change text every 8 seconds (slower rotation)
-    
+
     // Set up the interval to rotate text
     this.textRotationInterval = setInterval(() => {
       // Update to next text in the array (wraps around after last item)
       this.textIndex.update(index => (index + 1) % this.TEXT_COUNT);
       // Update key to trigger Angular change detection
       this.textKey.update(key => key + 1);
-      
+
       /**
        * Force CSS animation restart using requestAnimationFrame
        * CSS animations don't automatically restart when content changes,
@@ -503,14 +584,12 @@ export class ChristmasGiftComponent implements OnDestroy {
         }
       });
     }, intervalTime);
-  }
 
-  /**
-   * Cleanup: Clear the text rotation interval when component is destroyed
-   */
-  ngOnDestroy(): void {
-    if (this.textRotationInterval) {
-      clearInterval(this.textRotationInterval);
-    }
+    // Register cleanup using DestroyRef
+    this.destroyRef.onDestroy(() => {
+      if (this.textRotationInterval) {
+        clearInterval(this.textRotationInterval);
+      }
+    });
   }
 }

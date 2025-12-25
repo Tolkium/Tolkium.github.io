@@ -1,40 +1,47 @@
 <div class="relative z-10 min-h-screen pb-8">
+  <!-- Translation Toggle Button - Matching search button style -->
+  <button
+    (click)="toggleLanguage()"
+    class="fixed top-4 right-[8rem] z-50 w-10 h-10 flex items-center justify-center backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 hover:text-[#8833cc] dark:hover:text-[#f29f67] rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-outfit font-semibold text-sm"
+    [attr.aria-label]="currentLanguage() === 'en' ? 'Translate to Slovak' : 'Translate to English'"
+  >
+    {{ t().translateButton }}
+  </button>
+
   <!-- Hover tooltip (positioned at cursor) - moved to top level to avoid clipping -->
   @if (hoveredContributorIndex() !== null && tooltipPosition()) {
-    @let contributor = contributors[hoveredContributorIndex()!];
+    @let contributor = groupedContributors()[hoveredContributorIndex()!];
     @let index = hoveredContributorIndex()!;
     @let pos = tooltipPosition()!;
-    <div 
-      class="fixed pointer-events-none tooltip-container"
+    <div
+      class="fixed pointer-events-none tooltip-container tooltip-z-index"
       [style.left.px]="pos.x"
       [style.top.px]="pos.y"
       [style.transform]="pos.placement === 'top' ? 'translateY(-100%)' : 'none'"
-      style="z-index: 99999;"
     >
       <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md text-slate-800 dark:text-slate-100 text-xs px-3 py-2 rounded-lg shadow-xl border border-slate-300/50 dark:border-slate-600/50 min-w-[150px]">
         <div class="font-semibold mb-1 text-slate-900 dark:text-slate-100">{{ contributor.name === 'Unknown' ? 'Unknown Donation' : contributor.name }}</div>
-        <div class="text-slate-700 dark:text-slate-300">Amount: {{ contributor.amount }}€</div>
-        <div class="text-slate-600 dark:text-slate-400 text-[10px]">{{ contributor.date }}</div>
+        <div class="text-slate-700 dark:text-slate-300">{{ t().total }}: {{ contributor.amount }}€</div>
         <div class="text-slate-600 dark:text-slate-400 text-[10px] mt-1">{{ getPiePercentage(index) | number:'1.2-2' }}%</div>
       </div>
     </div>
   }
-  
+
   <div class="container mx-auto px-4 py-2 md:px-6 md:py-4 max-w-7xl">
-    
+
     <!-- Hero Header with Gradient Text -->
     <div class="mb-1">
       <h1 class="text-5xl md:text-6xl font-bold mb-0 leading-tight bg-gradient-to-r from-[#f29f67] via-[#8833cc] to-[#3b82f6] bg-clip-text text-transparent font-outfit">
-        Operation Christmas Gift
+        {{ t().pageTitle }}
       </h1>
-      <!-- 
+      <!--
         Animation Variant 8: Elastic Stretch
         Rotates through 6 gift message alternatives every 5 seconds
         Animation restarts on each text change via requestAnimationFrame
       -->
       <p class="text-xl text-slate-600 dark:text-slate-300 font-inter rotating-subtitle mb-0 leading-tight" [ngClass]="getAnimationClass(8)">
-        <span 
-          class="rotating-text font-bold" 
+        <span
+          class="rotating-text font-bold"
           [attr.data-key]="getAnimationKey(8)"
           [attr.data-variant]="8">
           {{ getCurrentText(8) }}
@@ -44,50 +51,67 @@
 
     <!-- Main Dashboard Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
-      
+
       <!-- Left Side: Product Showcase (8 columns) -->
       <div class="lg:col-span-8 space-y-6">
-        
+
         <!-- Product Hero Card with Modern Design -->
         <div class="dashboard-card">
           <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
             <div>
               <h2 class="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white mb-2 font-outfit">
-                GIGABYTE GeForce RTX 5070 Ti
+                GIGABYTE GeForce RTX 5080
               </h2>
-              <p class="text-slate-600 dark:text-slate-300 font-inter">WINDFORCE OC SFF 16G • Blackwell Architecture</p>
+              <p class="text-slate-600 dark:text-slate-300 font-inter">WINDFORCE OC 16G • Blackwell Architecture</p>
             </div>
             <!-- Progress percentage display: Shows donation progress as percentage -->
-            <div class="mt-4 md:mt-0 text-right">
-              <div class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#f29f67] to-[#8833cc] bg-clip-text text-transparent font-outfit">
-                {{ progressPercentage() | number:'1.0-1' }}%
+            <div class="mt-4 md:mt-0">
+              <div class="flex items-end justify-end gap-2">
+                <div class="text-center">
+                  <div class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#8833cc] to-[#3b82f6] bg-clip-text text-transparent font-outfit">
+                    {{ othersContributionPercentage() | number:'1.0-1' }}%
+                  </div>
+                  <div class="text-xs text-slate-500 dark:text-slate-400 font-inter">{{ t().byOthers }}</div>
+                </div>
+                <span class="text-xl text-slate-400 font-outfit pb-4">+</span>
+                <div class="text-center">
+                  <div class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#f29f67] to-[#8833cc] bg-clip-text text-transparent font-outfit">
+                    {{ myContributionPercentage() | number:'1.0-1' }}%
+                  </div>
+                  <div class="text-xs text-slate-500 dark:text-slate-400 font-inter">{{ t().byMe }}</div>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- GPU Image with HUD Overlay -->
-          <div 
-            class="relative group mb-3 rounded-xl overflow-hidden"
+          <div
+            class="relative group mb-3"
             (mouseenter)="onImageHover(true)"
             (mouseleave)="onImageHover(false)"
           >
+            <!-- Glow behind GPU - theme gradient colors -->
+            <div class="absolute inset-0 -m-10 gpu-color-glow pointer-events-none" aria-hidden="true">
+              <div class="w-full h-full rounded-[50%] opacity-60" style="background: radial-gradient(ellipse at center, rgba(136,51,204,0.5) 0%, rgba(242,159,103,0.4) 40%, transparent 70%); filter: blur(40px);"></div>
+            </div>
             <div class="relative aspect-[16/9] flex items-center justify-center">
               @if (!imageError()) {
-                <img 
-                  [src]="gpuImageUrl" 
-                  alt="GIGABYTE RTX 5070 Ti"
-                  class="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
-                  (error)="onImageError()"
-                />
+                  <!-- Actual GPU image -->
+                  <img
+                    [src]="gpuImageUrl"
+                    alt="GIGABYTE RTX 5080"
+                    class="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105 relative z-10"
+                    (error)="onImageError()"
+                  />
               } @else {
                 <div class="flex items-center justify-center h-full">
                   <div class="text-center">
                     <div class="text-8xl mb-4">🎮</div>
-                    <p class="text-slate-600 dark:text-slate-300 font-inter">GIGABYTE RTX 5070 Ti</p>
+                    <p class="text-slate-600 dark:text-slate-300 font-inter">GIGABYTE RTX 5080</p>
                   </div>
                 </div>
               }
-              
+
               <!-- HUD Overlay - Bottom 1/4 with fade, maximum compact -->
               @if (showHUD()) {
                 <div class="absolute bottom-0 left-0 right-0 h-1/4 pointer-events-none z-10 hud-overlay-bottom">
@@ -95,9 +119,9 @@
                     <div class="w-full font-mono text-[12px] leading-tight hud-stats-box-transparent">
                       <!-- Header - Compact title -->
                       <div class="text-[#f29f67] dark:text-[#8833cc] font-bold mb-1 text-[13px] border-b border-[#f29f67]/40 dark:border-[#8833cc]/40 pb-0.5">
-                        RTX 3080 → RTX 5070 Ti
+                        RTX 3080 → RTX 5080
                       </div>
-                      
+
                       <!-- Visual Specs - Compact -->
                       <div class="mb-1 text-[11px] flex flex-wrap gap-x-2 gap-y-0.5">
                         <span class="text-white dark:text-white"><span class="text-[#f29f67] dark:text-[#8833cc]">●</span> {{ gpuSpecs.vram }}</span>
@@ -131,43 +155,56 @@
           <!-- Circuit Road Progress -->
           <div class="mb-2 relative z-10">
             <div class="flex items-center justify-between mb-2 relative z-20">
-              <h3 class="text-lg font-semibold text-slate-800 dark:text-white font-outfit">Assembly Progress</h3>
-              <!-- Progress display: Shows current amount / total goal (e.g., "190€ / 803€") -->
-              <span class="text-2xl md:text-4xl font-bold bg-gradient-to-r from-[#f29f67] to-[#8833cc] bg-clip-text text-transparent font-outfit relative z-20 pulsing-percentage whitespace-nowrap">
-                {{ currentAmount() | number:'1.0-0' }}€ / {{ totalGoal | number:'1.0-0' }}€
-              </span>
+              <div>
+                <h3 class="text-lg font-semibold text-slate-800 dark:text-white font-outfit">{{ t().assemblyProgress }}</h3>
+                <span class="text-sm text-slate-500 dark:text-slate-400 font-inter">{{ myContributionAmount() | number:'1.0-0' }}€ self-funded</span>
+              </div>
+              <!-- Progress display: Shows funding status -->
+              <div class="text-right relative z-20">
+                <span class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#8833cc] to-[#f29f67] bg-clip-text text-transparent font-outfit">
+                  {{ othersContributionPercentage() | number:'1.0-0' }}%
+                </span>
+              </div>
             </div>
-            
+
             <!-- Space for badge and tooltips - aligned with progress bar -->
             <div class="h-8 mb-2 relative progress-bar-spacer"></div>
-            
+
             <!-- Progress bar container - extends beyond image to allow balls to stick out -->
             <div class="relative mb-8 progress-bar-container">
-              <!-- Actual progress bar -->
-              <div class="relative h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-visible progress-bar-track">
-                <!-- Progress fill with glow effect -->
-                <div 
-                  class="absolute top-0 left-0 h-full bg-gradient-to-r from-[#f29f67] via-[#8833cc] to-[#3b82f6] rounded-full transition-all duration-500 shadow-lg"
-                  [style.width.%]="progressPercentage()"
-                  [style.box-shadow]="progressPercentage() > 0 ? '0 0 20px rgba(136, 51, 204, 0.5)' : 'none'"
+<!-- Actual progress bar -->
+            <div class="relative h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-visible progress-bar-track">
+                <!-- Others' contribution (purple) -->
+                <div
+                  class="absolute top-0 left-0 h-full bg-[#8833cc] rounded-l-full transition-all duration-500"
+                  [style.width.%]="othersContributionPercentage()"
+                  [style.box-shadow]="othersContributionPercentage() > 0 ? '0 0 15px rgba(136, 51, 204, 0.5)' : 'none'"
+                ></div>
+                <!-- My contribution (orange) - starts where others end -->
+                <div
+                  class="absolute top-0 h-full bg-[#f29f67] transition-all duration-500"
+                  [style.left.%]="othersContributionPercentage()"
+                  [style.width.%]="myContributionPercentage()"
+                  [class.rounded-r-full]="progressPercentage() >= 100"
+                  [style.box-shadow]="myContributionPercentage() > 0 ? '0 0 15px rgba(242, 159, 103, 0.5)' : 'none'"
                 ></div>
               </div>
-              
+
               <!-- Milestone nodes on the bar - positioned relative to container -->
               <div class="absolute top-1/2 left-0 right-0 transform -translate-y-1/2 h-0 milestone-nodes-container">
                 @for (milestone of milestones; track milestone.id) {
                   @if (milestone.id === currentMilestone().id && progressPercentage() < milestone.percentage) {
                     <!-- Current/Active milestone - bigger -->
-                    <div 
+                    <div
                       class="absolute milestone-node milestone-current"
                       [style.left.%]="milestone.percentage"
                       [style.transform]="'translate(-50%, -50%)'"
                     >
-                      <div 
+                      <div
                         class="w-8 h-8 rounded-full border-3 transition-all duration-300 z-10 relative milestone-ball milestone-current-ball border-white dark:border-slate-800 shadow-xl ring-4 ring-[#8833cc]/50 animate-pulse"
                       >
                       </div>
-                      
+
                       <!-- Hover tooltip below -->
                       <div class="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 opacity-0 hover:opacity-100 transition-all duration-300 pointer-events-none z-50 milestone-tooltip">
                         <div class="bg-slate-800 dark:bg-slate-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl border border-[#8833cc]/50 backdrop-blur-sm">
@@ -180,12 +217,12 @@
                     </div>
                   } @else {
                     <!-- Regular milestone -->
-                    <div 
+                    <div
                       class="absolute milestone-node"
                       [style.left.%]="milestone.percentage"
                       [style.transform]="'translate(-50%, -50%)'"
                     >
-                      <div 
+                      <div
                         class="w-6 h-6 rounded-full border-2 transition-all duration-300 z-10 relative milestone-ball"
                         [class.milestone-filled]="progressPercentage() >= milestone.percentage"
                         [class.milestone-empty]="progressPercentage() < milestone.percentage"
@@ -193,7 +230,7 @@
                         [class.shadow-[#8833cc]/50]="progressPercentage() >= milestone.percentage"
                       >
                       </div>
-                      
+
                       <!-- Hover tooltip below -->
                       <div class="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 opacity-0 hover:opacity-100 transition-all duration-300 pointer-events-none z-50 milestone-tooltip">
                         <div class="bg-slate-800 dark:bg-slate-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl border border-[#8833cc]/50 backdrop-blur-sm">
@@ -211,23 +248,28 @@
                   }
                 }
               </div>
-              
-              <!-- Last achieved milestone badge on top - always visible -->
+
+              <!-- Last achieved milestone badge on top -->
               @if (lastAchievedMilestone()) {
-                <div 
-                  class="absolute top-0 left-0 transform -translate-x-1/2 milestone-badge z-10"
-                  [style.left.%]="lastAchievedMilestone()!.percentage"
-                  [style.top.px]="-45"
-                  [class.milestone-badge-left]="lastAchievedMilestone()!.percentage < 10"
-                  [class.milestone-badge-right]="lastAchievedMilestone()!.percentage > 90"
+                <div
+                  class="absolute top-0 z-10"
+                  [style.top.px]="-42"
+                  [style.right]="lastAchievedMilestone()!.percentage >= 90 ? '-20px' : 'auto'"
+                  [style.left]="lastAchievedMilestone()!.percentage >= 90 ? 'auto' : lastAchievedMilestone()!.percentage + '%'"
+                  [style.transform]="lastAchievedMilestone()!.percentage >= 90 ? 'none' : 'translateX(-50%)'"
                 >
-                  <div class="bg-gradient-to-r from-[#f29f67] to-[#8833cc] text-white text-xs px-3 py-1.5 rounded-lg shadow-lg border-2 border-white dark:border-slate-800 font-semibold whitespace-nowrap flex items-center gap-1.5">
+                  <div class="bg-gradient-to-r from-[#8833cc] to-[#6b21a8] text-white text-xs px-3 py-1 rounded-full whitespace-nowrap font-semibold font-inter flex items-center gap-1.5 shadow-sm">
                     <span>✨</span>
                     <span>{{ lastAchievedMilestone()!.name }}</span>
-                    <span>✓</span>
+                    <span class="text-green-300">✓</span>
                   </div>
-                  <!-- Arrow pointing to bar -->
-                  <div class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-[#8833cc]"></div>
+                  <!-- Arrow pointing down to bar -->
+                  <div 
+                    class="absolute top-full w-0 h-0 border-l-[6px] border-r-[6px] border-t-[7px] border-transparent border-t-[#6b21a8]"
+                    [style.right]="lastAchievedMilestone()!.percentage >= 90 ? '12px' : 'auto'"
+                    [style.left]="lastAchievedMilestone()!.percentage >= 90 ? 'auto' : '50%'"
+                    [style.transform]="lastAchievedMilestone()!.percentage >= 90 ? 'none' : 'translateX(-50%)'"
+                  ></div>
                 </div>
               }
             </div>
@@ -238,8 +280,8 @@
             (click)="openModal()"
             class="w-full py-4 px-6 bg-gradient-to-r from-[#8833cc] via-[#f29f67] to-[#8833cc] text-white font-bold text-lg rounded-xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 font-outfit relative overflow-hidden group"
           >
-            <span class="relative z-10 block group-hover:hidden">Make my Gift true</span>
-            <span class="relative z-10 hidden group-hover:block">Wow, it worked?... Thank you!</span>
+            <span class="relative z-10 block group-hover:hidden">{{ t().donationButtonText }}</span>
+            <span class="relative z-10 hidden group-hover:block">{{ t().donationButtonHover }}</span>
             <div class="absolute inset-0 bg-gradient-to-r from-[#f29f67] via-[#8833cc] to-[#f29f67] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </button>
         </div>
@@ -251,9 +293,9 @@
             <div class="flex-1">
               <h3 class="text-sm font-semibold text-slate-800 dark:text-white mb-1 font-outfit">Friendly Disclaimer</h3>
               <p class="text-sm text-slate-600 dark:text-slate-400 font-inter leading-tight">
-                This is a voluntary contribution, not a charity. I'm planning to buy this GPU anyway 
-                (electronics prices are estimated to increase significantly in Q1 and Q2 2026), 
-                and I'll be contributing a larger portion myself. This is just a fun way to share 
+                This is a voluntary contribution, not a charity. I'm planning to buy this GPU anyway
+                (electronics prices are estimated to increase significantly in Q1 and Q2 2026),
+                and I'll be contributing a larger portion myself. This is just a fun way to share
                 the gift with friends & family. No pressure! 🎮
               </p>
             </div>
@@ -264,7 +306,7 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <!-- Your Growth Card -->
           <div class="dashboard-card-small">
-            <div class="text-sm text-slate-600 dark:text-slate-400 mb-1 font-inter">Your Growth</div>
+            <div class="text-sm text-slate-600 dark:text-slate-400 mb-1 font-inter">{{ t().statsGrowth }}</div>
             <div class="text-3xl font-bold text-slate-800 dark:text-white mb-2 font-outfit">{{ chartData.growth | number:'1.2-2' }}%</div>
             <div class="flex items-center gap-1 text-green-600 dark:text-green-400 text-xs">
               <span>↑</span>
@@ -274,64 +316,98 @@
 
           <!-- Total Donors -->
           <div class="dashboard-card-small">
-            <div class="text-sm text-slate-600 dark:text-slate-400 mb-1 font-inter">Total Donors</div>
-            <div class="text-3xl font-bold text-slate-800 dark:text-white mb-2 font-outfit">{{ chartData.totalDonors }}</div>
-            <div class="text-xs text-slate-500 dark:text-slate-400 font-inter">Active contributors</div>
+            <div class="text-sm text-slate-600 dark:text-slate-400 mb-1 font-inter">{{ t().statsTotalDonors }}</div>
+            <div class="text-3xl font-bold text-slate-800 dark:text-white mb-2 font-outfit">{{ uniqueContributorsCount() }}</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 font-inter">{{ t().statsActiveContributors }}</div>
           </div>
 
           <!-- Earnings -->
           <div class="dashboard-card-small">
-            <div class="text-sm text-slate-600 dark:text-slate-400 mb-1 font-inter">Earnings</div>
+            <div class="text-sm text-slate-600 dark:text-slate-400 mb-1 font-inter">{{ t().statsEarnings }}</div>
             <div class="text-3xl font-bold text-slate-800 dark:text-white mb-2 font-outfit">{{ currentAmount() | number:'1.0-0' }}€</div>
-            <div class="text-xs text-slate-500 dark:text-slate-400 font-inter">Raised so far</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 font-inter">{{ t().statsRaisedSoFar }}</div>
           </div>
 
-          <!-- Days Until Goal -->
+          <!-- Purchase Status -->
           <div class="dashboard-card-small">
-            <div class="text-sm text-slate-600 dark:text-slate-400 mb-1 font-inter">Days Until Goal</div>
-            <div class="text-3xl font-bold text-slate-800 dark:text-white mb-2 font-outfit">{{ daysUntilGoal() }}</div>
-            <div class="text-xs text-slate-500 dark:text-slate-400 font-inter">Need to buy earlier</div>
+            <div class="text-sm text-slate-600 dark:text-slate-400 mb-1 font-inter">{{ t().statsStatus }}</div>
+            <div class="text-3xl font-bold text-slate-800 dark:text-white mb-2 font-outfit">✓</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 font-inter">{{ t().statsPurchased }}</div>
           </div>
         </div>
 
-        <!-- Donation Activity Chart -->
-        <div class="dashboard-card">
-          <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-6 font-outfit">Donation Activity</h3>
-          <div class="flex items-end justify-between gap-3" style="height: 200px;">
-            @for (donation of chartData.dailyDonations; track $index) {
-              <div class="flex-1 flex flex-col items-center gap-2 h-full">
-                <div class="relative w-full h-full flex items-end justify-center">
-                  <div 
-                    class="w-full max-w-[70px] mx-auto rounded-t-lg transition-all duration-500 hover:opacity-90 hover:scale-105 shadow-lg"
-                    [style.height.%]="getBarWidth(donation)"
-                    [style.min-height.px]="donation > 0 ? 10 : 0"
-                    [style.background-color]="getBarColor(donation)"
-                  ></div>
-                </div>
-                <div class="flex flex-col items-center gap-0.5">
-                  <span class="text-[12px] font-bold text-slate-700 dark:text-slate-300 text-center">{{ donation }}€</span>
-                  <span class="text-[10px] text-slate-600 dark:text-slate-400 font-inter text-center">{{ chartData.days[$index] }}</span>
-                </div>
-              </div>
-            }
-          </div>
         </div>
-      </div>
 
       <!-- Right Side: Charts & Metrics (4 columns) -->
-      <div class="lg:col-span-4 space-y-6">
-        
-        <!-- Contributors Visualization - Pie Chart -->
-        <div class="dashboard-card">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-slate-800 dark:text-white font-outfit">Contributors</h3>
-            <span class="text-sm text-slate-600 dark:text-slate-400 font-inter">{{ totalContributors() }} total</span>
-          </div>
+      <div class="lg:col-span-4 flex flex-col gap-6">
+
+        <!-- 💜 Thank You Card -->
+        <div class="dashboard-card relative overflow-hidden">
+          <!-- Subtle gradient background -->
+          <div class="absolute inset-0 bg-gradient-to-br from-[#8833cc]/5 to-[#f29f67]/5"></div>
           
-          <div class="relative w-full aspect-square max-w-[200px] mx-auto mb-4">
-            <svg class="w-full h-full" viewBox="0 0 100 100">
-              @for (contributor of contributors; track $index) {
-                <g 
+          <div class="relative z-10">
+            <!-- Header with heart and count -->
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <span class="text-2xl heart-beat">💜</span>
+                <h3 class="text-lg font-semibold bg-gradient-to-r from-[#8833cc] to-[#f29f67] bg-clip-text text-transparent font-outfit">Thank You!</h3>
+              </div>
+              <div class="text-right">
+                <div class="text-2xl font-bold text-[#8833cc] font-outfit">{{ thankYouCount() }}</div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 font-inter uppercase">people</div>
+              </div>
+            </div>
+            
+            <!-- Contributors badges -->
+            <div class="flex flex-wrap gap-2">
+              @for (contributor of groupedContributors(); track contributor.name) {
+                @if (contributor.name !== 'Šimon') {
+                  <span 
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full border transition-all hover:scale-105 hover:shadow-md"
+                    [style.background-color]="contributor.color + '15'"
+                    [style.border-color]="contributor.color + '40'"
+                    [style.color]="contributor.color"
+                  >
+                    <span class="w-2 h-2 rounded-full" [style.background-color]="contributor.color"></span>
+                    {{ contributor.name }}
+                  </span>
+                }
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Contributors Visualization - Pie Chart -->
+        <div class="dashboard-card contributors-card overflow-hidden flex-grow">
+          <!-- Header with gradient accent -->
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <div class="w-1 h-8 bg-gradient-to-b from-[#f29f67] to-[#8833cc] rounded-full"></div>
+              <div>
+                <h3 class="text-lg font-semibold text-slate-800 dark:text-white font-outfit">{{ t().contributors }}</h3>
+                <span class="text-xs text-slate-500 dark:text-slate-400 font-inter">{{ uniqueContributorsCount() }} {{ t().total | lowercase }}</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-[#f29f67] animate-pulse"></span>
+              <span class="w-2 h-2 rounded-full bg-[#8833cc] animate-pulse" style="animation-delay: 0.3s"></span>
+              <span class="w-2 h-2 rounded-full bg-[#3b82f6] animate-pulse" style="animation-delay: 0.6s"></span>
+            </div>
+          </div>
+
+          <!-- Pie Chart with glow ring -->
+          <div class="relative w-full aspect-square max-w-[220px] mx-auto mb-6">
+            <!-- Outer glow ring -->
+            <div class="absolute inset-0 rounded-full bg-gradient-to-r from-[#f29f67]/20 via-[#8833cc]/20 to-[#3b82f6]/20 blur-xl"></div>
+
+            <!-- SVG Chart -->
+            <svg class="w-full h-full relative z-10 pie-chart-glow" viewBox="0 0 100 100">
+              <!-- Decorative outer ring -->
+              <circle cx="50" cy="50" r="48" fill="none" stroke="url(#outerRingGradient)" stroke-width="0.5" opacity="0.5"/>
+
+              @for (contributor of groupedContributors(); track $index) {
+                <g
                   class="pie-segment-group cursor-pointer"
                   (mouseenter)="onContributorHover($index, $event)"
                   (mousemove)="onContributorHover($index, $event)"
@@ -340,40 +416,74 @@
                   <path
                     [attr.d]="getPiePath($index)"
                     [attr.fill]="contributor.color"
+                    [attr.fill-opacity]="contributor.name === 'Šimon' ? '0.5' : '1'"
                     class="pie-segment"
                     [class.pie-segment-hovered]="hoveredContributorIndex() === $index"
                   />
                 </g>
               }
-              <!-- Center circle to create donut/hollow effect -->
+              <!-- Center circle with gradient border -->
               <circle cx="50" cy="50" r="30" class="pie-center-circle"/>
+              <circle cx="50" cy="50" r="30" fill="none" stroke="url(#centerRingGradient)" stroke-width="1" opacity="0.3"/>
+
+              <!-- Gradients -->
+              <defs>
+                <linearGradient id="outerRingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#f29f67"/>
+                  <stop offset="50%" style="stop-color:#8833cc"/>
+                  <stop offset="100%" style="stop-color:#3b82f6"/>
+                </linearGradient>
+                <linearGradient id="centerRingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#f29f67"/>
+                  <stop offset="100%" style="stop-color:#8833cc"/>
+                </linearGradient>
+              </defs>
             </svg>
-            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+
+            <!-- Center content -->
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
               <div class="text-center">
-                <div class="text-2xl font-bold bg-gradient-to-r from-[#f29f67] to-[#8833cc] bg-clip-text text-transparent font-outfit">
+                <div class="text-3xl font-bold bg-gradient-to-r from-[#f29f67] to-[#8833cc] bg-clip-text text-transparent font-outfit">
                   {{ contributorsTotal() }}€
                 </div>
-                <div class="text-xs text-slate-600 dark:text-slate-400 font-inter">Total</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400 font-inter uppercase tracking-wider">{{ t().total }}</div>
               </div>
+            </div>
+          </div>
+
+          <!-- Bottom stats row -->
+          <div class="grid grid-cols-2 gap-3 pt-4 border-t border-slate-200/50 dark:border-slate-700/50">
+            <div class="text-center">
+              <div class="text-lg font-bold text-[#8833cc] font-outfit">{{ othersContributionAmount() | number:'1.0-0' }}€</div>
+              <div class="text-[10px] text-slate-500 dark:text-slate-400 font-inter uppercase tracking-wider">{{ t().byOthers }}</div>
+            </div>
+            <div class="text-center">
+              <div class="text-lg font-bold text-[#f29f67] font-outfit">{{ myContributionAmount() | number:'1.0-0' }}€</div>
+              <div class="text-[10px] text-slate-500 dark:text-slate-400 font-inter uppercase tracking-wider">{{ t().byMe }}</div>
             </div>
           </div>
         </div>
 
-        <!-- Goal Velocity Card -->
-        <div class="dashboard-card">
-          <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 font-outfit">Goal Velocity</h3>
-          <div class="text-center">
-            <div class="text-4xl font-bold bg-gradient-to-r from-[#f29f67] to-[#8833cc] bg-clip-text text-transparent font-outfit mb-2">
-              {{ goalVelocity() | number:'1.0-1' }}€
+        <!-- Top Contributor Card - Compact -->
+        <div class="dashboard-card py-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">🏆</span>
+              <div>
+                <div class="text-xs text-slate-500 dark:text-slate-400 font-inter uppercase">Top Contributor</div>
+                <div class="text-sm font-semibold text-slate-800 dark:text-white font-outfit">{{ topContributor().name }}</div>
+              </div>
             </div>
-            <div class="text-sm text-slate-600 dark:text-slate-400 font-inter">per day average</div>
+            <div class="text-2xl font-bold bg-gradient-to-r from-[#f29f67] to-[#8833cc] bg-clip-text text-transparent font-outfit">
+              {{ topContributor().amount | number:'1.0-0' }}€
+            </div>
           </div>
         </div>
 
         <!-- Growth Trend Line Chart -->
         <div class="dashboard-card">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-slate-800 dark:text-white font-outfit">Growth Trend</h3>
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-white font-outfit">{{ t().growthTrend }}</h3>
             <span class="text-2xl font-bold text-slate-800 dark:text-white font-outfit">
               {{ chartData.velocityTrend[chartData.velocityTrend.length - 1] >= 0 ? '+' : '' }}{{ chartData.velocityTrend[chartData.velocityTrend.length - 1] }}€
             </span>
@@ -421,92 +531,71 @@
             </svg>
           </div>
           <div class="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 font-inter mt-2">
-            <span>Ahead</span>
-            <span>Velocity Trend</span>
-            <span>Behind</span>
+            <span>{{ t().ahead }}</span>
+            <span>{{ t().velocityTrend }}</span>
+            <span>{{ t().behind }}</span>
           </div>
         </div>
 
-        <!-- Milestone Achievements -->
-        <div class="dashboard-card">
-          <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 font-outfit">Milestone Achievements</h3>
-          <div class="overflow-x-auto">
-            <table class="w-full">
-              <thead>
-                <tr class="border-b border-slate-200 dark:border-slate-700">
-                  <th class="text-left py-2 px-3 text-xs font-semibold text-slate-600 dark:text-slate-400 font-inter uppercase tracking-wider">Milestone</th>
-                  <th class="text-right py-2 px-3 text-xs font-semibold text-slate-600 dark:text-slate-400 font-inter uppercase tracking-wider">Progress</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (milestone of completedMilestones(); track milestone.id) {
-                  <tr class="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                    <td class="py-3 px-3 text-sm text-slate-800 dark:text-slate-200 font-inter">{{ milestone.name }}</td>
-                    <td class="py-3 px-3 text-sm text-right text-slate-600 dark:text-slate-400 font-inter">{{ milestone.percentage | number:'1.0-0' }}%</td>
-                  </tr>
-                }
-                @if (completedMilestones().length === 0) {
-                  <tr>
-                    <td colspan="2" class="py-8 text-center text-sm text-slate-500 dark:text-slate-400 font-inter">
-                      No milestones achieved yet
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
+        
+      </div>
+    </div>
 
-        <!-- Recent Milestones -->
-        <div class="dashboard-card">
-          <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 font-outfit">Recent Milestones</h3>
-          <div class="space-y-3">
-            @for (milestone of completedMilestones().slice(-3).reverse(); track milestone.id) {
-              <div class="flex items-center gap-3 p-2 rounded-lg bg-slate-100 dark:bg-slate-700/50">
-                <div class="w-2 h-2 rounded-full bg-gradient-to-r from-[#f29f67] to-[#8833cc]"></div>
-                <span class="text-sm text-slate-800 dark:text-white font-inter">{{ milestone.name }}</span>
-              </div>
-            }
-            @if (completedMilestones().length === 0) {
-              <div class="text-sm text-slate-600 dark:text-slate-400 font-inter">No milestones completed yet</div>
-            }
+    <!-- Donation Activity Chart - Full Width -->
+    <div class="dashboard-card mt-6">
+      <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-6 font-outfit">{{ t().donationActivity }}</h3>
+      <div class="flex items-end justify-between gap-3 donation-chart-container">
+        @for (donation of chartData.dailyDonations; track $index) {
+          <div class="flex-1 flex flex-col items-center gap-2 h-full">
+            <div class="relative w-full h-full flex items-end justify-center">
+              <div
+                class="w-full max-w-[70px] mx-auto rounded-t-lg transition-all duration-500 hover:opacity-90 hover:scale-105 shadow-lg"
+                [style.height.%]="getBarWidth(donation)"
+                [style.min-height.px]="donation > 0 ? 10 : 0"
+                [style.background-color]="getBarColor(donation)"
+              ></div>
+            </div>
+            <div class="flex flex-col items-center gap-0.5">
+              <span class="text-[12px] font-bold text-slate-700 dark:text-slate-300 text-center">{{ donation }}€</span>
+              <span class="text-[10px] text-slate-600 dark:text-slate-400 font-inter text-center">{{ chartData.days[$index] }}</span>
+            </div>
           </div>
-        </div>
+        }
       </div>
     </div>
   </div>
 
   <!-- Donation Modal -->
   @if (showModal()) {
-    <div 
+    <div
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md"
       (click)="closeModal()"
     >
-      <div 
+      <div
         class="modal-card max-w-md w-full mx-4 p-6"
         (click)="$event.stopPropagation()"
       >
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-2xl font-bold bg-gradient-to-r from-[#f29f67] to-[#8833cc] bg-clip-text text-transparent font-outfit">
-            System Update Initiated...
+            {{ t().modalTitle }}
           </h3>
-          <button 
+          <button
             (click)="closeModal()"
             class="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-xl"
           >
             ✕
           </button>
         </div>
-        
+
         <div>
           <p class="text-slate-700 dark:text-slate-300 mb-6 font-inter">
-            Automatic payment implementation in progress.
+            {{ t().modalDescription }}
           </p>
-          
+
           <div class="bg-slate-100 dark:bg-slate-700/50 p-4 rounded-lg mb-4 space-y-4">
             <div>
               <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 font-inter">
-                Name:
+                {{ t().modalName }}
               </label>
               <code class="block text-base font-mono text-slate-900 dark:text-white break-all bg-white dark:bg-slate-800/50 p-2 rounded border border-slate-200 dark:border-slate-700">
                 {{ paymentInfo.name }}
@@ -514,7 +603,7 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 font-inter">
-                IBAN:
+                {{ t().modalIban }}
               </label>
               <div class="flex items-center gap-2">
                 <code class="flex-1 text-base font-mono text-slate-900 dark:text-white break-all bg-white dark:bg-slate-800/50 p-2 rounded border border-slate-200 dark:border-slate-700">
@@ -524,22 +613,22 @@
                   (click)="copyToClipboard(paymentInfo.iban)"
                   class="px-4 py-2 bg-gradient-to-r from-[#8833cc] to-[#f29f67] text-white rounded-lg hover:opacity-90 transition-opacity font-inter text-sm font-semibold"
                 >
-                  Copy
+                  {{ t().modalCopy }}
                 </button>
               </div>
             </div>
             <div>
               <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 font-inter">
-                BIC/SWIFT:
+                {{ t().modalBicSwift }}
               </label>
               <code class="block text-base font-mono text-slate-900 dark:text-white break-all bg-white dark:bg-slate-800/50 p-2 rounded border border-slate-200 dark:border-slate-700">
                 {{ paymentInfo.bicSwift }}
               </code>
             </div>
           </div>
-          
+
           <div class="text-xs text-slate-600 dark:text-slate-400 font-inter">
-            Thank you for your contribution! Every donation brings us closer to the ultimate gaming setup.
+            {{ t().modalThankYou }}
           </div>
         </div>
       </div>

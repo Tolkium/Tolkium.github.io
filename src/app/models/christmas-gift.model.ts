@@ -58,8 +58,8 @@ export interface PaymentInfo {
 }
 
 // Constants
-export const TOTAL_GOAL = 802.90;
-export const GOAL_DATE = new Date(2025, 11, 19); // December 19, 2025
+export const TOTAL_GOAL = 1059;
+export const GOAL_DATE = new Date(2025, 11, 20); // December 20, 2025 (Purchase date)
 
 export const MILESTONES: Milestone[] = [
   { id: 1, name: 'Anti-Static Bag', percentage: 0 },
@@ -84,11 +84,14 @@ export const CONTRIBUTORS: Contributor[] = [
   { name: 'Šimon', amount: 100, date: '2025-12-13', color: '#f29f67' },
   { name: 'Family member M', amount: 100, date: '2025-12-14', color: '#8833cc' },
   { name: 'Family member S', amount: 30, date: '2025-12-14', color: '#3b82f6' },
-{ name: 'Family member P', amount: 100, date: '2025-12-18', color: '#3b12f6' },
-{ name: 'Family member N', amount: 100, date: '2025-12-20', color: '#3b82a6' },
   { name: 'Ace Friend', amount: 50, date: '2025-12-15', color: '#10b981' },
-{ name: 'Ace Friend', amount: 50, date: '2025-12-15', color: '#10c921' },
+  { name: 'Family member P', amount: 100, date: '2025-12-18', color: '#3b12f6' },
+  { name: 'Family member N', amount: 100, date: '2025-12-20', color: '#3b82a6' },
   { name: 'First OP Friend', amount: 10, date: '2025-12-20', color: '#e74c3c' },
+  { name: 'Ace Friend', amount: 30, date: '2025-12-20', color: '#10b981' },
+  { name: 'Ace Friend', amount: 20, date: '2025-12-21', color: '#10b981' },
+  { name: 'Family member M', amount: 50, date: '2025-12-22', color: '#8833cc' },
+  { name: 'Šimon', amount: 439, date: '2025-12-20', color: '#f29f67' },
 ];
 
 export const PAYMENT_INFO: PaymentInfo = {

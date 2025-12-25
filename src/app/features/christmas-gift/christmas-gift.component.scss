@@ -3,6 +3,25 @@
   min-height: 100vh;
 }
 
+// Translation button styles
+.translate-button {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+
+  // Responsive adjustments for mobile
+  @media (max-width: 640px) {
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
 // Modern Dashboard Card Styles - Transparent like about-me
 .dashboard-card {
   background: rgba(255, 255, 255, 0.5);
@@ -50,6 +69,82 @@
 
   &:hover {
     transform: translateY(-2px);
+  }
+}
+
+// Milestone achievement badges
+.milestone-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(136, 51, 204, 0.15), rgba(242, 159, 103, 0.15));
+  border: 1px solid rgba(136, 51, 204, 0.3);
+  color: #6b21a8;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s ease;
+  cursor: default;
+
+  &:hover {
+    transform: scale(1.05);
+    background: linear-gradient(135deg, rgba(136, 51, 204, 0.25), rgba(242, 159, 103, 0.25));
+    box-shadow: 0 2px 8px rgba(136, 51, 204, 0.2);
+  }
+}
+
+::ng-deep .dark .milestone-badge {
+  background: linear-gradient(135deg, rgba(136, 51, 204, 0.25), rgba(242, 159, 103, 0.2));
+  border-color: rgba(242, 159, 103, 0.4);
+  color: #f29f67;
+}
+
+// Heart beat animation - subtle
+.heart-beat {
+  display: inline-block;
+  animation: heartBeat 2s ease-in-out infinite;
+}
+
+@keyframes heartBeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+// GPU card animated glow
+.gpu-card-glow {
+  position: relative;
+}
+
+.animate-glow-pulse {
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.5;
+    filter: blur(4px);
+  }
+  50% {
+    opacity: 0.9;
+    filter: blur(8px);
+  }
+}
+
+// GPU color glow effect - subtle theme gradient
+.gpu-color-glow {
+  animation: gpuColorGlow 4s ease-in-out infinite;
+}
+
+@keyframes gpuColorGlow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
   }
 }
 
@@ -117,7 +212,7 @@
 // Circuit Road Progress Bar Enhanced
 .circuit-road {
   position: relative;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -139,7 +234,7 @@
 // Progress bar container - extends beyond image to allow balls to stick out
 .progress-bar-container {
   position: relative;
-  
+
   // Add padding to allow milestone balls to stick out on edges
   // padding: 0 12px;
   margin-left: 17px;
@@ -163,6 +258,7 @@
   padding: 0 12px;
   margin-left: -12px;
   margin-right: -12px;
+  margin-top: 16px;
   width: calc(100% + 24px);
 }
 
@@ -170,23 +266,23 @@
 .milestone-node {
   position: absolute;
   transition: all 0.3s ease;
-  
+
   &:hover {
     z-index: 50 !important;
-    
+
     .milestone-tooltip {
       opacity: 1 !important;
       transform: translate(-50%, 0) scale(1.05);
       pointer-events: auto;
     }
-    
+
     > div:first-child {
       transform: scale(1.2);
       // Light mode: use orange/peach glow that fits the theme
       box-shadow: 0 0 20px rgba(242, 159, 103, 0.6);
     }
   }
-  
+
   // Only show tooltip on direct hover, not group hover
   .milestone-tooltip {
     opacity: 0;
@@ -204,14 +300,14 @@
   // Empty state - light theme
   background-color: rgb(148, 163, 184);
   border-color: rgb(148, 163, 184);
-  
+
   // Filled state - simple flat circle with smooth gradient, no border or outline
   &.milestone-filled {
-    background: radial-gradient(circle at 35% 35%, 
-      rgba(242, 159, 103, 1) 0%, 
-      rgba(242, 159, 103, 0.95) 25%, 
-      rgba(200, 120, 150, 0.9) 50%, 
-      rgba(150, 80, 180, 0.95) 75%, 
+    background: radial-gradient(circle at 35% 35%,
+      rgba(242, 159, 103, 1) 0%,
+      rgba(242, 159, 103, 0.95) 25%,
+      rgba(200, 120, 150, 0.9) 50%,
+      rgba(150, 80, 180, 0.95) 75%,
       rgba(136, 51, 204, 1) 100%) !important;
     border: none !important;
     border-width: 0 !important;
@@ -222,18 +318,18 @@
     background-clip: padding-box;
     background-origin: padding-box;
   }
-  
+
   // Current milestone ball - this one looks good, use same for filled
   &.milestone-current-ball {
-    background: radial-gradient(circle at 35% 35%, 
-      rgba(242, 159, 103, 1) 0%, 
-      rgba(242, 159, 103, 0.95) 25%, 
-      rgba(200, 120, 150, 0.9) 50%, 
-      rgba(150, 80, 180, 0.95) 75%, 
+    background: radial-gradient(circle at 35% 35%,
+      rgba(242, 159, 103, 1) 0%,
+      rgba(242, 159, 103, 0.95) 25%,
+      rgba(200, 120, 150, 0.9) 50%,
+      rgba(150, 80, 180, 0.95) 75%,
       rgba(136, 51, 204, 1) 100%);
     border-color: white;
   }
-  
+
   // Empty state styling
   &.milestone-empty {
     background-color: rgb(148, 163, 184);
@@ -248,14 +344,14 @@
     background-color: rgb(71, 85, 105);
     border-color: rgb(100, 116, 139);
   }
-  
+
   // Filled state - dark theme (simple flat circle, no border)
   &.milestone-filled {
-    background: radial-gradient(circle at 35% 35%, 
-      rgba(242, 159, 103, 1) 0%, 
-      rgba(242, 159, 103, 0.95) 25%, 
-      rgba(200, 120, 150, 0.9) 50%, 
-      rgba(150, 80, 180, 0.95) 75%, 
+    background: radial-gradient(circle at 35% 35%,
+      rgba(242, 159, 103, 1) 0%,
+      rgba(242, 159, 103, 0.95) 25%,
+      rgba(200, 120, 150, 0.9) 50%,
+      rgba(150, 80, 180, 0.95) 75%,
       rgba(136, 51, 204, 1) 100%) !important;
     border: none !important;
     border-width: 0 !important;
@@ -266,14 +362,14 @@
     background-clip: padding-box;
     background-origin: padding-box;
   }
-  
+
   // Current milestone ball - dark theme
   &.milestone-current-ball {
-    background: radial-gradient(circle at 35% 35%, 
-      rgba(242, 159, 103, 1) 0%, 
-      rgba(242, 159, 103, 0.95) 25%, 
-      rgba(200, 120, 150, 0.9) 50%, 
-      rgba(150, 80, 180, 0.95) 75%, 
+    background: radial-gradient(circle at 35% 35%,
+      rgba(242, 159, 103, 1) 0%,
+      rgba(242, 159, 103, 0.95) 25%,
+      rgba(200, 120, 150, 0.9) 50%,
+      rgba(150, 80, 180, 0.95) 75%,
       rgba(136, 51, 204, 1) 100%);
     border-color: rgb(30, 41, 59);
   }
@@ -281,7 +377,7 @@
 
 .milestone-current {
   z-index: 30;
-  
+
   &:hover {
     z-index: 50 !important;
   }
@@ -290,7 +386,7 @@
 .milestone-tooltip {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translate(-50%, -5px);
-  
+
   &:hover {
     opacity: 1 !important;
   }
@@ -299,7 +395,7 @@
 .milestone-badge {
   animation: float 2s ease-in-out infinite;
   z-index: 20;
-  
+
   @keyframes float {
     0%, 100% {
       transform: translate(-50%, 0) translateY(0);
@@ -308,14 +404,30 @@
       transform: translate(-50%, 0) translateY(-5px);
     }
   }
-  
+
   // Adjust positioning when near edges to avoid header overlap
   &.milestone-badge-left {
     left: 10% !important;
   }
-  
+
   &.milestone-badge-right {
     left: 90% !important;
+  }
+}
+
+// Pulsing animation for "By Me" text
+.pulsing-by-me {
+  animation: pulse-by-me 2s ease-in-out infinite;
+
+  @keyframes pulse-by-me {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.05);
+    }
   }
 }
 
@@ -326,12 +438,12 @@
   max-width: 100%; // Prevent overflow
   overflow: hidden; // Hide overflow if text is too long
   text-overflow: ellipsis; // Show ellipsis if text overflows (fallback)
-  
+
   // Responsive text size for mobile devices
   @media (max-width: 640px) {
     font-size: 1.5rem; // Smaller text on mobile to fit better
   }
-  
+
   @keyframes pulse-percentage {
     0%, 100% {
       transform: scale(1);
@@ -344,30 +456,43 @@
   }
 }
 
+// Contributors card enhanced styles
+.contributors-card {
+  position: relative;
+}
+
+// Pie chart glow effect
+.pie-chart-glow {
+  filter: drop-shadow(0 0 10px rgba(136, 51, 204, 0.2));
+}
+
 // Pie chart styles
 .pie-segment-group {
-  transition: filter 0.25s ease-out;
-  
+  transition: filter 0.3s ease-out, transform 0.3s ease-out;
+  transform-origin: 50px 50px; // Center of the SVG viewBox
+
   &:hover {
-    // Subtle shadow for depth
-    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
+    // Pop out effect - scale up and add shadow
+    transform: scale(1.12);
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
+    z-index: 10;
   }
 }
 
 .pie-segment {
-  transition: opacity 0.25s ease-out, 
+  transition: opacity 0.25s ease-out,
               filter 0.25s ease-out;
-  opacity: 0.95;
-  
+  opacity: 0.9;
+
   &.pie-segment-hovered {
     opacity: 1 !important;
     // Enhanced brightness and saturation for better visibility
-    filter: brightness(1.35) saturate(1.25);
+    filter: brightness(1.3) saturate(1.3);
   }
-  
+
   .pie-segment-group:hover & {
     opacity: 1 !important;
-    filter: brightness(1.35) saturate(1.25);
+    filter: brightness(1.3) saturate(1.3);
   }
 }
 
@@ -384,14 +509,23 @@
 // Tooltip styles
 .tooltip-container {
   pointer-events: none;
-  z-index: 99999 !important;
   position: fixed;
-  
+
   div {
     white-space: nowrap;
     animation: tooltipFadeIn 0.2s ease-out;
     position: relative;
   }
+}
+
+// Tooltip z-index - moved from inline style
+.tooltip-z-index {
+  z-index: 99999 !important;
+}
+
+// Donation chart container height - moved from inline style
+.donation-chart-container {
+  height: 200px;
 }
 
 @keyframes tooltipFadeIn {
@@ -414,7 +548,7 @@
 .donation-button {
   position: relative;
   overflow: hidden;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -427,7 +561,7 @@
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
   }
-  
+
   &:hover::before {
     width: 400px;
     height: 400px;
@@ -443,14 +577,14 @@
 // GPU Image Container
 .gpu-image-container {
   transition: transform 0.3s ease;
-  
+
   &:hover {
     transform: scale(1.02);
   }
-  
+
   img {
     transition: transform 0.3s ease;
-    
+
     &:hover {
       transform: scale(1.05);
     }
@@ -460,11 +594,11 @@
 // Progress circle chart with glow
 .progress-circle {
   transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   .dark & {
     filter: drop-shadow(0 0 8px rgba(136, 51, 204, 0.5));
   }
-  
+
   filter: drop-shadow(0 0 4px rgba(242, 159, 103, 0.4));
 }
 
@@ -500,7 +634,7 @@
 // Stats card hover effect
 .stats-card {
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
@@ -512,7 +646,7 @@
   .dashboard-card {
     padding: 16px;
   }
-  
+
   .dashboard-card-small {
     padding: 12px;
   }
@@ -568,7 +702,7 @@
 // Chart container
 .chart-container {
   position: relative;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -579,7 +713,7 @@
     transition: opacity 0.3s;
     z-index: -1;
   }
-  
+
   &:hover::before {
     opacity: 1;
   }

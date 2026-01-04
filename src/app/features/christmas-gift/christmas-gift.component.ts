@@ -58,16 +58,16 @@ export class ChristmasGiftComponent {
   toggleLanguage(): void {
     this.currentLanguage.update(lang => lang === 'en' ? 'sk' : 'en');
   }
-
+  
   /**
    * Text rotation system - 6 alternative gift messages
    * These messages rotate every 5 seconds with Elastic Stretch animation
    * Now uses translations based on current language
    */
   readonly textAlternatives = computed(() => this.t().textAlternatives);
-
+  
   private readonly TEXT_COUNT = 6; // Number of text alternatives
-
+  
   /**
    * Single variant (variant 8: Elastic Stretch animation)
    * textIndex: Current index in the textAlternatives array
@@ -76,7 +76,7 @@ export class ChristmasGiftComponent {
   readonly textIndex = signal(8 % this.TEXT_COUNT);
   readonly textKey = signal(0); // Key to force re-render and animation restart
   private textRotationInterval: ReturnType<typeof setInterval> | null = null;
-
+  
   readonly paymentInfo: PaymentInfo = PAYMENT_INFO;
   readonly gpuImageUrl = GPU_IMAGE_URL;
 
@@ -216,33 +216,33 @@ export class ChristmasGiftComponent {
 
     // Calculate start and end angles for this segment
     let startAngle = -90; // Start from top (-90 degrees)
-
+    
     // Calculate cumulative angle for all previous segments
     for (let i = 0; i < index; i++) {
       const prevPercentage = grouped[i].amount / total;
       startAngle += prevPercentage * 360;
     }
-
+    
     // Calculate end angle for this segment
     const percentage = grouped[index].amount / total;
     const endAngle = startAngle + (percentage * 360);
-
+    
     // For the last segment, ensure it closes exactly at 270 degrees (full circle)
     const finalEndAngle = index === grouped.length - 1 ? 270 : endAngle;
-
+    
     // Convert angles to radians
     const startRad = (startAngle * Math.PI) / 180;
     const endRad = (finalEndAngle * Math.PI) / 180;
-
+    
     // Calculate start and end points
     const x1 = 50 + this.pieRadius * Math.cos(startRad);
     const y1 = 50 + this.pieRadius * Math.sin(startRad);
     const x2 = 50 + this.pieRadius * Math.cos(endRad);
     const y2 = 50 + this.pieRadius * Math.sin(endRad);
-
+    
     // Large arc flag (1 if angle > 180 degrees)
     const largeArcFlag = percentage > 0.5 ? 1 : 0;
-
+    
     // Create SVG path for pie segment
     return `M 50 50 L ${x1} ${y1} A ${this.pieRadius} ${this.pieRadius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
   }
@@ -255,26 +255,26 @@ export class ChristmasGiftComponent {
 
     // Calculate start and end angles for this segment
     let startAngle = -90; // Start from top (-90 degrees)
-
+    
     // Calculate cumulative angle for all previous segments
     for (let i = 0; i < index; i++) {
       const prevPercentage = grouped[i].amount / total;
       startAngle += prevPercentage * 360;
     }
-
+    
     // Calculate end angle for this segment
     const percentage = grouped[index].amount / total;
     const endAngle = startAngle + (percentage * 360);
-
+    
     // For the last segment, ensure it closes exactly at 270 degrees (full circle)
     const finalEndAngle = index === grouped.length - 1 ? 270 : endAngle;
-
+    
     // Generate rough outer arc
     const outerPath = this.generateRoughArc(50, 50, this.pieRadius, startAngle, finalEndAngle);
-
+    
     // Generate rough inner arc (reversed)
     const innerPath = this.generateRoughArc(50, 50, this.innerRadius, finalEndAngle, startAngle, true);
-
+    
     return `${outerPath} ${innerPath} Z`;
   }
 
@@ -288,23 +288,23 @@ export class ChristmasGiftComponent {
   private generateRoughArc(cx: number, cy: number, radius: number, startAngle: number, endAngle: number, reverse: boolean = false): string {
     const numPoints = Math.max(12, Math.ceil(Math.abs(endAngle - startAngle) / 8)); // More points for smoother but still rough
     const points: { x: number; y: number }[] = [];
-
+    
     const angleStep = (endAngle - startAngle) / numPoints;
-
+    
     for (let i = 0; i <= numPoints; i++) {
       const angle = startAngle + (angleStep * i);
       const rad = (angle * Math.PI) / 180;
-
+      
       // Use seeded random based on angle for deterministic but rough effect
       const seed = angle * 100 + radius;
       const randomOffset = (this.seededRandom(seed) - 0.5) * this.roughness;
       const currentRadius = radius + randomOffset;
-
+      
       const x = cx + currentRadius * Math.cos(rad);
       const y = cy + currentRadius * Math.sin(rad);
       points.push({ x, y });
     }
-
+    
     // Build path with smooth curves for organic rough look
     let path = '';
     if (reverse) {
@@ -339,7 +339,7 @@ export class ChristmasGiftComponent {
         }
       }
     }
-
+    
     return path;
   }
 
@@ -380,7 +380,7 @@ export class ChristmasGiftComponent {
   getBarColor(value: number): string {
     // Simple color based on value - no gradient
     const percentage = (value / this.maxDonation()) * 100;
-
+    
     if (percentage < 30) {
       // Small values: purple
       return '#8833cc';
@@ -407,10 +407,10 @@ export class ChristmasGiftComponent {
     const maxValue = this.maxVelocity();
     const trendData = this.chartData.velocityTrend;
     if (trendData.length === 0) return [];
-
+    
     const stepX = trendData.length > 1 ? (width - padding * 2) / (trendData.length - 1) : width / 2;
     const midY = height / 2; // Center line (zero point)
-
+    
     return trendData.map((value, index) => {
       const x = padding + (index * stepX);
       // Normalize value: positive values go up, negative go down
@@ -424,7 +424,7 @@ export class ChristmasGiftComponent {
   getLineChartPath(): string {
     const points = this.lineChartPoints();
     if (points.length === 0) return '';
-
+    
     let path = `M ${points[0].x} ${points[0].y}`;
     for (let i = 1; i < points.length; i++) {
       path += ` L ${points[i].x} ${points[i].y}`;
@@ -435,17 +435,17 @@ export class ChristmasGiftComponent {
   getAreaPath(): string {
     const points = this.lineChartPoints();
     if (points.length === 0) return '';
-
+    
     const height = 80;
     const midY = height / 2; // Center line (zero point)
-
+    
     let path = `M ${points[0].x} ${midY}`;
     path += ` L ${points[0].x} ${points[0].y}`;
-
+    
     for (let i = 1; i < points.length; i++) {
       path += ` L ${points[i].x} ${points[i].y}`;
     }
-
+    
     const lastPoint = points[points.length - 1];
     path += ` L ${lastPoint.x} ${midY} Z`;
     return path;
@@ -475,32 +475,32 @@ export class ChristmasGiftComponent {
         const tooltipWidth = 180; // Approximate tooltip width
         const tooltipHeight = 100; // Approximate tooltip height
         const padding = 15;
-
+        
         let x = event.clientX + 15;
         let y = event.clientY - 10;
         let placement: 'top' | 'bottom' = 'top';
-
+        
         // Check if tooltip would go off right edge
         if (x + tooltipWidth > window.innerWidth - padding) {
           x = event.clientX - tooltipWidth - 15;
         }
-
+        
         // Check if tooltip would go off left edge
         if (x < padding) {
           x = padding;
         }
-
+        
         // Check if tooltip would go off top edge (show below instead)
         if (y - tooltipHeight < padding) {
           y = event.clientY + 15;
           placement = 'bottom';
         }
-
+        
         // Check if tooltip would go off bottom edge
         if (y + tooltipHeight > window.innerHeight - padding) {
           y = window.innerHeight - tooltipHeight - padding;
         }
-
+        
         this.tooltipPosition.set({ x, y, placement });
       });
     } else {
@@ -553,20 +553,20 @@ export class ChristmasGiftComponent {
     this.initTextRotation();
   }
 
-  /**
-   * Initialize text rotation for variant 8 (Elastic Stretch animation)
-   * Text changes every 8 seconds, cycling through all 6 alternatives
-   */
+    /**
+     * Initialize text rotation for variant 8 (Elastic Stretch animation)
+     * Text changes every 8 seconds, cycling through all 6 alternatives
+     */
   private initTextRotation(): void {
     const intervalTime = 8000; // Change text every 8 seconds (slower rotation)
-
+    
     // Set up the interval to rotate text
     this.textRotationInterval = setInterval(() => {
       // Update to next text in the array (wraps around after last item)
       this.textIndex.update(index => (index + 1) % this.TEXT_COUNT);
       // Update key to trigger Angular change detection
       this.textKey.update(key => key + 1);
-
+      
       /**
        * Force CSS animation restart using requestAnimationFrame
        * CSS animations don't automatically restart when content changes,
@@ -587,9 +587,9 @@ export class ChristmasGiftComponent {
 
     // Register cleanup using DestroyRef
     this.destroyRef.onDestroy(() => {
-      if (this.textRotationInterval) {
-        clearInterval(this.textRotationInterval);
-      }
+    if (this.textRotationInterval) {
+      clearInterval(this.textRotationInterval);
+    }
     });
   }
 }

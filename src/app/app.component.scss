@@ -32,7 +32,7 @@
   display: flex;
   gap: 0.5rem;
   align-items: center;
-  
+
   // Search component handles its own positioning
   app-search {
     position: fixed;
@@ -73,16 +73,10 @@
     }
   }
 
-  // Responsive behavior for menu expansion
-  &:not(.menu-collapsed) {
-    // On medium-large screens, push content
-    @media (min-width: 768px) and (max-width: 1399px) {
+  // When menu is expanded, push content on all desktop screens
+  &.menu-expanded {
+    @media (min-width: 768px) {
       margin-left: 16rem;
-    }
-
-    // On extra large screens, keep content in place (overlay)
-    @media (min-width: 1400px) {
-      margin-left: 3rem;
     }
   }
 }

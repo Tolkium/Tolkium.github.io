@@ -74,6 +74,18 @@ export interface GiftTranslations {
   // By Me indicator
   byMe: string;
   byOthers: string;
+  selfFunded: string;
+  
+  // Thank You card
+  thankYouTitle: string;
+  people: string;
+  
+  // Top Contributor
+  topContributor: string;
+  
+  // Friendly Disclaimer
+  friendlyDisclaimerTitle: string;
+  friendlyDisclaimerText: string;
   
   // Text alternatives (rotating subtitle)
   textAlternatives: string[];
@@ -151,6 +163,18 @@ export const TRANSLATIONS: Record<Language, GiftTranslations> = {
     // By Me indicator
     byMe: 'By Me',
     byOthers: 'by others',
+    selfFunded: 'self-funded',
+    
+    // Thank You card
+    thankYouTitle: 'Thank You!',
+    people: 'people',
+    
+    // Top Contributor
+    topContributor: 'Top Contributor',
+    
+    // Friendly Disclaimer
+    friendlyDisclaimerTitle: 'Friendly Disclaimer',
+    friendlyDisclaimerText: 'This is a voluntary contribution, not a charity. I\'m planning to buy this GPU anyway (electronics prices are estimated to increase significantly in Q1 and Q2 2026), and I\'ll be contributing a larger portion myself. This is just a fun way to share the gift with friends & family. No pressure! 🎮',
     
     // Text alternatives
     textAlternatives: [
@@ -233,6 +257,18 @@ export const TRANSLATIONS: Record<Language, GiftTranslations> = {
     // By Me indicator
     byMe: 'Mnou',
     byOthers: 'od ostatných',
+    selfFunded: 'samofinancované',
+    
+    // Thank You card
+    thankYouTitle: 'Ďakujem!',
+    people: 'ľudí',
+    
+    // Top Contributor
+    topContributor: 'Top Prispievateľ',
+    
+    // Friendly Disclaimer
+    friendlyDisclaimerTitle: 'Priateľské upozornenie',
+    friendlyDisclaimerText: 'Toto je dobrovoľný príspevok, nie charita. GPU plánujem kúpiť aj tak (ceny elektroniky by mali výrazne stúpnuť v Q1 a Q2 2026) a väčšiu časť prispiem sám. Je to len zábavný spôsob, ako zdieľať darček s priateľmi a rodinou. Bez tlaku! 🎮',
     
     // Text alternatives
     textAlternatives: [

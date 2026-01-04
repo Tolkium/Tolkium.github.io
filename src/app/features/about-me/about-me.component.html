@@ -1,130 +1,251 @@
-<div class="relative z-10">
+<div class="relative z-10 min-h-screen">
   <div class="container mx-auto px-4 py-2 md:px-6 md:py-4 max-w-7xl">
-      <header class="bg-gradient-to-br from-[#f59656]/80 to-[#f59656]/80 dark:from-[#8833cc]/70 dark:to-[#8833cc]/70 text-white p-4 md:p-8 rounded-lg shadow-lg mb-4 md:mb-4 transition-colors duration-200 backdrop-blur-sm">
-        <div class="text-center">
-          <h1 class="text-4xl font-bold mb-3 font-outfit">Marek Šípoš</h1>
-          <h2 class="text-xl mb-3 text-indigo-100 font-inter">Frontend Web Developer</h2>
-          <div class="flex items-center justify-center gap-2 text-sm text-indigo-100 font-inter">
-            📍 Bratislava, Slovakia
+    
+    <!-- Terminal-style Header -->
+    <header class="terminal-header mb-6">
+      <div class="terminal-bar">
+        <div class="terminal-buttons">
+          <span class="terminal-btn close"></span>
+          <span class="terminal-btn minimize"></span>
+          <span class="terminal-btn maximize"></span>
+        </div>
+        <span class="terminal-title font-mono text-xs">marek@portfolio:~</span>
+      </div>
+      <div class="terminal-content p-6 md:p-8">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <!-- Left: Profile Info -->
+          <div class="flex items-center gap-6">
+            <!-- Avatar with status -->
+            <div class="relative">
+              <div class="w-24 h-24 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-[#f29f67] to-[#8833cc] p-1">
+                <div class="w-full h-full rounded-full bg-slate-900 flex items-center justify-center text-4xl">
+                  👨‍💻
+                </div>
+              </div>
+              <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-4 border-slate-900 status-pulse"></div>
+            </div>
+            
+            <!-- Name & Title -->
+            <div>
+              <h1 class="text-3xl md:text-4xl font-bold font-outfit mb-1">
+                <span class="text-[#f29f67]">&gt;</span> <span class="bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">Marek Šípoš</span>
+              </h1>
+              <div class="flex items-center gap-2 text-green-400 font-mono text-sm md:text-base">
+                <span class="typing-cursor">█</span>
+                <span>Frontend Web Developer</span>
+              </div>
+              <div class="flex items-center gap-2 mt-2 text-slate-400 font-mono text-sm">
+                <span class="text-[#8833cc]">📍</span>
+                <span>Bratislava, Slovakia</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right: Quick Stats -->
+          <div class="grid grid-cols-3 gap-4 lg:gap-6">
+            <div class="stat-card">
+              <div class="text-2xl md:text-3xl font-bold text-[#f29f67] font-mono">5+</div>
+              <div class="text-xs text-slate-400 font-inter uppercase tracking-wider">Years Exp</div>
+            </div>
+            <div class="stat-card">
+              <div class="text-2xl md:text-3xl font-bold text-[#8833cc] font-mono">7</div>
+              <div class="text-xs text-slate-400 font-inter uppercase tracking-wider">Companies</div>
+            </div>
+            <div class="stat-card">
+              <div class="text-2xl md:text-3xl font-bold text-green-400 font-mono">∞</div>
+              <div class="text-xs text-slate-400 font-inter uppercase tracking-wider">Curiosity</div>
+            </div>
           </div>
         </div>
-      </header>
+      </div>
+    </header>
 
-      <main class="space-y-4">
-        <!-- About Section -->
-        <section class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-lg shadow-md hover:-translate-y-1 transition-all duration-300 backdrop-blur-sm">
-          <h2 class="text-2xl font-bold text-[#f29f67]/90 dark:text-[#8833cc]/70 mb-4 font-outfit">About Me</h2>
-          <p class="text-slate-700 dark:text-slate-300 font-inter">
-            Experienced web developer specializing in Angular, with a passion for creating exceptional digital experiences.
-            I balance perfectionism with pragmatism to deliver high-quality work while fostering positive team dynamics.
-            Always eager to learn and adapt in the ever-evolving world of web development! 🚀
-          </p>
-        </section>
-
-        <!-- Experience Section -->
-        <section class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-lg shadow-md hover:-translate-y-1 transition-all duration-300 backdrop-blur-sm">
-          <h2 class="text-2xl font-bold text-[#f29f67]/90 dark:text-[#8833cc]/70 mb-4 font-outfit">Experience</h2>
-
-          <div class="space-y-6">
-            <div class="experience-item">
-              <div class="experience-branch"></div>
-              <h3 class="text-lg font-bold text-[#f29f67]/90 dark:text-[#8833cc]/70 font-outfit">T7</h3>
-              <p class="text-sm text-slate-500 dark:text-slate-400 mb-2 font-inter">Apr 2024 - Aug 2024</p>
-              <p class="text-slate-700 dark:text-slate-300 font-inter">Fullstack Developer working on analytics dashboard for Etsy seller optimization.</p>
+    <!-- Main Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- Left Column: About & Skills -->
+      <div class="lg:col-span-5 space-y-6">
+        
+        <!-- About Card -->
+        <section class="code-card">
+          <div class="code-card-header">
+            <span class="text-green-400">~/</span>about.md
+            <div class="flex gap-1">
+              <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+              <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+              <span class="w-2 h-2 rounded-full bg-slate-600"></span>
             </div>
-
-            <div class="experience-item">
-              <div class="experience-branch"></div>
-              <h3 class="text-lg font-bold text-[#f29f67]/90 dark:text-[#8833cc]/70 font-outfit">Exomal</h3>
-              <p class="text-sm text-slate-500 dark:text-slate-400 mb-2 font-inter">Mar 2024 - Apr 2024</p>
-              <p class="text-slate-700 dark:text-slate-300 font-inter">Solidity Developer specializing in ERC20 token development and smart contract security.</p>
+          </div>
+          <div class="code-card-content">
+            <div class="code-line">
+              <span class="line-number">1</span>
+              <span class="code-comment">// Who am I?</span>
             </div>
-
-            <div class="experience-item">
-              <div class="experience-branch"></div>
-              <h3 class="text-lg font-bold text-[#f29f67]/90 dark:text-[#8833cc]/70 font-outfit">Capco</h3>
-              <p class="text-sm text-slate-500 dark:text-slate-400 mb-2 font-inter">Nov 2022 - Jun 2023</p>
-              <p class="text-slate-700 dark:text-slate-300 font-inter">Frontend Developer building enterprise banking software with Angular and integrating AI solutions.</p>
+            <div class="code-line">
+              <span class="line-number">2</span>
+              <span class="code-keyword">const</span> <span class="code-var">developer</span> = &#123;
             </div>
-
-            <div class="experience-item">
-              <div class="experience-branch"></div>
-              <h3 class="text-lg font-bold text-[#f29f67]/90 dark:text-[#8833cc]/70 font-outfit">AmNFT</h3>
-              <p class="text-sm text-slate-500 dark:text-slate-400 mb-2 font-inter">Jul 2022 - Sep 2022</p>
-              <p class="text-slate-700 dark:text-slate-300 font-inter">Solidity/Frontend Developer creating NFT marketplace smart contracts and interfaces.</p>
+            <div class="code-line">
+              <span class="line-number">3</span>
+              <span class="code-prop ml-4">passion:</span> <span class="code-string">"exceptional digital experiences"</span>,
             </div>
-
-            <div class="experience-item">
-              <div class="experience-branch"></div>
-              <h3 class="text-lg font-bold text-[#f29f67]/90 dark:text-[#8833cc]/70 font-outfit">alfaBASE</h3>
-              <p class="text-sm text-slate-500 dark:text-slate-400 mb-2 font-inter">Jun 2022 - Aug 2022</p>
-              <p class="text-slate-700 dark:text-slate-300 font-inter">Frontend Developer working on government IT projects using Angular.</p>
+            <div class="code-line">
+              <span class="line-number">4</span>
+              <span class="code-prop ml-4">approach:</span> <span class="code-string">"perfectionism + pragmatism"</span>,
             </div>
-
-            <div class="experience-item">
-              <div class="experience-branch"></div>
-              <h3 class="text-lg font-bold text-[#f29f67]/90 dark:text-[#8833cc]/70 font-outfit">Hmstrsoc.io</h3>
-              <p class="text-sm text-slate-500 dark:text-slate-400 mb-2 font-inter">Sep 2021 - Dec 2021</p>
-              <p class="text-slate-700 dark:text-slate-300 font-inter">Fullstack Developer building NFT collection platform with Angular and Solidity.</p>
+            <div class="code-line">
+              <span class="line-number">5</span>
+              <span class="code-prop ml-4">superpower:</span> <span class="code-string">"Angular 🚀"</span>,
             </div>
-
-            <div class="experience-item">
-              <div class="experience-branch"></div>
-              <h3 class="text-lg font-bold text-[#f29f67]/90 dark:text-[#8833cc]/70 font-outfit">Siemens Healthineers</h3>
-              <p class="text-sm text-slate-500 dark:text-slate-400 mb-2 font-inter">Jul 2019 - Aug 2019</p>
-              <p class="text-slate-700 dark:text-slate-300 font-inter">Full-Stack Developer Intern developing Azure migration automation tools.</p>
+            <div class="code-line">
+              <span class="line-number">6</span>
+              <span class="code-prop ml-4">mode:</span> <span class="code-string">"always learning"</span>
+            </div>
+            <div class="code-line">
+              <span class="line-number">7</span>
+              &#125;;
             </div>
           </div>
         </section>
 
-        <!-- Skills Section -->
-        <section class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-lg shadow-md hover:-translate-y-1 transition-all duration-300 backdrop-blur-sm">
-          <h2 class="text-2xl font-bold text-[#f29f67]/90 dark:text-[#8833cc]/70 mb-4 font-outfit">Skills</h2>
+        <!-- Skills Terminal -->
+        <section class="code-card">
+          <div class="code-card-header">
+            <span class="text-[#f29f67]">$</span> skills --list
+            <div class="flex gap-1">
+              <span class="w-2 h-2 rounded-full bg-green-500"></span>
+            </div>
+          </div>
+          <div class="code-card-content">
+            <div class="mb-4">
+              <div class="text-xs text-slate-500 font-mono mb-2 uppercase tracking-wider">// Technical Stack</div>
+              <div class="flex flex-wrap gap-2">
+                @for (skill of technicalSkills; track skill) {
+                  <span class="skill-tag skill-tag-tech">{{ skill }}</span>
+                }
+              </div>
+            </div>
+            <div>
+              <div class="text-xs text-slate-500 font-mono mb-2 uppercase tracking-wider">// Soft Skills</div>
+              <div class="flex flex-wrap gap-2">
+                @for (skill of softSkills; track skill) {
+                  <span class="skill-tag skill-tag-soft">{{ skill }}</span>
+                }
+              </div>
+            </div>
+          </div>
+        </section>
 
-          <!-- Technical Skills -->
-          <div class="mb-6">
-            <div class="flex flex-wrap gap-3">
-              @for (skill of technicalSkills; track skill) {
-                <span class="px-4 py-2 bg-indigo-50/80 dark:bg-slate-800/50 rounded-full text-sm text-slate-700 dark:text-slate-300 hover:bg-[#8833cc]/70 hover:text-white dark:hover:bg-[#f29f67]/90 dark:hover:text-white transition-colors duration-200 font-inter">
-                  {{skill}}
-                </span>
+        <!-- Education -->
+        <section class="code-card">
+          <div class="code-card-header">
+            <span class="text-[#8833cc]">🎓</span> education.log
+          </div>
+          <div class="code-card-content">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#f29f67]/20 to-[#8833cc]/20 flex items-center justify-center text-lg shrink-0">
+                🏛️
+              </div>
+              <div>
+                <h3 class="text-white font-semibold font-outfit">Slovak University of Technology</h3>
+                <p class="text-slate-400 text-sm font-inter">Information Technology</p>
+                <p class="text-xs text-slate-500 font-mono mt-1">2016 → 2022</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right Column: Experience Git Tree -->
+      <div class="lg:col-span-7">
+        <section class="code-card h-full">
+          <div class="code-card-header">
+            <span class="text-green-400">⎇</span> git log --graph --oneline
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-500 font-mono">main</span>
+              <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            </div>
+          </div>
+          <div class="code-card-content git-tree-container">
+            <!-- Git Tree -->
+            <div class="git-tree">
+              @for (job of experiences; track job.company; let i = $index; let first = $first) {
+                <div class="git-commit" [class.git-commit-active]="first">
+                  <!-- Git branch line -->
+                  <div class="git-branch">
+                    <div class="git-line" [class.git-line-first]="first"></div>
+                    <div class="git-node" [style.background]="job.color">
+                      <span class="git-node-icon">{{ job.icon }}</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Commit content -->
+                  <div class="git-content">
+                    <div class="flex items-start justify-between gap-2 mb-1">
+                      <h3 class="text-white font-semibold font-outfit text-lg">{{ job.company }}</h3>
+                      <span class="text-xs font-mono px-2 py-0.5 rounded-full shrink-0"
+                            [style.background]="job.color + '20'"
+                            [style.color]="job.color">
+                        {{ job.role }}
+                      </span>
+                    </div>
+                    <p class="text-xs text-slate-500 font-mono mb-2">{{ job.period }}</p>
+                    <p class="text-sm text-slate-400 font-inter leading-relaxed">{{ job.description }}</p>
+                    
+                    <!-- Tech tags -->
+                    @if (job.tech && job.tech.length > 0) {
+                      <div class="flex flex-wrap gap-1.5 mt-3">
+                        @for (tech of job.tech; track tech) {
+                          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-700/50 text-slate-400">{{ tech }}</span>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
               }
-            </div>
-          </div>
-
-          <!-- Soft Skills -->
-          <div>
-            <div class="flex flex-wrap gap-3">
-              @for (skill of softSkills; track skill) {
-                <span class="px-4 py-2 bg-indigo-50/80 dark:bg-slate-800/50 rounded-full text-sm text-slate-700 dark:text-slate-300 hover:bg-[#8833cc]/70 hover:text-white dark:hover:bg-[#f29f67]/90 dark:hover:text-white transition-colors duration-200 font-inter">
-                  {{skill}}
-                </span>
-              }
+              
+              <!-- Initial commit -->
+              <div class="git-commit git-commit-initial">
+                <div class="git-branch">
+                  <div class="git-line git-line-last"></div>
+                  <div class="git-node git-node-initial">
+                    <span class="text-xs">🎯</span>
+                  </div>
+                </div>
+                <div class="git-content">
+                  <p class="text-slate-500 font-mono text-sm italic">Initial commit: journey.begin()</p>
+                </div>
+              </div>
             </div>
           </div>
         </section>
+      </div>
+    </div>
 
-        <!-- Education Section -->
-        <section class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-lg shadow-md hover:-translate-y-1 transition-all duration-300 backdrop-blur-sm">
-          <h2 class="text-2xl font-bold text-[#f29f67]/90 dark:text-[#8833cc]/70 mb-4 font-outfit">Education</h2>
-          <div class="experience-item">
-            <h3 class="text-lg font-bold text-[#f29f67]/90 dark:text-[#8833cc]/70 font-outfit">Slovenská technická univerzita v Bratislave</h3>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mb-2 font-inter">2016 - 2022</p>
-            <p class="text-slate-700 dark:text-slate-300 font-inter">Information Technology</p>
+    <!-- CTA Footer -->
+    <footer class="mt-8 mb-4">
+      <div class="code-card">
+        <div class="code-card-content py-6">
+          <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl animate-bounce">🚀</span>
+              <div>
+                <p class="text-white font-outfit font-semibold">Ready to build something amazing?</p>
+                <p class="text-slate-400 text-sm font-inter">Open for exciting opportunities!</p>
+              </div>
+            </div>
+            <button class="cta-button group" (click)="goToLinkedIn()">
+              <span class="cta-button-bg"></span>
+              <span class="relative z-10 flex items-center gap-2">
+                <span>Connect on LinkedIn</span>
+                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+              </span>
+            </button>
           </div>
-        </section>
-
-        <!-- Contact Section -->
-        <div class="text-center mt-8">
-          <button class="glitch-button inline-block text-lg text-black dark:text-white font-inter"
-                  (click)="goToLinkedIn()"
-                  (keydown.enter)="goToLinkedIn()"
-                  tabindex="0"
-                  role="button"
-                  aria-label="View LinkedIn profile">
-            <span class="relative z-10">💼 Open for exciting opportunities!</span>
-          </button>
         </div>
-      </main>
+      </div>
+    </footer>
   </div>
 </div>

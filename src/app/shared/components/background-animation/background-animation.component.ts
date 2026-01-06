@@ -17,11 +17,10 @@ import { Store } from '@ngrx/store';
 import {
   Point,
   RGB,
-  ANIMATION_CONSTANTS,
-  AnimationConfig
+  ANIMATION_CONSTANTS
 } from '../../../models/animation.constants';
 import { QuadTree } from '../../../utils/quad-tree';
-import { 
+import {
   selectEnableBackgroundAnimation,
   selectEnableMagneticForce,
   selectEnableRepulsionForce,
@@ -84,7 +83,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
   private lastFrameTime: number = 0;
   private frameCount: number = 0;
   private currentTimeMs: number = 0;
-  
+
   // Subscriptions
   private resizeSubscription?: Subscription;
   private scrollSubscription?: Subscription;
@@ -95,7 +94,15 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
   private brownianMotionSubscription?: Subscription;
   private clusterBreakingSubscription?: Subscription;
   private polygonStabilizerSubscription?: Subscription;
+  private windowBlurSubscription?: Subscription;
+  private windowFocusSubscription?: Subscription;
   private scrollTimeout: ReturnType<typeof setTimeout> | undefined;
+
+  /**
+   * Tracks if animation was running before window lost focus
+   * Used to resume animation when window regains focus after ALT+TAB
+   */
+  private wasRunningBeforeBlur = false;
 
   // Physics toggle states
   private enableMagneticForce = true;
@@ -152,7 +159,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
         .select(selectEnableBackgroundAnimation)
         .subscribe(enabled => {
           this.isAnimationEnabled = enabled;
-          
+
           if (enabled && !this.isRunning) {
             // Resume animation - reset lastFrameTime to prevent jump
             this.isRunning = true;
@@ -234,27 +241,76 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
         this.store.select(selectMinClusterSize).subscribe(v => this.config.MIN_CLUSTER_SIZE = v)
       );
 
+      // Handle window resize events with debouncing for performance
       this.resizeSubscription = fromEvent(window, 'resize')
         .pipe(debounceTime(250))
         .subscribe(() => this.handleResize());
 
-      // Add scroll event listener
+      /**
+       * Scroll event listener
+       * Temporarily pauses animation during scrolling for better performance
+       * Resumes automatically after scrolling stops (150ms delay)
+       */
       this.scrollSubscription = fromEvent(window, 'scroll')
         .pipe(debounceTime(50))
         .subscribe(() => {
           if (!this.isAnimationEnabled) return; // Don't handle scroll if animation is disabled
-          
+
           this.isRunning = false;
           clearTimeout(this.scrollTimeout);
 
-          // Resume animation after scrolling stops
+          // Resume animation after scrolling stops (150ms delay)
           this.scrollTimeout = setTimeout(() => {
             if (this.isAnimationEnabled) {
               this.isRunning = true;
-              this.lastFrameTime = performance.now(); // Reset to prevent jump
+              this.lastFrameTime = performance.now(); // Reset to prevent time jump
               this.animate(performance.now());
             }
           }, 150);
+        });
+
+      /**
+       * Window blur/focus event listeners
+       * Pauses animation when user ALT+TABs away or switches to another application
+       * Resumes animation when the window regains focus
+       */
+      this.windowBlurSubscription = fromEvent(window, 'blur')
+        .subscribe(() => {
+          // Store current running state so we can resume later
+          this.wasRunningBeforeBlur = this.isRunning;
+
+          // Pause animation when window loses focus (e.g., ALT+TAB to another app)
+          if (this.isRunning) {
+            this.isRunning = false;
+            if (this.animationId) {
+              cancelAnimationFrame(this.animationId);
+              this.animationId = 0;
+            }
+            // Render one final static frame to keep the canvas visible
+            this.calculateConnectionsForStaticRender();
+            this.ctx.clearRect(0, 0, this.canvasRef.nativeElement.width, this.canvasRef.nativeElement.height);
+            this.drawScene();
+          }
+        });
+
+      this.windowFocusSubscription = fromEvent(window, 'focus')
+        .subscribe(() => {
+          /**
+           * Resume animation when window regains focus
+           * Only resumes if:
+           * - Animation was running before window lost focus
+           * - Animation is enabled in settings
+           * - Animation is not currently running
+           */
+          if (this.wasRunningBeforeBlur && this.isAnimationEnabled && !this.isRunning) {
+            this.isRunning = true;
+            this.lastFrameTime = performance.now(); // Reset to prevent time jump
+            this.ngZone.runOutsideAngular(() => {
+              this.animate(performance.now());
+            });
+            // Reset flag after resuming
+            this.wasRunningBeforeBlur = false;
+          }
         });
 
       // Run animation outside Angular's zone for better performance (if enabled)
@@ -288,6 +344,8 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
     this.brownianMotionSubscription?.unsubscribe();
     this.clusterBreakingSubscription?.unsubscribe();
     this.polygonStabilizerSubscription?.unsubscribe();
+    this.windowBlurSubscription?.unsubscribe();
+    this.windowFocusSubscription?.unsubscribe();
     this.configSubscriptions.forEach(sub => sub.unsubscribe());
   }
 
@@ -371,7 +429,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
       this.drawScene();
 
       // Check for cluster breaking periodically
-      if (this.enableClusterBreaking && 
+      if (this.enableClusterBreaking &&
           this.frameCount % this.config.CLUSTER_CHECK_INTERVAL === 0) {
         this.physicsService.breakUpClusters(
           this.points,
@@ -421,7 +479,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
 
         // Calculate distance once for performance (avoid repeated calculation)
         const distance = this.physicsService.getDistance(point, otherPoint);
-        
+
         if (distance < this.config.CONNECTION_RADIUS) {
           point.connections++;
           otherPoint.connections++;
@@ -674,7 +732,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
    */
   private adjustParticleCount(oldCount: number, newCount: number): void {
     const canvas = this.canvasRef.nativeElement;
-    
+
     if (newCount > oldCount) {
       // Add new particles
       const toAdd = newCount - oldCount;

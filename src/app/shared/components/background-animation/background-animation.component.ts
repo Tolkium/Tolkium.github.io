@@ -280,16 +280,14 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
           this.wasRunningBeforeBlur = this.isRunning;
 
           // Pause animation when window loses focus (e.g., ALT+TAB to another app)
+          // Just stop the animation loop - canvas keeps the last rendered frame
           if (this.isRunning) {
             this.isRunning = false;
             if (this.animationId) {
               cancelAnimationFrame(this.animationId);
               this.animationId = 0;
             }
-            // Render one final static frame to keep the canvas visible
-            this.calculateConnectionsForStaticRender();
-            this.ctx.clearRect(0, 0, this.canvasRef.nativeElement.width, this.canvasRef.nativeElement.height);
-            this.drawScene();
+            // Don't clear or redraw - keep the current frame visible
           }
         });
 

@@ -1,0 +1,55 @@
+<div
+  class="snippet-card"
+  [class.selected]="selected()"
+  (click)="onCardClick()"
+  role="button"
+  [attr.aria-label]="'Snippet: ' + snippet().title"
+  tabindex="0"
+  (keydown.enter)="onCardClick()"
+  (keydown.space)="onCardClick()"
+>
+  <div class="snippet-card-header">
+    <h3 class="snippet-title">{{ snippet().title }}</h3>
+    <div class="snippet-actions">
+      <button
+        class="action-btn edit-btn"
+        (click)="onEditClick($event)"
+        aria-label="Edit snippet"
+        type="button"
+      >
+        <ng-icon name="heroPencilSquare" class="icon-sm"></ng-icon>
+      </button>
+      <button
+        class="action-btn delete-btn"
+        (click)="onDeleteClick($event)"
+        aria-label="Delete snippet"
+        type="button"
+      >
+        <ng-icon name="heroTrash" class="icon-sm"></ng-icon>
+      </button>
+    </div>
+  </div>
+
+  @if (snippet().description) {
+    <p class="snippet-description">{{ snippet().description }}</p>
+  }
+
+  <div class="snippet-preview">
+    <pre class="preview-code">{{ getPreviewText() }}</pre>
+  </div>
+
+  @if (snippet().tags.length > 0) {
+    <div class="snippet-tags">
+      @for (tag of snippet().tags; track tag) {
+        <span class="tag">{{ tag }}</span>
+      }
+    </div>
+  }
+
+  <div class="snippet-footer">
+    <span class="snippet-date">
+      {{ snippet().updatedAt | date:'short' }}
+    </span>
+  </div>
+</div>
+

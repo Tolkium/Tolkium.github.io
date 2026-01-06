@@ -73,7 +73,7 @@ export const MENU_SECTIONS: MenuSection[] = [
       {
         iconName: 'heroArchiveBox',
         label: 'Snippet Vault',
-        route: '/SnippetVault'
+        route: '/snippet-vault'
       },
       {
         iconName: 'heroDevicePhoneMobile',

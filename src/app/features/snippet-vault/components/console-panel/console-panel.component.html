@@ -1,0 +1,49 @@
+@if (visible()) {
+  <div class="console-panel">
+    <div class="console-header">
+      <div class="console-title">
+        <ng-icon name="heroCommandLine" class="icon"></ng-icon>
+        <span>Console</span>
+        @if (messages().length > 0) {
+          <span class="message-count">({{ messages().length }})</span>
+        }
+      </div>
+      <button
+        class="clear-btn"
+        (click)="onClear()"
+        aria-label="Clear console"
+        type="button"
+        [disabled]="messages().length === 0"
+      >
+        <ng-icon name="heroTrash" class="icon-sm"></ng-icon>
+        Clear
+      </button>
+    </div>
+
+    <div class="console-content">
+      @if (messages().length === 0) {
+        <div class="console-empty">
+          <ng-icon name="heroCommandLine" class="empty-icon"></ng-icon>
+          <p>No console messages yet</p>
+          <span class="empty-hint">Run your code to see console output here</span>
+        </div>
+      } @else {
+        <div class="console-messages">
+          @for (message of messages(); track message.id) {
+            <div class="console-message" [class]="'message-' + message.type">
+              <div class="message-header">
+                <ng-icon [name]="getMessageIcon(message.type)" [class]="getMessageClass(message.type)"></ng-icon>
+                <span class="message-type">{{ message.type.toUpperCase() }}</span>
+                <span class="message-time">{{ message.timestamp | date:'HH:mm:ss.SSS' }}</span>
+              </div>
+              <div class="message-body">
+                <pre class="message-text">{{ formatMessage(message) }}</pre>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}
+

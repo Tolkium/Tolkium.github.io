@@ -37,6 +37,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/christmas-gift/christmas-gift.component').then(m => m.ChristmasGiftComponent)
   },
+  {
+    path: 'snippet-vault',
+    loadComponent: () =>
+      import('./features/snippet-vault/snippet-vault.component').then(m => m.SnippetVaultComponent)
+  },
   // Add other routes as needed
   { path: '**', redirectTo: 'about' }
 ];

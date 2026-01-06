@@ -1,0 +1,56 @@
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.snippet-editor {
+  @apply bg-white/50 dark:bg-slate-800/50 backdrop-blur-[10px] rounded-xl border border-slate-200/50 dark:border-slate-700/50 shadow-lg flex flex-col overflow-hidden;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.editor-header {
+  @apply border-b border-slate-200/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-900/50;
+}
+
+.editor-tabs {
+  @apply flex gap-1 p-2;
+}
+
+.tab-btn {
+  @apply flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#8833cc] dark:focus:ring-[#f29f67] text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700;
+
+  &.active {
+    @apply bg-gradient-to-r from-[#8833cc] to-[#f29f67] text-white shadow-md;
+  }
+}
+
+.tab-icon {
+  @apply w-4 h-4;
+}
+
+.editor-content {
+  @apply flex-1 overflow-hidden;
+}
+
+.code-editor {
+  @apply w-full h-full p-4 font-mono text-sm bg-transparent resize-none border-0 outline-none;
+  font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+  line-height: 1.6;
+  tab-size: 2;
+  color: #111827;
+  
+  @apply dark:text-slate-100;
+
+  &::placeholder {
+    color: #6b7280;
+    @apply dark:text-slate-400;
+  }
+
+  &:focus {
+    @apply outline-none;
+  }
+}
+

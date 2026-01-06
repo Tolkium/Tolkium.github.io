@@ -1,0 +1,89 @@
+.console-panel {
+  @apply bg-slate-900 dark:bg-slate-950 rounded-lg border border-slate-700 dark:border-slate-600 flex flex-col h-full max-h-64 overflow-hidden;
+}
+
+.console-header {
+  @apply flex items-center justify-between p-3 border-b border-slate-700 dark:border-slate-600 bg-slate-800/50 dark:bg-slate-900/50;
+}
+
+.console-title {
+  @apply flex items-center gap-2 text-sm font-semibold text-slate-300 dark:text-slate-200 font-mono;
+}
+
+.icon {
+  @apply w-5 h-5;
+}
+
+.message-count {
+  @apply text-slate-500 dark:text-slate-400 font-normal;
+}
+
+.clear-btn {
+  @apply flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-red-600/20 hover:bg-red-600/30 text-red-400 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500;
+}
+
+.icon-sm {
+  @apply w-4 h-4;
+}
+
+.console-content {
+  @apply flex-1 overflow-y-auto p-3;
+}
+
+.console-empty {
+  @apply flex flex-col items-center justify-center h-full text-center py-8;
+}
+
+.empty-icon {
+  @apply w-12 h-12 text-slate-600 dark:text-slate-500 mb-3;
+}
+
+.empty-hint {
+  @apply text-xs text-slate-500 dark:text-slate-400 mt-2;
+}
+
+.console-messages {
+  @apply space-y-2;
+}
+
+.console-message {
+  @apply bg-slate-800/50 dark:bg-slate-900/50 rounded-lg p-2 border-l-2 border-slate-600 dark:border-slate-500;
+}
+
+.message-header {
+  @apply flex items-center gap-2 mb-1 text-xs font-mono;
+}
+
+.message-type {
+  @apply font-semibold text-slate-400 dark:text-slate-300;
+}
+
+.message-time {
+  @apply text-slate-500 dark:text-slate-400 ml-auto;
+}
+
+.message-body {
+  @apply mt-1;
+}
+
+.message-text {
+  @apply text-xs text-slate-300 dark:text-slate-200 font-mono whitespace-pre-wrap break-words m-0;
+  font-family: 'Courier New', monospace;
+}
+
+.message-error {
+  @apply border-l-red-500 bg-red-950/20;
+}
+
+.message-warn {
+  @apply border-l-yellow-500 bg-yellow-950/20;
+}
+
+.message-info {
+  @apply border-l-cyan-500 bg-cyan-950/20;
+}
+
+.message-log {
+  @apply border-l-blue-500 bg-blue-950/20;
+}
+

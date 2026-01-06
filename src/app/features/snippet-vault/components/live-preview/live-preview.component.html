@@ -1,0 +1,15 @@
+<div class="live-preview">
+  <div class="preview-header">
+    <h3 class="preview-title">Live Preview</h3>
+  </div>
+  <div class="preview-content">
+    <iframe
+      #previewIframe
+      [srcdoc]="previewContent()"
+      class="preview-iframe"
+      title="Code preview"
+      sandbox="allow-scripts allow-same-origin"
+    ></iframe>
+  </div>
+</div>
+

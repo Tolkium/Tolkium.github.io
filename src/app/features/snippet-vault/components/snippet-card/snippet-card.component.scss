@@ -1,0 +1,69 @@
+.snippet-card {
+  @apply bg-white/50 dark:bg-slate-800/50 backdrop-blur-[10px] rounded-xl border border-slate-200/50 dark:border-slate-700/50 shadow-lg p-4 cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-[#8833cc]/50 dark:hover:border-[#f29f67]/50;
+
+  &.selected {
+    @apply border-[#8833cc] dark:border-[#f29f67] ring-2 ring-[#8833cc]/20 dark:ring-[#f29f67]/20;
+  }
+
+  &:focus-visible {
+    @apply outline-none ring-2 ring-[#8833cc] dark:ring-[#f29f67] ring-offset-2;
+  }
+}
+
+.snippet-card-header {
+  @apply flex items-start justify-between mb-3;
+}
+
+.snippet-title {
+  @apply text-lg font-semibold text-slate-800 dark:text-white font-outfit flex-1;
+}
+
+.snippet-actions {
+  @apply flex gap-2;
+}
+
+.action-btn {
+  @apply p-1.5 rounded-lg transition-colors duration-200 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-[#8833cc] dark:focus:ring-[#f29f67];
+
+  &.edit-btn {
+    @apply text-blue-600 dark:text-blue-400;
+  }
+
+  &.delete-btn {
+    @apply text-red-600 dark:text-red-400;
+  }
+}
+
+.icon-sm {
+  @apply w-4 h-4;
+}
+
+.snippet-description {
+  @apply text-sm text-slate-600 dark:text-slate-400 mb-3 line-clamp-2;
+}
+
+.snippet-preview {
+  @apply bg-slate-900 dark:bg-slate-950 rounded-lg p-3 mb-3 overflow-hidden;
+}
+
+.preview-code {
+  @apply text-xs text-slate-300 font-mono whitespace-pre-wrap break-words m-0;
+  font-family: 'Courier New', monospace;
+}
+
+.snippet-tags {
+  @apply flex flex-wrap gap-1.5 mb-3;
+}
+
+.tag {
+  @apply px-2 py-0.5 text-xs font-medium rounded-full bg-gradient-to-r from-[#8833cc] to-[#f29f67] text-white;
+}
+
+.snippet-footer {
+  @apply flex items-center justify-between text-xs text-slate-500 dark:text-slate-400;
+}
+
+.snippet-date {
+  @apply font-mono;
+}
+

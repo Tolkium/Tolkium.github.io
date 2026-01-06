@@ -7,7 +7,7 @@
   width: 100%;
   aspect-ratio: 5 / 8;
   perspective: 1500px;
-  
+
   // CSS variables for holographic effect
   --rotate-x: 0deg;
   --rotate-y: 0deg;
@@ -31,21 +31,21 @@
   will-change: transform, filter;
   touch-action: pan-y;
   isolation: isolate;
-  
+
   // Fully transparent background
   background: transparent;
-  
+
   // Backdrop-filter for glassmorphism effect - reduces transparency slightly
   backdrop-filter: blur(5px) saturate(90%);
-  
+
   // Premium glossy border
   border: 1px solid rgba(255, 255, 255, 0.15);
-  
+
   // Minimal shadow when not hovering
-  box-shadow: 
+  box-shadow:
     0 2px 8px 0 rgba(0, 0, 0, 0.15),
     inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
-  
+
   // Smooth transitions for interactive effects
   transition: transform 0.1s ease-out, box-shadow 0.2s ease-out, background 0.33s ease;
 
@@ -75,11 +75,11 @@
     pointer-events: none;
     transition: all 0.33s ease;
     border-radius: inherit;
-    
+
     :host-context(:not(.dark)) & {
       filter: invert(1) hue-rotate(180deg) brightness(0.8) contrast(1.2);
     }
-    
+
     :host-context(.dark) & {
       filter: brightness(0.8) contrast(1.2);
     }
@@ -93,20 +93,20 @@
     background-repeat: no-repeat;
     background-position: 0 0;
     background-size: 100% 100%;
-    background-image: 
+    background-image:
       url("https://assets.codepen.io/13471/sparkles.gif"),
       radial-gradient(circle at var(--spark-pos-x) var(--spark-pos-y), rgba(147, 51, 234, 0.08) 0%, transparent 30%),
       radial-gradient(circle at var(--spark-pos-x) var(--spark-pos-y), rgba(59, 130, 246, 0.08) 0%, transparent 30%),
       radial-gradient(circle at var(--spark-pos-x) var(--spark-pos-y), rgba(16, 185, 129, 0.06) 0%, transparent 40%);
     background-blend-mode: screen, screen, screen, screen;
     // Mask to show only around cursor - bigger circle with smooth fade
-    mask-image: radial-gradient(circle 250px at var(--spark-pos-x) var(--spark-pos-y), 
-      rgba(0, 0, 0, 1) 0%, 
+    mask-image: radial-gradient(circle 250px at var(--spark-pos-x) var(--spark-pos-y),
+      rgba(0, 0, 0, 1) 0%,
       rgba(0, 0, 0, 0.5) 60%,
       rgba(0, 0, 0, 0) 100%
     );
-    -webkit-mask-image: radial-gradient(circle 250px at var(--spark-pos-x) var(--spark-pos-y), 
-      rgba(0, 0, 0, 1) 0%, 
+    -webkit-mask-image: radial-gradient(circle 250px at var(--spark-pos-x) var(--spark-pos-y),
+      rgba(0, 0, 0, 1) 0%,
       rgba(0, 0, 0, 0.5) 60%,
       rgba(0, 0, 0, 0) 100%
     );
@@ -116,11 +116,11 @@
     pointer-events: none;
     transition: opacity 0.33s ease, filter 0.33s ease;
     border-radius: inherit;
-    
+
     :host-context(:not(.dark)) & {
       filter: invert(1) hue-rotate(180deg) brightness(1.2) contrast(1.1);
     }
-    
+
     :host-context(.dark) & {
       filter: brightness(1.2) contrast(1.1);
     }
@@ -135,7 +135,7 @@
   &.active,
   &:hover {
     // Red glow for light theme
-    box-shadow: 
+    box-shadow:
       0 12px 48px 0 rgba(0, 0, 0, 0.2),
       0 4px 16px 0 rgba(255, 136, 85, 0.4),
       0 2px 8px 0 rgba(255, 137, 86, 0.3),
@@ -143,9 +143,9 @@
       inset 0 -1px 2px 0 rgba(0, 0, 0, 0.1),
       0 0 40px 0 rgba(220, 81, 38, 0.25),
       0 0 0 1px rgba(255, 255, 255, 0.3);
-    
+
     :host-context(.dark) & {
-      box-shadow: 
+      box-shadow:
         0 12px 48px 0 rgba(0, 0, 0, 0.5),
         0 4px 16px 0 rgba(147, 51, 234, 0.4),
         0 2px 8px 0 rgba(168, 85, 247, 0.3),
@@ -157,11 +157,11 @@
 
     &::before {
       opacity: 0.6;
-      
+
       :host-context(:not(.dark)) & {
         filter: invert(1) hue-rotate(180deg) brightness(1.2) contrast(1.4);
       }
-      
+
       :host-context(.dark) & {
         filter: brightness(1.2) contrast(1.4);
       }
@@ -169,11 +169,11 @@
 
     &::after {
       opacity: 0.8;
-      
+
       :host-context(:not(.dark)) & {
         filter: invert(1) hue-rotate(180deg) brightness(1.4) contrast(1.2);
       }
-      
+
       :host-context(.dark) & {
         filter: brightness(1.4) contrast(1.2);
       }
@@ -183,7 +183,7 @@
   // Top gloss reflection when card has an image
   &:has(.card-image) {
     &::before {
-      background-image: 
+      background-image:
         linear-gradient(
           180deg,
           rgba(255, 255, 255, 0.12) 0%,
@@ -240,11 +240,11 @@
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.3));
     color: rgb(5, 150, 105); // Default: dark for light mode
     text-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
-    box-shadow: 
+    box-shadow:
       0 4px 12px rgba(0, 0, 0, 0.5),
       inset 0 1px 0 rgba(255, 255, 255, 0.1),
       0 0 20px rgba(16, 185, 129, 0.2);
-    
+
     :host-context(.dark) & {
       color: rgb(110, 231, 183);
       text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
@@ -255,11 +255,11 @@
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.3));
     color: rgb(37, 99, 235); // Default: dark for light mode
     text-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
-    box-shadow: 
+    box-shadow:
       0 4px 12px rgba(0, 0, 0, 0.5),
       inset 0 1px 0 rgba(255, 255, 255, 0.1),
       0 0 20px rgba(59, 130, 246, 0.2);
-    
+
     :host-context(.dark) & {
       color: rgb(147, 197, 253);
       text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
@@ -270,11 +270,11 @@
     background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(219, 39, 119, 0.3));
     color: rgb(219, 39, 119); // Default: dark for light mode
     text-shadow: 0 0 8px rgba(236, 72, 153, 0.3);
-    box-shadow: 
+    box-shadow:
       0 4px 12px rgba(0, 0, 0, 0.5),
       inset 0 1px 0 rgba(255, 255, 255, 0.1),
       0 0 20px rgba(236, 72, 153, 0.2);
-    
+
     :host-context(.dark) & {
       color: rgb(249, 168, 212);
       text-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
@@ -319,18 +319,18 @@
   flex-shrink: 0;
   z-index: 3;
 
+  // Dark border with subtle glow
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 8px 16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 30px rgba(147, 51, 234, 0.15);
+
   @media (max-width: 639px) {
     width: calc(100% - 20px);
     margin: 10px 10px 0;
     border-radius: 14px;
   }
-  
-  // Dark border with subtle glow
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 
-    0 8px 16px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 0 30px rgba(147, 51, 234, 0.15);
 
   img {
     width: 100%;
@@ -387,7 +387,7 @@
   margin: 0;
   font-family: 'Outfit', sans-serif;
   line-height: 1.2;
-  text-shadow: 
+  text-shadow:
     0 1px 2px rgba(255, 255, 255, 0.5),
     0 0 15px rgba(245, 158, 11, 0.2);
   letter-spacing: 0.3px;
@@ -395,7 +395,7 @@
   // Light text for dark mode
   :host-context(.dark) & {
     color: rgb(203, 213, 225); // dark:text-slate-300
-    text-shadow: 
+    text-shadow:
       0 2px 4px rgba(0, 0, 0, 0.8),
       0 0 20px rgba(147, 51, 234, 0.3);
   }
@@ -481,12 +481,6 @@
   align-items: center;
   line-height: 1.2;
 
-  @media (max-width: 639px) {
-    padding: 2px 5px;
-    font-size: 0.65rem;
-    border-radius: 5px;
-  }
-  
   // Purple from dark theme for light mode
   background: linear-gradient(135deg, rgba(147, 51, 234, 0.15), rgba(109, 40, 217, 0.2));
   color: rgb(102, 69, 139);
@@ -496,9 +490,15 @@
   text-shadow: 0 0 8px rgba(147, 51, 234, 0.4);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  box-shadow: 
+  box-shadow:
     0 2px 6px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  @media (max-width: 639px) {
+    padding: 2px 5px;
+    font-size: 0.65rem;
+    border-radius: 5px;
+  }
 
   // Orange from light theme for dark mode - lighter orange (less yellow)
   :host-context(.dark) & {
@@ -512,16 +512,16 @@
     // Purple hover for light mode (same as dark theme)
     background: linear-gradient(135deg, rgba(147, 51, 234, 0.25), rgba(109, 40, 217, 0.3));
     transform: translateY(-2px);
-    box-shadow: 
+    box-shadow:
       0 4px 12px rgba(147, 51, 234, 0.3),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
     text-shadow: 0 0 12px rgba(147, 51, 234, 0.6);
     color: rgb(216, 180, 254);
-    
+
     // Orange hover for dark mode - lighter orange
     :host-context(.dark) & {
       background: linear-gradient(135deg, rgba(251, 146, 60, 0.25), rgba(249, 115, 22, 0.3));
-      box-shadow: 
+      box-shadow:
         0 4px 12px rgba(251, 146, 60, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
       text-shadow: 0 0 12px rgba(251, 146, 60, 0.6);
@@ -553,14 +553,6 @@
   border-radius: 7px;
   font-size: 0.65rem;
   font-weight: 700;
-
-  @media (max-width: 639px) {
-    padding: 9px;
-    font-size: 0.95rem;
-    border-radius: 10px;
-    gap: 4px;
-  }
-  
   text-decoration: none;
   // Orange theme for light mode - more solid white
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6));
@@ -571,17 +563,24 @@
   text-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  box-shadow: 
+  box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.95);
-  
+
+  @media (max-width: 639px) {
+    padding: 9px;
+    font-size: 0.95rem;
+    border-radius: 10px;
+    gap: 4px;
+  }
+
   // Purple theme for dark mode - darker background
   :host-context(.dark) & {
     background: linear-gradient(135deg, rgba(147, 51, 234, 0.2), rgba(109, 40, 217, 0.3));
     color: rgb(216, 180, 254);
     border: 1px solid rgba(147, 51, 234, 0.4);
     text-shadow: 0 0 10px rgba(147, 51, 234, 0.5);
-    box-shadow: 
+    box-shadow:
       0 4px 12px rgba(0, 0, 0, 0.5),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
@@ -595,7 +594,7 @@
       width: 16px;
       height: 16px;
     }
-    
+
     :host-context(.dark) & {
       filter: drop-shadow(0 0 4px rgba(147, 51, 234, 0.5));
     }
@@ -605,16 +604,16 @@
     // Orange hover for light mode - almost fully white
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
     transform: translateY(-2px);
-    box-shadow: 
+    box-shadow:
       0 6px 20px rgba(245, 158, 11, 0.4),
       inset 0 1px 0 rgba(255, 255, 255, 1);
     text-shadow: 0 0 15px rgba(245, 158, 11, 0.8);
     border-color: rgba(245, 158, 11, 0.7);
-    
+
     // Purple hover for dark mode
     :host-context(.dark) & {
       background: linear-gradient(135deg, rgba(147, 51, 234, 0.3), rgba(109, 40, 217, 0.4));
-      box-shadow: 
+      box-shadow:
         0 6px 20px rgba(147, 51, 234, 0.4),
         inset 0 1px 0 rgba(255, 255, 255, 0.12);
       text-shadow: 0 0 15px rgba(147, 51, 234, 0.8);
@@ -626,4 +625,3 @@
     transform: translateY(0);
   }
   }
-  

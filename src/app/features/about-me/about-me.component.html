@@ -40,18 +40,18 @@
           </div>
 
           <!-- Right: Quick Stats -->
-          <div class="grid grid-cols-3 gap-4 lg:gap-6">
-            <div class="stat-card text-center p-3 rounded-lg bg-slate-100/50 dark:bg-slate-700/30 border border-slate-200/50 dark:border-slate-600/30">
-              <div class="text-2xl md:text-3xl font-bold text-[#f29f67] font-mono">5+</div>
-              <div class="text-xs text-slate-500 dark:text-slate-400 font-inter uppercase tracking-wider">Years Exp</div>
+          <div class="grid grid-cols-3 gap-2 md:gap-4 lg:gap-6">
+            <div class="stat-card text-center p-2 md:p-3 rounded-lg bg-slate-100/50 dark:bg-slate-700/30 border border-slate-200/50 dark:border-slate-600/30 min-w-0">
+              <div class="text-lg md:text-2xl lg:text-3xl font-bold text-[#f29f67] font-mono">5+</div>
+              <div class="text-[9px] md:text-xs text-slate-500 dark:text-slate-400 font-inter uppercase tracking-wider whitespace-nowrap">Years Exp</div>
             </div>
-            <div class="stat-card text-center p-3 rounded-lg bg-slate-100/50 dark:bg-slate-700/30 border border-slate-200/50 dark:border-slate-600/30">
-              <div class="text-2xl md:text-3xl font-bold text-[#8833cc] font-mono">7</div>
-              <div class="text-xs text-slate-500 dark:text-slate-400 font-inter uppercase tracking-wider">Companies</div>
+            <div class="stat-card text-center p-2 md:p-3 rounded-lg bg-slate-100/50 dark:bg-slate-700/30 border border-slate-200/50 dark:border-slate-600/30 min-w-0">
+              <div class="text-lg md:text-2xl lg:text-3xl font-bold text-[#8833cc] font-mono">7</div>
+              <div class="text-[9px] md:text-xs text-slate-500 dark:text-slate-400 font-inter uppercase tracking-wider whitespace-nowrap">Companies</div>
             </div>
-            <div class="stat-card text-center p-3 rounded-lg bg-slate-100/50 dark:bg-slate-700/30 border border-slate-200/50 dark:border-slate-600/30">
-              <div class="text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400 font-mono">∞</div>
-              <div class="text-xs text-slate-500 dark:text-slate-400 font-inter uppercase tracking-wider">Curiosity</div>
+            <div class="stat-card text-center p-2 md:p-3 rounded-lg bg-slate-100/50 dark:bg-slate-700/30 border border-slate-200/50 dark:border-slate-600/30 min-w-0">
+              <div class="text-lg md:text-2xl lg:text-3xl font-bold text-green-600 dark:text-green-400 font-mono">∞</div>
+              <div class="text-[9px] md:text-xs text-slate-500 dark:text-slate-400 font-inter uppercase tracking-wider whitespace-nowrap">Curiosity</div>
             </div>
           </div>
         </div>
@@ -59,11 +59,10 @@
     </header>
 
     <!-- Main Grid Layout -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="main-content-grid grid grid-cols-1 lg:grid-cols-12 gap-6 lg:items-stretch">
 
       <!-- Left Column: About & Skills -->
-      <div class="lg:col-span-5 space-y-6">
-
+      <div class="lg:col-span-5 flex flex-col gap-6">
         <!-- About Card -->
         <section class="code-card bg-white/50 dark:bg-slate-800/50 backdrop-blur-[10px] rounded-xl border border-slate-200/50 dark:border-slate-700/50 shadow-lg overflow-hidden">
           <div class="code-card-header flex items-center justify-between px-4 py-3 bg-slate-100/50 dark:bg-slate-900/30 border-b border-slate-200/50 dark:border-slate-700/50">
@@ -136,16 +135,16 @@
       </div>
 
       <!-- Right Column: Experience Git Tree -->
-      <div class="lg:col-span-7">
-        <section class="code-card h-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-[10px] rounded-xl border border-slate-200/50 dark:border-slate-700/50 shadow-lg overflow-hidden">
-          <div class="code-card-header flex items-center justify-between px-4 py-3 bg-slate-100/50 dark:bg-slate-900/30 border-b border-slate-200/50 dark:border-slate-700/50">
+      <div class="lg:col-span-7 right-column-wrapper">
+        <section class="code-card w-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-[10px] rounded-xl border border-slate-200/50 dark:border-slate-700/50 shadow-lg overflow-hidden flex flex-col experience-card-height">
+          <div class="code-card-header flex items-center justify-between px-4 py-3 bg-slate-100/50 dark:bg-slate-900/30 border-b border-slate-200/50 dark:border-slate-700/50 flex-shrink-0">
             <span class="font-mono text-xs text-slate-600 dark:text-slate-400"><span class="text-green-500">⎇</span> git log --graph --oneline</span>
             <div class="flex items-center gap-2">
               <span class="text-xs text-slate-500 dark:text-slate-500 font-mono">main</span>
               <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
             </div>
           </div>
-          <div class="code-card-content p-5 git-tree-container max-h-[600px] overflow-y-auto">
+          <div class="code-card-content p-5 git-tree-container overflow-y-auto flex-1 min-h-0">
             <!-- Git Tree -->
             <div class="git-tree">
               @for (job of experiences; track job.company; let i = $index; let first = $first) {

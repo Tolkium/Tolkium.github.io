@@ -3,6 +3,33 @@
   min-height: 100vh;
 }
 
+// Main content grid - ensure columns align properly and match height
+.main-content-grid {
+  @media (min-width: 1024px) {
+    align-items: stretch;
+  }
+}
+
+.right-column-wrapper {
+  @media (min-width: 1024px) {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+}
+
+.experience-card-height {
+  @media (min-width: 1024px) {
+    flex: 1 1 0;
+    min-height: 0;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+}
+
 // Status pulse animation
 .status-pulse {
   animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -26,6 +53,7 @@
 // Stat card hover
 .stat-card {
   transition: all 0.2s ease;
+  overflow: hidden;
   
   &:hover {
     transform: translateY(-2px);
@@ -46,6 +74,13 @@
 .git-tree-container {
   scrollbar-width: thin;
   scrollbar-color: rgba(136, 51, 204, 0.3) transparent;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  
+  @media (min-width: 1024px) {
+    max-height: 100%;
+  }
   
   &::-webkit-scrollbar {
     width: 6px;

@@ -1,113 +1,111 @@
-<div class="relative z-10 min-h-screen">
-  <div class="container mx-auto px-4 py-2 md:px-6 md:py-4 max-w-7xl">
+<div class="about-page-wrapper">
+  <div class="about-container">
 
     <!-- Terminal-style Header -->
-    <header class="terminal-header mb-6 bg-white/50 dark:bg-slate-800/50 backdrop-blur-[10px] rounded-xl border border-slate-200/50 dark:border-slate-700/50 shadow-lg overflow-hidden">
-      <div class="terminal-bar flex items-center gap-3 px-4 py-3 bg-slate-100/50 dark:bg-slate-900/30 border-b border-slate-200/50 dark:border-slate-700/50">
-        <div class="flex gap-2">
-          <span class="w-3 h-3 rounded-full bg-red-400"></span>
-          <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
-          <span class="w-3 h-3 rounded-full bg-green-400"></span>
+    <header class="terminal-header terminal-header-spacing">
+      <div class="terminal-bar">
+        <div class="terminal-window-controls">
+          <span class="terminal-dot terminal-dot-red"></span>
+          <span class="terminal-dot terminal-dot-yellow"></span>
+          <span class="terminal-dot terminal-dot-green"></span>
         </div>
-        <span class="flex-1 text-center text-xs font-mono text-slate-500 dark:text-slate-400">marek&#64;portfolio:~</span>
+        <span class="terminal-title">marek&#64;portfolio:~</span>
       </div>
-      <div class="terminal-content p-6 md:p-8">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+      <div class="terminal-content">
+        <div class="terminal-content-wrapper">
           <!-- Left: Profile Info -->
-          <div class="flex items-center gap-6">
+          <div class="profile-section">
             <!-- Avatar with status -->
-            <div class="relative">
-              <div class="w-24 h-24 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-[#f29f67] to-[#8833cc] p-1">
-                <img src="assets/images/avatar1.png" alt="Marek Šípoš" class="w-full h-full rounded-full object-cover" style="mix-blend-mode: multiply;">
+            <div class="profile-avatar-wrapper">
+              <div class="avatar-wrapper">
+                <img [src]="profile.avatarUrl" [alt]="profile.name" class="avatar-image" loading="lazy">
               </div>
-              <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-4 border-white dark:border-slate-900 status-pulse"></div>
+              <div class="status-indicator status-pulse"></div>
             </div>
 
             <!-- Name & Title -->
-            <div>
-              <h1 class="text-3xl md:text-4xl font-bold font-outfit mb-1">
-                <span class="text-[#f29f67]">&gt;</span> <span class="text-slate-800 dark:text-white">Marek Šípoš</span>
+            <div class="profile-info">
+              <h1 class="profile-name">
+                <span class="profile-name-prefix" aria-hidden="true">&gt;</span>
+                <span class="profile-name-text">{{ profile.name }}</span>
               </h1>
-              <div class="flex items-center gap-2 text-green-600 dark:text-green-400 font-mono text-sm md:text-base">
-                <span class="typing-cursor">█</span>
-                <span>Frontend Web Developer</span>
+              <div class="profile-title" role="text">
+                <span class="typing-cursor" aria-hidden="true">█</span>
+                <span>{{ profile.title }}</span>
               </div>
-              <div class="flex items-center gap-2 mt-2 text-slate-500 dark:text-slate-400 font-mono text-sm">
-                <span class="text-[#8833cc]">📍</span>
-                <span>Bratislava, Slovakia</span>
+              <div class="profile-location" role="text">
+                <span class="profile-location-icon" aria-label="Location">📍</span>
+                <span>{{ profile.location }}</span>
               </div>
             </div>
           </div>
 
           <!-- Right: Quick Stats -->
-          <div class="grid grid-cols-3 gap-2 md:gap-4 lg:gap-6">
-            <div class="stat-card text-center p-2 md:p-3 rounded-lg bg-slate-100/50 dark:bg-slate-700/30 border border-slate-200/50 dark:border-slate-600/30 min-w-0">
-              <div class="text-lg md:text-2xl lg:text-3xl font-bold text-[#f29f67] font-mono">5+</div>
-              <div class="text-[9px] md:text-xs text-slate-500 dark:text-slate-400 font-inter uppercase tracking-wider whitespace-nowrap">Years Exp</div>
-            </div>
-            <div class="stat-card text-center p-2 md:p-3 rounded-lg bg-slate-100/50 dark:bg-slate-700/30 border border-slate-200/50 dark:border-slate-600/30 min-w-0">
-              <div class="text-lg md:text-2xl lg:text-3xl font-bold text-[#8833cc] font-mono">7</div>
-              <div class="text-[9px] md:text-xs text-slate-500 dark:text-slate-400 font-inter uppercase tracking-wider whitespace-nowrap">Companies</div>
-            </div>
-            <div class="stat-card text-center p-2 md:p-3 rounded-lg bg-slate-100/50 dark:bg-slate-700/30 border border-slate-200/50 dark:border-slate-600/30 min-w-0">
-              <div class="text-lg md:text-2xl lg:text-3xl font-bold text-green-600 dark:text-green-400 font-mono">∞</div>
-              <div class="text-[9px] md:text-xs text-slate-500 dark:text-slate-400 font-inter uppercase tracking-wider whitespace-nowrap">Curiosity</div>
-            </div>
+          <div class="stats-grid" role="list" aria-label="Professional statistics">
+            @for (stat of statCards; track trackByStatLabel($index, stat)) {
+              <div class="stat-card" role="listitem">
+                <div class="stat-value" [style.color]="stat.color">{{ stat.value }}</div>
+                <div class="stat-label">{{ stat.label }}</div>
+              </div>
+            }
           </div>
         </div>
       </div>
     </header>
 
     <!-- Main Grid Layout -->
-    <div class="main-content-grid grid grid-cols-1 lg:grid-cols-12 gap-6 lg:items-stretch">
+    <div class="main-content-grid">
 
       <!-- Left Column: About & Skills -->
-      <div class="lg:col-span-5 flex flex-col gap-6">
+      <div class="left-column">
         <!-- About Card -->
-        <section class="code-card bg-white/50 dark:bg-slate-800/50 backdrop-blur-[10px] rounded-xl border border-slate-200/50 dark:border-slate-700/50 shadow-lg overflow-hidden">
-          <div class="code-card-header flex items-center justify-between px-4 py-3 bg-slate-100/50 dark:bg-slate-900/30 border-b border-slate-200/50 dark:border-slate-700/50">
-            <span class="font-mono text-xs text-slate-600 dark:text-slate-400"><span class="text-green-500">~/</span>about.md</span>
-            <div class="flex gap-1">
-              <span class="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-600"></span>
-              <span class="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-600"></span>
-              <span class="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-600"></span>
+        <section class="code-card">
+          <div class="code-card-header">
+            <span class="code-header-text"><span class="code-header-path">~/</span>about.md</span>
+            <div class="code-header-dots">
+              <span class="code-dot"></span>
+              <span class="code-dot"></span>
+              <span class="code-dot"></span>
             </div>
           </div>
-          <div class="code-card-content p-5">
-            <div class="font-mono text-sm space-y-1">
-              <div class="code-line flex"><span class="w-6 text-slate-400 dark:text-slate-600 text-right pr-4">1</span><span class="text-slate-500 dark:text-slate-500 italic">// Who am I?</span></div>
-              <div class="code-line flex"><span class="w-6 text-slate-400 dark:text-slate-600 text-right pr-4">2</span><span class="text-purple-600 dark:text-purple-400">const</span> <span class="text-cyan-600 dark:text-cyan-400 ml-1">developer</span> <span class="text-slate-600 dark:text-slate-300">= &#123;</span></div>
-              <div class="code-line flex"><span class="w-6 text-slate-400 dark:text-slate-600 text-right pr-4">3</span><span class="text-indigo-600 dark:text-indigo-400 ml-4">passion:</span> <span class="text-green-600 dark:text-green-400">"exceptional digital experiences"</span><span class="text-slate-600 dark:text-slate-300">,</span></div>
-              <div class="code-line flex"><span class="w-6 text-slate-400 dark:text-slate-600 text-right pr-4">4</span><span class="text-indigo-600 dark:text-indigo-400 ml-4">approach:</span> <span class="text-green-600 dark:text-green-400">"perfectionism + pragmatism"</span><span class="text-slate-600 dark:text-slate-300">,</span></div>
-              <div class="code-line flex"><span class="w-6 text-slate-400 dark:text-slate-600 text-right pr-4">5</span><span class="text-indigo-600 dark:text-indigo-400 ml-4">superpower:</span> <span class="text-green-600 dark:text-green-400">"Angular 🚀"</span><span class="text-slate-600 dark:text-slate-300">,</span></div>
-              <div class="code-line flex"><span class="w-6 text-slate-400 dark:text-slate-600 text-right pr-4">6</span><span class="text-indigo-600 dark:text-indigo-400 ml-4">mode:</span> <span class="text-green-600 dark:text-green-400">"always learning"</span></div>
-              <div class="code-line flex"><span class="w-6 text-slate-400 dark:text-slate-600 text-right pr-4">7</span><span class="text-slate-600 dark:text-slate-300">&#125;;</span></div>
+          <div class="code-card-content">
+            <div class="code-content" role="code" aria-label="About me code snippet">
+              @for (line of codeLines; track trackByLineNumber($index, line)) {
+                <div class="code-line">
+                  <span class="code-line-number" aria-hidden="true">{{ line.lineNumber }}</span>
+                  <span>
+                    @for (part of line.parts; track trackByPartText($index, part)) {
+                      <span [class]="'code-text--' + part.type">{{ part.text }}</span>
+                    }
+                  </span>
+                </div>
+              }
             </div>
           </div>
         </section>
 
         <!-- Skills Terminal -->
-        <section class="code-card bg-white/50 dark:bg-slate-800/50 backdrop-blur-[10px] rounded-xl border border-slate-200/50 dark:border-slate-700/50 shadow-lg overflow-hidden">
-          <div class="code-card-header flex items-center justify-between px-4 py-3 bg-slate-100/50 dark:bg-slate-900/30 border-b border-slate-200/50 dark:border-slate-700/50">
-            <span class="font-mono text-xs text-slate-600 dark:text-slate-400"><span class="text-[#f29f67]">$</span> skills --list</span>
-            <div class="flex gap-1">
-              <span class="w-2 h-2 rounded-full bg-green-500"></span>
+        <section class="code-card">
+          <div class="code-card-header">
+            <span class="code-header-text"><span class="code-header-command">$</span> skills --list</span>
+            <div class="code-header-dots">
+              <span class="code-dot code-dot-active"></span>
             </div>
           </div>
-          <div class="code-card-content p-5">
-            <div class="mb-4">
-              <div class="text-xs text-slate-500 dark:text-slate-500 font-mono mb-2 uppercase tracking-wider">// Technical Stack</div>
-              <div class="flex flex-wrap gap-2">
-                @for (skill of technicalSkills; track skill) {
-                  <span class="skill-tag px-3 py-1.5 rounded-md text-xs font-medium bg-purple-100/60 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-300/40 dark:border-purple-500/30 hover:border-purple-400 dark:hover:border-purple-400/50 transition-colors">{{ skill }}</span>
+          <div class="code-card-content">
+            <div class="skills-section">
+              <div class="skills-section-title">// Technical Stack</div>
+              <div class="skills-tags-wrapper" role="list" aria-label="Technical skills">
+                @for (skill of technicalSkills(); track trackBySkill($index, skill)) {
+                  <span class="skill-tag skill-tag-purple" role="listitem">{{ skill }}</span>
                 }
               </div>
             </div>
-            <div>
-              <div class="text-xs text-slate-500 dark:text-slate-500 font-mono mb-2 uppercase tracking-wider">// Soft Skills</div>
-              <div class="flex flex-wrap gap-2">
-                @for (skill of softSkills; track skill) {
-                  <span class="skill-tag px-3 py-1.5 rounded-md text-xs font-medium bg-green-100/50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300/30 dark:border-green-600/30 hover:border-green-400/50 transition-colors">{{ skill }}</span>
+            <div class="skills-section">
+              <div class="skills-section-title">// Soft Skills</div>
+              <div class="skills-tags-wrapper" role="list" aria-label="Soft skills">
+                @for (skill of softSkills(); track trackBySkill($index, skill)) {
+                  <span class="skill-tag skill-tag-green" role="listitem">{{ skill }}</span>
                 }
               </div>
             </div>
@@ -115,19 +113,19 @@
         </section>
 
         <!-- Education -->
-        <section class="code-card bg-white/50 dark:bg-slate-800/50 backdrop-blur-[10px] rounded-xl border border-slate-200/50 dark:border-slate-700/50 shadow-lg overflow-hidden">
-          <div class="code-card-header flex items-center justify-between px-4 py-3 bg-slate-100/50 dark:bg-slate-900/30 border-b border-slate-200/50 dark:border-slate-700/50">
-            <span class="font-mono text-xs text-slate-600 dark:text-slate-400"><span class="text-[#8833cc]">🎓</span> education.log</span>
+        <section class="code-card">
+          <div class="code-card-header">
+            <span class="code-header-text"><span class="code-header-icon">🎓</span> education.log</span>
           </div>
-          <div class="code-card-content p-5">
-            <div class="flex items-start gap-3">
-              <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#f29f67]/20 to-[#8833cc]/20 flex items-center justify-center text-lg shrink-0">
-                🏛️
+          <div class="code-card-content">
+            <div class="education-content">
+              <div class="education-icon" aria-hidden="true">
+                {{ education.icon }}
               </div>
-              <div>
-                <h3 class="text-slate-800 dark:text-white font-semibold font-outfit">Slovak University of Technology</h3>
-                <p class="text-slate-500 dark:text-slate-400 text-sm font-inter">Information Technology</p>
-                <p class="text-xs text-slate-400 dark:text-slate-500 font-mono mt-1">2016 → 2022</p>
+              <div class="education-details">
+                <h3 class="education-institution">{{ education.institution }}</h3>
+                <p class="education-degree">{{ education.degree }}</p>
+                <p class="education-period">{{ education.period }}</p>
               </div>
             </div>
           </div>
@@ -135,87 +133,204 @@
       </div>
 
       <!-- Right Column: Experience Git Tree -->
-      <div class="lg:col-span-7 right-column-wrapper">
-        <section class="code-card w-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-[10px] rounded-xl border border-slate-200/50 dark:border-slate-700/50 shadow-lg overflow-hidden flex flex-col experience-card-height">
-          <div class="code-card-header flex items-center justify-between px-4 py-3 bg-slate-100/50 dark:bg-slate-900/30 border-b border-slate-200/50 dark:border-slate-700/50 flex-shrink-0">
-            <span class="font-mono text-xs text-slate-600 dark:text-slate-400"><span class="text-green-500">⎇</span> git log --graph --oneline</span>
-            <div class="flex items-center gap-2">
-              <span class="text-xs text-slate-500 dark:text-slate-500 font-mono">main</span>
-              <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+      <div class="right-column-wrapper">
+        <section class="code-card experience-card experience-card-height">
+          <div class="code-card-header code-card-header-fixed">
+            <span class="code-header-text"><span class="code-header-icon">⎇</span> git log --graph --oneline</span>
+            <div class="git-branch-indicator">
+              <span class="git-branch-name">main</span>
+              <span class="git-branch-pulse"></span>
             </div>
           </div>
-          <div class="code-card-content p-5 git-tree-container overflow-y-auto flex-1 min-h-0">
-            <!-- Git Tree -->
-            <div class="git-tree">
-              @for (job of experiences; track job.company; let i = $index; let first = $first) {
-                <div class="git-commit flex gap-4 py-4" [class.git-commit-active]="first">
-                  <!-- Git branch line -->
-                  <div class="git-branch relative flex flex-col items-center w-10 shrink-0">
-                    <div class="git-line absolute left-1/2 -translate-x-1/2 w-0.5 bg-gradient-to-b from-[#8833cc] to-[#f29f67] top-0 bottom-0" [class.top-5]="first"></div>
-                    <div class="git-node relative z-10 w-9 h-9 rounded-full flex items-center justify-center mt-1 border-[3px] border-white dark:border-slate-800" [style.background]="job.color">
-                      <span class="text-sm">{{ job.icon }}</span>
-                    </div>
-                  </div>
+          <div class="code-card-content git-tree-container">
+            <!-- GitLens-style Multi-Branch Graph -->
+            <table class="git-tree-table" role="list" aria-label="Work experience timeline">
+              <thead>
+                <tr>
+                  <th class="git-col-mobile"></th>
+                  <th class="git-col-main"></th>
+                  <th class="git-col-feature"></th>
+                  <th class="git-col-content"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Row 1: T7 - Main branch start (dashed) -->
+                <tr class="git-row #git-row-first">
+                  <!-- Mobile: single branch -->
+                  <td class="git-cell git-cell-mobile border-main border-dashed">
+                    <div class="circle-component circle-upper-left border-dashed" [style.border-color]="experiences[0].color"></div>
+                  </td>
+                  <!-- Desktop: Main branch -->
+                  <td class="branch-connector-right git-cell git-cell-desktop border-main border-dashed">
+                    <div class="circle-component circle-upper-left border-dashed" [style.border-color]="experiences[0].color"></div>
+                  </td>
+                  <!-- Desktop: Feature branch (empty) -->
+                  <td class="git-cell git-cell-desktop #border-top-spacer-main"></td>
+                  <!-- Content -->
+                  <td class="git-content-cell">
+                    <p class="git-text">{{ experiences[0].icon }} {{ experiences[0].company }} - {{ experiences[0].role }}</p>
+                    <time class="git-period">{{ experiences[0].period }}</time>
+                  </td>
+                </tr>
 
-                  <!-- Commit content -->
-                  <div class="git-content flex-1 pr-2">
-                    <div class="flex items-start justify-between gap-2 mb-1">
-                      <h3 class="text-slate-800 dark:text-white font-semibold font-outfit text-lg">{{ job.company }}</h3>
-                      <span class="text-xs font-mono px-2 py-0.5 rounded-full shrink-0"
-                            [style.background]="job.color + '20'"
-                            [style.color]="job.color">
-                        {{ job.role }}
-                      </span>
-                    </div>
-                    <p class="text-xs text-slate-400 dark:text-slate-500 font-mono mb-2">{{ job.period }}</p>
-                    <p class="text-sm text-slate-600 dark:text-slate-400 font-inter leading-relaxed">{{ job.description }}</p>
+                <!-- Row 2: Exomal - Feature branch start (dashed) -->
+                <tr class="git-row">
+                  <!-- Mobile: single branch -->
+                  <td class="git-cell git-cell-mobile border-feature">
+                    <div class="circle-component circle-upper-left border-dashed " [style.border-color]="experiences[1].color"></div>
+                  </td>
+                  <!-- Desktop: Main branch continues with branch connector -->
+                  <td class="git-cell git-cell-desktop border-main border-dashed #branch-connector-right"></td>
+                  <!-- Desktop: Feature branch starts with connector from main -->
+                  <td class="git-cell git-cell-desktop border-feature #border-top-spacer-feature branch-connector-corner">
+                    <div class="circle-component circle-upper-left border-dashed" [style.border-color]="experiences[1].color"></div>
+                  </td>
+                  <!-- Content -->
+                  <td class="git-content-cell">
+                    <p class="git-text">{{ experiences[1].icon }} {{ experiences[1].company }} - {{ experiences[1].role }}</p>
+                    <time class="git-period">{{ experiences[1].period }}</time>
+                  </td>
+                </tr>
 
-                    <!-- Tech tags -->
-                    @if (job.tech && job.tech.length > 0) {
-                      <div class="flex flex-wrap gap-1.5 mt-3">
-                        @for (tech of job.tech; track tech) {
-                          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-200/80 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300">{{ tech }}</span>
-                        }
-                      </div>
-                    }
-                  </div>
-                </div>
-              }
+                <!-- Row 3: Capco - Main branch (solid) -->
+                <tr class="git-row git-row-tall">
+                  <!-- Mobile: single branch -->
+                  <td class="git-cell git-cell-mobile border-main">
+                    <div class="circle-component circle-upper-left" [style.border-color]="experiences[2].color"></div>
+                  </td>
+                  <!-- Desktop: Main branch -->
+                  <td class="git-cell git-cell-desktop border-main #border-top-spacer-main">
+                    <div class="circle-component circle-upper-left" [style.border-color]="experiences[2].color"></div>
+                  </td>
+                  <!-- Desktop: Feature branch continues -->
+                  <td class="git-cell git-cell-desktop border-feature #border-top-spacer-main"></td>
+                  <!-- Content -->
+                  <td class="git-content-cell">
+                    <p class="git-text">{{ experiences[2].icon }} {{ experiences[2].company }} - {{ experiences[2].role }}</p>
+                    <time class="git-period">{{ experiences[2].period }}</time>
+                  </td>
+                </tr>
 
-              <!-- Initial commit -->
-              <div class="git-commit git-commit-initial flex gap-4 py-4 opacity-60">
-                <div class="git-branch relative flex flex-col items-center w-10 shrink-0">
-                  <div class="git-line git-line-last absolute left-1/2 -translate-x-1/2 w-0.5 bg-gradient-to-b from-[#8833cc] to-[#f29f67] top-0 h-5"></div>
-                  <div class="git-node git-node-initial relative z-10 w-9 h-9 rounded-full flex items-center justify-center mt-1 border-2 border-dashed border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800">
-                    <span class="text-xs">🎯</span>
-                  </div>
-                </div>
-                <div class="git-content flex items-center pt-2">
-                  <p class="text-slate-500 dark:text-slate-500 font-mono text-sm italic">Initial commit: journey.begin()</p>
-                </div>
-              </div>
-            </div>
+                <!-- Row 4: AmNFT - Merge point -->
+                <tr class="git-row git-row-merge">
+                  <!-- Mobile: single branch -->
+                  <td class="git-cell git-cell-mobile border-merge">
+                    <div class="circle-component circle-upper-left circle-merge-offset" [style.border-color]="experiences[3].color"></div>
+                  </td>
+                  <!-- Desktop: Main branch with merge line -->
+                  <td class="git-cell git-cell-desktop border-main border-merge-top">
+                    <div class="circle-component circle-upper-left circle-merge-offset" [style.border-color]="experiences[2].color"></div>
+                  </td>
+                  <!-- Desktop: Feature branch + merge corner -->
+                  <td class="git-cell git-cell-desktop border-feature border-merge-corner-tr border-merge-right"></td>
+                  <!-- Content -->
+                  <td class="git-content-cell">
+                    <p class="git-text">{{ experiences[3].icon }} {{ experiences[3].company }} - {{ experiences[3].role }}</p>
+                    <time class="git-period">{{ experiences[3].period }}</time>
+                  </td>
+                </tr>
+
+                <!-- Row 5: alfaBASE - Feature branch -->
+                <tr class="git-row">
+                  <!-- Mobile: single branch -->
+                  <td class="git-cell git-cell-mobile border-merge">
+                    <div class="circle-component circle-upper-left" [style.border-color]="experiences[4].color"></div>
+                  </td>
+                  <!-- Desktop: Main branch -->
+                  <td class="git-cell git-cell-desktop border-main"></td>
+                  <!-- Desktop: Feature branch with merge right border -->
+                  <td class="git-cell git-cell-desktop border-feature border-merge-right">
+                    <div class="circle-component circle-upper-right" [style.border-color]="experiences[4].color"></div>
+                  </td>
+                  <!-- Content -->
+                  <td class="git-content-cell">
+                    <p class="git-text">{{ experiences[4].icon }} {{ experiences[4].company }} - {{ experiences[4].role }}</p>
+                    <time class="git-period">{{ experiences[4].period }}</time>
+                  </td>
+                </tr>
+
+                <!-- Row 6: Hmstrsoc.io - Branch end -->
+                <tr class="git-row git-row-tall">
+                  <!-- Mobile: single branch -->
+                  <td class="git-cell git-cell-mobile border-merge">
+                    <div class="circle-component circle-upper-left" [style.border-color]="experiences[5].color"></div>
+                  </td>
+                  <!-- Desktop: Main branch with bottom merge -->
+                  <td class="git-cell git-cell-desktop border-main border-merge-bottom"></td>
+                  <!-- Desktop: Feature branch ends with corner -->
+                  <td class="git-cell git-cell-desktop border-feature border-merge-corner-br border-merge-bottom border-merge-right">
+                    <div class="circle-component circle-upper-right" [style.border-color]="experiences[5].color"></div>
+                  </td>
+                  <!-- Content -->
+                  <td class="git-content-cell">
+                    <p class="git-text">{{ experiences[5].icon }} {{ experiences[5].company }} - {{ experiences[5].role }}</p>
+                    <time class="git-period">{{ experiences[5].period }}</time>
+                  </td>
+                </tr>
+
+                <!-- Row 7: Siemens - Main branch -->
+                <tr class="git-row git-row-merge">
+                  <!-- Mobile: single branch -->
+                  <td class="git-cell git-cell-mobile border-main">
+                    <div class="circle-component circle-upper-left circle-merge-offset" [style.border-color]="experiences[6].color"></div>
+                  </td>
+                  <!-- Desktop: Main branch -->
+                  <td class="git-cell git-cell-desktop border-main">
+                    <div class="circle-component circle-upper-left circle-merge-offset" [style.border-color]="experiences[6].color"></div>
+                  </td>
+                  <!-- Desktop: Feature branch ended -->
+                  <td class="git-cell git-cell-desktop border-feature"></td>
+                  <!-- Content -->
+                  <td class="git-content-cell">
+                    <p class="git-text">{{ experiences[6].icon }} {{ experiences[6].company }} - {{ experiences[6].role }}</p>
+                    <time class="git-period">{{ experiences[6].period }}</time>
+                  </td>
+                </tr>
+
+                <!-- Initial commit -->
+                <tr class="git-row git-row-initial">
+                  <!-- Mobile: single branch -->
+                  <td class="git-cell git-cell-mobile border-main-short">
+                    <div class="circle-component circle-upper-left circle-initial-offset border-initial border-dashed"></div>
+                  </td>
+                  <!-- Desktop: Main branch ends -->
+                  <td class="git-cell git-cell-desktop border-top-spacer-main border-main-short">
+                    <div class="circle-component circle-upper-left circle-initial-offset border-initial border-dashed"></div>
+                  </td>
+                  <!-- Desktop: Empty -->
+                  <td class="git-cell git-cell-desktop #border-top-spacer-main"></td>
+                  <!-- Content -->
+                  <td class="git-content-cell">
+                    <p class="git-text git-text-initial">🎯 Initial commit</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </section>
       </div>
     </div>
 
     <!-- CTA Footer -->
-    <footer class="mt-8 mb-4">
-      <div class="code-card bg-white/50 dark:bg-slate-800/50 backdrop-blur-[10px] rounded-xl border border-slate-200/50 dark:border-slate-700/50 shadow-lg">
-        <div class="code-card-content py-6 px-6">
-          <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-              <span class="text-2xl animate-bounce">🚀</span>
-              <div>
-                <p class="text-slate-800 dark:text-white font-outfit font-semibold">Ready to build something amazing?</p>
-                <p class="text-slate-500 dark:text-slate-400 text-sm font-inter">Open for exciting opportunities!</p>
+    <footer class="cta-footer">
+      <div class="code-card">
+        <div class="code-card-content cta-footer-content">
+          <div class="cta-content">
+            <div class="cta-text">
+              <span class="cta-icon" aria-hidden="true">🚀</span>
+              <div class="cta-text-content">
+                <p class="cta-heading">Ready to build something amazing?</p>
+                <p class="cta-subheading">Open for exciting opportunities!</p>
               </div>
             </div>
-            <button class="cta-button group relative px-6 py-3 rounded-lg font-semibold font-outfit text-white bg-gradient-to-r from-[#8833cc] to-[#f29f67] hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-0.5 transition-all duration-300" (click)="goToLinkedIn()">
-              <span class="relative z-10 flex items-center gap-2">
+            <button
+              type="button"
+              class="cta-button"
+              (click)="goToLinkedIn()"
+              aria-label="Connect with {{ profile.name }} on LinkedIn">
+              <span class="cta-button-content">
                 <span>Connect on LinkedIn</span>
-                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="cta-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                 </svg>
               </span>

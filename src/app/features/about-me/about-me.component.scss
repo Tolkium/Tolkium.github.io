@@ -1,17 +1,1755 @@
+// Responsive breakpoints variables
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+
 :host {
   display: block;
   min-height: 100vh;
+
+  // CSS Variables for theme colors
+  --about-primary-color: #f29f67;
+  --about-secondary-color: #8833cc;
+  --about-success-color: #10b981;
+  --about-gradient-start: #f29f67;
+  --about-gradient-end: #8833cc;
+}
+
+// ============================================
+// Page Layout
+// ============================================
+
+.about-page-wrapper {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+}
+
+// Terminal Header
+.terminal-header-spacing {
+  margin-bottom: 1.5rem;
+}
+
+.terminal-window-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.terminal-dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 9999px;
+}
+
+.terminal-dot-red {
+  background-color: rgba(248, 113, 113, 1);
+}
+
+.terminal-dot-yellow {
+  background-color: rgba(250, 204, 21, 1);
+}
+
+.terminal-dot-green {
+  background-color: rgba(34, 197, 94, 1);
+}
+
+.terminal-title {
+  flex: 1 1 0%;
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  color: rgba(100, 116, 139, 1);
+}
+
+.terminal-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+
+  @media (min-width: $breakpoint-lg) {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+// Profile Section
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.profile-avatar-wrapper {
+  position: relative;
+}
+
+.avatar-wrapper {
+  width: 6rem;
+  height: 6rem;
+  border-radius: 9999px;
+  background: linear-gradient(to bottom right, var(--about-gradient-start), var(--about-gradient-end));
+  padding: 0.25rem;
+
+  @media (min-width: $breakpoint-md) {
+    width: 7rem;
+    height: 7rem;
+  }
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  object-fit: cover;
+  mix-blend-mode: multiply;
+}
+
+.status-indicator {
+  position: absolute;
+  bottom: -0.25rem;
+  right: -0.25rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  background-color: rgba(34, 197, 94, 1);
+  border-radius: 9999px;
+  border-width: 4px;
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 1);
+
+  :host-context(.dark) &,
+  .dark & {
+    border-color: rgba(15, 23, 42, 1);
+  }
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-name {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  margin-bottom: 0.25rem;
+
+  @media (min-width: $breakpoint-md) {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+}
+
+.profile-name-prefix {
+  color: var(--about-primary-color);
+}
+
+.profile-name-text {
+  color: rgba(30, 41, 59, 1);
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(255, 255, 255, 1);
+  }
+}
+
+.profile-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(22, 163, 74, 1);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(74, 222, 128, 1);
+  }
+
+  @media (min-width: $breakpoint-md) {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+}
+
+.profile-location {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  color: rgba(100, 116, 139, 1);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.profile-location-icon {
+  color: var(--about-secondary-color);
+}
+
+// Code Header
+.code-header-text {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: rgba(71, 85, 105, 1);
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(148, 163, 184, 1);
+  }
+}
+
+.code-header-path,
+.code-header-command,
+.code-header-icon {
+  color: rgba(34, 197, 94, 1);
+}
+
+.code-header-command {
+  color: var(--about-primary-color);
+}
+
+.code-header-icon {
+  color: var(--about-secondary-color);
+}
+
+.code-header-dots {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.code-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background-color: rgba(148, 163, 184, 1);
+
+  :host-context(.dark) &,
+  .dark & {
+    background-color: rgba(71, 85, 105, 1);
+  }
+}
+
+.code-dot-active {
+  background-color: rgba(34, 197, 94, 1);
+}
+
+// Skills Section
+.skills-tags-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+// Education
+.education-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(to bottom right, rgba(242, 159, 103, 0.2), rgba(136, 51, 204, 0.2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  flex-shrink: 0;
+}
+
+.education-institution {
+  color: rgba(30, 41, 59, 1);
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  margin-bottom: 0.25rem;
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(255, 255, 255, 1);
+  }
+}
+
+.education-degree {
+  color: rgba(100, 116, 139, 1);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-family: 'Inter', sans-serif;
+  margin-bottom: 0.25rem;
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(148, 163, 184, 1);
+  }
+}
+
+.education-period {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: rgba(148, 163, 184, 1);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  margin-top: 0.25rem;
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(100, 116, 139, 1);
+  }
+}
+
+// Git Branch
+.git-branch-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.git-branch-name {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: rgba(100, 116, 139, 1);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+.git-branch-pulse {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background-color: rgba(34, 197, 94, 1);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+// ============================================
+// GitLens-style Multi-Branch Graph
+// ============================================
+
+// Branch color variables
+$branch-main-light: #7dd3fc; // sky-300
+$branch-main-dark: #7dd3fc;
+$branch-main-bg-light: #e0f2fe; // sky-100
+$branch-main-bg-dark: #0c4a6e; // sky-900
+
+$branch-feature-light: #a5b4fc; // indigo-300
+$branch-feature-dark: #fdba74; // orange-300
+$branch-feature-bg-light: #e0e7ff; // indigo-100
+$branch-feature-bg-dark: #7c2d12; // orange-900
+
+$branch-merge-light: #5eead4; // teal-300
+$branch-merge-dark: #f9a8d4; // pink-300
+$branch-merge-bg-light: #ccfbf1; // teal-100
+$branch-merge-bg-dark: #831843; // pink-900
+
+// Git Tree Table - GitLens style
+.git-tree-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-left: 0.5rem;
+  height: 100%;
+  display: table;
+
+  tbody {
+    display: table-row-group;
+    height: 100%;
+
+    // Spacer row that grows to fill remaining space
+    tr.git-row-spacer {
+      height: 100%;
+
+      td {
+        height: 100%;
+        padding: 0;
+        vertical-align: top;
+      }
+    }
+  }
+}
+
+// Column definitions
+.git-col-mobile {
+  width: 4px;
+  display: table-cell;
+
+  @media (min-width: $breakpoint-md) {
+    display: none;
+  }
+}
+
+.git-col-main {
+  width: 1.5625rem; // 25px
+  display: none;
+
+  @media (min-width: $breakpoint-md) {
+    display: table-cell;
+  }
+}
+
+.git-col-feature {
+  width: 1.75rem;
+  display: none;
+
+  @media (min-width: $breakpoint-md) {
+    display: table-cell;
+  }
+}
+
+.git-col-content {
+  width: auto;
+}
+
+// Row styles
+.git-row {
+  position: relative;
+  height: 3rem; // h-12
+
+  &.git-row-first {
+    height: 3rem;
+  }
+
+  &.git-row-tall {
+    height: 3.5rem; // h-14
+  }
+
+  &.git-row-merge {
+    height: 2.25rem; // h-10
+  }
+
+  &.git-row-initial {
+    height: 3rem;
+
+    // Apply opacity only to content, not borders
+    .git-content-cell {
+      opacity: 0.6;
+    }
+  }
+}
+
+// Cell styles
+.git-cell {
+  position: relative;
+  padding: 0;
+}
+
+.git-cell-mobile {
+  display: table-cell;
+
+  @media (min-width: $breakpoint-md) {
+    display: none;
+  }
+}
+
+.git-cell-desktop {
+  display: none;
+
+  @media (min-width: $breakpoint-md) {
+    display: table-cell;
+  }
+}
+
+// Content cell
+.git-content-cell {
+  vertical-align: top;
+  padding-left: 1.5rem; // ps-6
+}
+
+.git-text {
+  position: relative;
+  top: -0.5rem; // Align with circle position (moved up slightly)
+  margin: 0;
+  color: rgba(30, 41, 59, 1);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.5rem; // Match circle height for alignment
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(203, 213, 225, 1);
+  }
+}
+
+.git-text-initial {
+  font-style: italic;
+  color: rgba(100, 116, 139, 1);
+}
+
+.git-period {
+  position: relative;
+  top: 0; // Align directly below git-text
+  display: block;
+  font-size: 0.75rem;
+  color: rgba(100, 116, 139, 1);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  margin-top: 0.25rem; // Small gap after text
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(71, 85, 105, 1);
+  }
+}
+
+.git-row-tall .git-text {
+  top: -0.5rem; // Consistent with base alignment
+}
+
+.git-row-tall .git-period {
+  top: 0; // Same alignment for tall rows
+}
+
+// First row has top spacer, adjust text position
+.git-row-first .git-text {
+  top: 0.75rem; // Move down a little from previous position
+}
+
+.git-row-first .git-period {
+  top: 0;
+}
+
+// Merge rows are shorter, adjust text position more
+.git-row-merge .git-text {
+  top: -0.75rem; // Move up more for shorter merge rows
+}
+
+.git-row-merge .git-period {
+  top: 0; // Keep period aligned
+}
+
+// Initial commit row - move text down moderately
+.git-row-initial .git-text {
+  top: 0.5rem; // Move down moderately
+}
+
+.git-row-initial .git-period {
+  top: 0;
+}
+
+// ============================================
+// Circle Component - GitLens style
+// ============================================
+
+.circle-component {
+  position: absolute;
+  z-index: 40;
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 9999px;
+  border-width: 3px;
+  border-style: solid;
+  background-color: rgba(255, 255, 255, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+
+  :host-context(.dark) &,
+  .dark & {
+    background-color: rgba(2, 6, 23, 1); // slate-950
+  }
+}
+
+.circle-upper-left {
+  top: -0.5rem;
+  left: -2px;
+  transform: translate(-50%, -1px);
+}
+
+.circle-upper-right {
+  top: -0.25rem;
+  right: -2px;
+  transform: translate(50%, -1px);
+}
+
+.circle-merge-offset {
+  top: -0.25rem;
+  left: -3px;
+  transform: translate(-50%, -9px);
+}
+
+.circle-initial-offset {
+  // top: -1rem;
+  left: 2px;
+  transform: translate(-50%, -1px);
+}
+
+.git-row-first .circle-component {
+  top: 1rem; // Account for border-top spacer
+}
+
+// Hide indicator bar for initial commit
+.border-initial::after {
+  display: none;
+}
+
+// ============================================
+// Border-based Branch Lines
+// ============================================
+
+// Main branch borders
+.border-main {
+  border-left: 4px solid $branch-main-light;
+
+  :host-context(.dark) &,
+  .dark & {
+    border-left-color: $branch-main-dark;
+  }
+}
+
+// Feature branch borders
+.border-feature {
+  border-left: 4px solid $branch-feature-light;
+
+  :host-context(.dark) &,
+  .dark & {
+    border-left-color: $branch-feature-dark;
+  }
+}
+
+// Merge branch borders
+.border-merge {
+  border-left: 4px solid $branch-merge-light;
+
+  :host-context(.dark) &,
+  .dark & {
+    border-left-color: $branch-merge-dark;
+  }
+}
+
+// Dashed border style
+.border-dashed {
+  border-left-style: dashed;
+}
+
+// Initial commit dashed border
+.border-initial {
+  border-color: rgba(203, 213, 225, 1); // slate-300
+
+  :host-context(.dark) &,
+  .dark & {
+    border-color: rgb(203, 225, 225);
+  }
+}
+
+// Vertical line connecting to initial commit circle
+// Line extends from previous row (negative top) down to circle
+.border-main-short {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -1rem; // Start from previous row
+    left: 0; // Align with left edge (where border-left normally is)
+    width: 0;
+    height: calc(1rem + 0.75rem); // Through spacer + to circle
+    border-left: 4px solid $branch-main-light;
+
+    :host-context(.dark) &,
+    .dark & {
+      border-left-color: $branch-main-dark;
+    }
+  }
+}
+
+// Top spacer borders (creates visual gap at start of branch)
+.border-top-spacer-main {
+  border-top: 1rem solid transparent;
+
+}
+
+.border-top-spacer-feature {
+  // Feature branch top spacer - currently not used
+  // border-top: 1rem solid $branch-feature-bg-light;
+
+  // :host-context(.dark) &,
+  // .dark & {
+  //   border-top-color: $branch-feature-bg-dark;
+  // }
+  // Placeholder to avoid empty ruleset
+  display: table-cell;
+}
+
+// Merge line borders (horizontal connections)
+.border-merge-top {
+  border-top: 4px solid $branch-merge-light;
+
+  :host-context(.dark) &,
+  .dark & {
+    border-top-color: $branch-merge-dark;
+  }
+}
+
+.border-merge-bottom {
+  border-bottom: 4px solid $branch-merge-light;
+
+  :host-context(.dark) &,
+  .dark & {
+    border-bottom-color: $branch-merge-dark;
+  }
+}
+
+.border-merge-right {
+  border-right: 4px solid $branch-merge-light;
+
+  :host-context(.dark) &,
+  .dark & {
+    border-right-color: $branch-merge-dark;
+  }
+}
+
+.border-merge-right-dashed {
+  border-right: 4px solid $branch-feature-light;
+
+  :host-context(.dark) &,
+  .dark & {
+    border-right-color: $branch-feature-dark;
+  }
+}
+
+// Rounded corners for merge points - creates the corner where merge line meets feature branch
+.border-merge-corner-tr {
+  position: relative;
+  border-top: 4px solid $branch-merge-light !important;
+  border-top-right-radius: 0.5rem;
+
+  :host-context(.dark) &,
+  .dark & {
+    border-top-color: $branch-merge-dark !important;
+  }
+}
+
+.border-merge-corner-tr-dashed {
+  position: relative;
+  border-top: 4px solid $branch-feature-light !important;
+  border-top-right-radius: 0.5rem;
+  border-style: dashed;
+
+  :host-context(.dark) &,
+  .dark & {
+    border-top-color: $branch-feature-dark !important;
+  }
+}
+
+
+.border-merge-corner-br {
+  position: relative;
+  border-bottom: 4px solid $branch-merge-light !important;
+  border-bottom-right-radius: 0.5rem;
+
+  :host-context(.dark) &,
+  .dark & {
+    border-bottom-color: $branch-merge-dark !important;
+  }
+}
+
+// Branch connector elbow - L-shape going UP then RIGHT to connect to feature branch
+// Line goes: from bottom UP -> curves RIGHT with rounded corner -> connects to feature branch
+.branch-connector-right {
+  position: relative;
+
+  // L-shaped elbow: vertical line going UP + horizontal line going RIGHT
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -4px;
+    width: calc(50% + 1px); // From right edge to center of main branch line
+    height: 6rem; // Height of the elbow (matches top-spacer)
+    border-top: 4px dashed $branch-feature-light;
+    border-right: 4px dashed $branch-feature-light;
+    border-top-right-radius: 0.5rem;
+    pointer-events: none;
+
+    :host-context(.dark) &,
+    .dark & {
+      border-top-color: $branch-feature-dark;
+      border-right-color: $branch-feature-dark;
+    }
+  }
+}
+
+// Corner cell where feature branch starts - no additional line needed
+.branch-connector-corner {
+  // The elbow from branch-connector-right already connects to this cell
+  // No additional styling needed here
+  // Placeholder to avoid empty ruleset
+  position: relative;
+}
+
+.git-content {
+  flex: 1 1 0%;
+  padding-right: 0.5rem;
+}
+
+.experience-company {
+  color: rgba(30, 41, 59, 1);
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  margin: 0;
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(255, 255, 255, 1);
+  }
+}
+
+.experience-role {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.experience-period {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: rgba(148, 163, 184, 1);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  margin-bottom: 0.5rem;
+  display: block;
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(100, 116, 139, 1);
+  }
+}
+
+.experience-description {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: rgba(71, 85, 105, 1);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.625;
+  margin: 0;
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(148, 163, 184, 1);
+  }
+}
+
+.experience-tech-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.75rem;
+}
+
+.git-commit-initial-opacity {
+  opacity: 0.6;
+}
+
+.initial-commit {
+  display: flex;
+  align-items: center;
+  padding-top: 0.5rem;
+}
+
+.initial-commit-text {
+  color: rgba(100, 116, 139, 1);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-style: italic;
+  margin: 0;
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(100, 116, 139, 1);
+  }
+}
+
+// Experience Card
+.experience-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.code-card-header-fixed {
+  flex-shrink: 0;
+}
+
+// CTA Footer
+.cta-footer {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.cta-footer-content {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.cta-text-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.cta-heading {
+  color: rgba(30, 41, 59, 1);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  margin: 0;
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(255, 255, 255, 1);
+  }
+}
+
+.cta-subheading {
+  color: rgba(100, 116, 139, 1);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(148, 163, 184, 1);
+  }
+}
+
+// ============================================
+// Layout Utilities
+// ============================================
+
+// Container
+.about-container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 80rem; // max-w-7xl
+  padding: 0.5rem 1rem;
+
+  @media (min-width: $breakpoint-md) {
+    padding: 1rem 1.5rem;
+  }
+}
+
+// Flexbox utilities
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.items-start {
+  align-items: flex-start;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-shrink-0 {
+  flex-shrink: 0;
+}
+
+// Grid utilities
+.grid {
+  display: grid;
+}
+
+.grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.grid-cols-12 {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.grid-col-span-5 {
+  grid-column: span 5 / span 5;
+}
+
+.grid-col-span-7 {
+  grid-column: span 7 / span 7;
+}
+
+@media (min-width: $breakpoint-lg) {
+  .lg\:grid-cols-12 {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .lg\:flex-row {
+    flex-direction: row;
+  }
+
+  .lg\:items-center {
+    align-items: center;
+  }
+
+  .lg\:items-stretch {
+    align-items: stretch;
+  }
+
+  .lg\:col-span-5 {
+    grid-column: span 5 / span 5;
+  }
+
+  .lg\:col-span-7 {
+    grid-column: span 7 / span 7;
+  }
+}
+
+// Position utilities
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+// ============================================
+// Spacing Utilities
+// ============================================
+
+.gap-1 {
+  gap: 0.25rem;
+}
+
+.gap-1\.5 {
+  gap: 0.375rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-3 {
+  gap: 0.75rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.gap-6 {
+  gap: 1.5rem;
+}
+
+@media (min-width: $breakpoint-md) {
+  .md\:gap-4 {
+    gap: 1rem;
+  }
+}
+
+@media (min-width: $breakpoint-lg) {
+  .lg\:gap-6 {
+    gap: 1.5rem;
+  }
+}
+
+.space-y-1 > * + * {
+  margin-top: 0.25rem;
+}
+
+// Padding
+.p-1 {
+  padding: 0.25rem;
+}
+
+.p-5 {
+  padding: 1.25rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.py-3 {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.py-4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.py-6 {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.pr-2 {
+  padding-right: 0.5rem;
+}
+
+.pr-4 {
+  padding-right: 1rem;
+}
+
+.pt-2 {
+  padding-top: 0.5rem;
+}
+
+@media (min-width: $breakpoint-md) {
+  .md\:px-6 {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .md\:py-4 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  .md\:p-8 {
+    padding: 2rem;
+  }
+}
+
+// Margin
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.mt-3 {
+  margin-top: 0.75rem;
+}
+
+.mt-8 {
+  margin-top: 2rem;
+}
+
+// Negative margins
+.-bottom-1 {
+  bottom: -0.25rem;
+}
+
+.-right-1 {
+  right: -0.25rem;
+}
+
+.-translate-x-1\/2 {
+  transform: translateX(-50%);
+}
+
+// ============================================
+// Typography Utilities
+// ============================================
+
+// Font families
+.font-mono {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+.font-outfit {
+  font-family: 'Outfit', sans-serif;
+}
+
+.font-inter {
+  font-family: 'Inter', sans-serif;
+}
+
+// Font sizes
+.text-\[9px\] {
+  font-size: 0.5625rem;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.text-base {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
+.text-4xl {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+}
+
+@media (min-width: $breakpoint-md) {
+  .md\:text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
+  .md\:text-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  .md\:text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+
+  .md\:text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+}
+
+@media (min-width: $breakpoint-lg) {
+  .lg\:text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+}
+
+// Font weights
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+// Text alignment
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+// Text transforms
+.uppercase {
+  text-transform: uppercase;
+}
+
+.lowercase {
+  text-transform: lowercase;
+}
+
+.italic {
+  font-style: italic;
+}
+
+// Letter spacing
+.tracking-wider {
+  letter-spacing: 0.05em;
+}
+
+// Line height
+.leading-relaxed {
+  line-height: 1.625;
+}
+
+// Whitespace
+.whitespace-nowrap {
+  white-space: nowrap;
+}
+
+// ============================================
+// Color Utilities
+// ============================================
+
+// Text colors
+.text-slate-400 {
+  color: rgba(148, 163, 184, 1);
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(71, 85, 105, 1);
+  }
+}
+
+.text-slate-500 {
+  color: rgba(100, 116, 139, 1);
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(100, 116, 139, 1);
+  }
+}
+
+.text-slate-600 {
+  color: rgba(71, 85, 105, 1);
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(148, 163, 184, 1);
+  }
+}
+
+.text-slate-800 {
+  color: rgba(30, 41, 59, 1);
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(255, 255, 255, 1);
+  }
+}
+
+.text-slate-300 {
+  color: rgba(203, 213, 225, 1);
+}
+
+.text-green-400 {
+  color: rgba(74, 222, 128, 1);
+}
+
+.text-green-500 {
+  color: rgba(34, 197, 94, 1);
+}
+
+.text-green-600 {
+  color: rgba(22, 163, 74, 1);
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(74, 222, 128, 1);
+  }
+}
+
+.text-primary {
+  color: var(--about-primary-color);
+}
+
+.text-secondary {
+  color: var(--about-secondary-color);
+}
+
+// Background colors
+.bg-red-400 {
+  background-color: rgba(248, 113, 113, 1);
+}
+
+.bg-yellow-400 {
+  background-color: rgba(250, 204, 21, 1);
+}
+
+.bg-green-500 {
+  background-color: rgba(34, 197, 94, 1);
+}
+
+.bg-slate-100 {
+  background-color: rgba(241, 245, 249, 1);
+
+  :host-context(.dark) &,
+  .dark & {
+    background-color: rgba(30, 41, 59, 1);
+  }
+}
+
+.bg-slate-400 {
+  background-color: rgba(148, 163, 184, 1);
+
+  :host-context(.dark) &,
+  .dark & {
+    background-color: rgba(71, 85, 105, 1);
+  }
+}
+
+.bg-slate-600 {
+  background-color: rgba(71, 85, 105, 1);
+}
+
+// Gradient backgrounds
+.bg-gradient-primary {
+  background: linear-gradient(to bottom right, var(--about-gradient-start), var(--about-gradient-end));
+}
+
+.bg-gradient-primary-light {
+  background: linear-gradient(to bottom right, rgba(242, 159, 103, 0.2), rgba(136, 51, 204, 0.2));
+}
+
+// ============================================
+// Sizing Utilities
+// ============================================
+
+.w-full {
+  width: 100%;
+}
+
+.w-2 {
+  width: 0.5rem;
+}
+
+.w-3 {
+  width: 0.75rem;
+}
+
+.w-6 {
+  width: 1.5rem;
+}
+
+.w-9 {
+  width: 2.25rem;
+}
+
+.w-10 {
+  width: 2.5rem;
+}
+
+.w-24 {
+  width: 6rem;
+}
+
+.h-2 {
+  height: 0.5rem;
+}
+
+.h-3 {
+  height: 0.75rem;
+}
+
+.h-5 {
+  height: 1.25rem;
+}
+
+.h-6 {
+  height: 1.5rem;
+}
+
+.h-9 {
+  height: 2.25rem;
+}
+
+.h-10 {
+  height: 2.5rem;
+}
+
+.h-24 {
+  height: 6rem;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.min-h-screen {
+  min-height: 100vh;
+}
+
+.min-h-0 {
+  min-height: 0;
+}
+
+.max-h-full {
+  max-height: 100%;
+}
+
+@media (min-width: $breakpoint-md) {
+  .md\:w-28 {
+    width: 7rem;
+  }
+
+  .md\:h-28 {
+    height: 7rem;
+  }
+}
+
+// ============================================
+// Border Utilities
+// ============================================
+
+.border-4 {
+  border-width: 4px;
+}
+
+.border-white {
+  border-color: rgba(255, 255, 255, 1);
+
+  :host-context(.dark) &,
+  .dark & {
+    border-color: rgba(15, 23, 42, 1);
+  }
+}
+
+.border-slate-300 {
+  border-color: rgba(203, 213, 225, 1);
+
+  :host-context(.dark) &,
+  .dark & {
+    border-color: rgba(71, 85, 105, 1);
+  }
+}
+
+.border-slate-600 {
+  border-color: rgba(71, 85, 105, 1);
+}
+
+.border-slate-800 {
+  border-color: rgba(30, 41, 59, 1);
+}
+
+.border-\[3px\] {
+  border-width: 3px;
+}
+
+.border-2 {
+  border-width: 2px;
+}
+
+.border-dashed {
+  border-style: dashed;
+}
+
+// ============================================
+// Border Radius Utilities
+// ============================================
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.rounded-md {
+  border-radius: 0.375rem;
+}
+
+.rounded-xl {
+  border-radius: 0.75rem;
+}
+
+.rounded {
+  border-radius: 0.25rem;
+}
+
+// ============================================
+// Other Utilities
+// ============================================
+
+.z-10 {
+  z-index: 10;
+}
+
+.object-cover {
+  object-fit: cover;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.overflow-y-auto {
+  overflow-y: auto;
+}
+
+.opacity-60 {
+  opacity: 0.6;
+}
+
+.block {
+  display: block;
+}
+
+.left-1\/2 {
+  left: 50%;
+}
+
+.top-0 {
+  top: 0;
+}
+
+.top-5 {
+  top: 1.25rem;
+}
+
+.bottom-0 {
+  bottom: 0;
+}
+
+// Animations
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// Base glass-morphism card style
+.code-card {
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(226, 232, 240, 0.5);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+
+  :host-context(.dark) &,
+  .dark & {
+    background-color: rgba(30, 41, 59, 0.5);
+    border-color: rgba(51, 65, 85, 0.5);
+  }
+}
+
+// Terminal header (uses same style as code-card)
+.terminal-header {
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(226, 232, 240, 0.5);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+
+  :host-context(.dark) &,
+  .dark & {
+    background-color: rgba(30, 41, 59, 0.5);
+    border-color: rgba(51, 65, 85, 0.5);
+  }
+}
+
+// Code card header bar
+.code-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background-color: rgba(241, 245, 249, 0.5);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+
+  :host-context(.dark) &,
+  .dark & {
+    background-color: rgba(15, 23, 42, 0.3);
+    border-bottom-color: rgba(51, 65, 85, 0.5);
+  }
+}
+
+// Terminal bar (similar to code-card-header)
+.terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background-color: rgba(241, 245, 249, 0.5);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+
+  :host-context(.dark) &,
+  .dark & {
+    background-color: rgba(15, 23, 42, 0.3);
+    border-bottom-color: rgba(51, 65, 85, 0.5);
+  }
 }
 
 // Main content grid - ensure columns align properly and match height
 .main-content-grid {
-  @media (min-width: 1024px) {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1.5rem;
+
+  @media (min-width: $breakpoint-lg) {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
     align-items: stretch;
   }
 }
 
 .right-column-wrapper {
-  @media (min-width: 1024px) {
+  @media (min-width: $breakpoint-lg) {
+    grid-column: span 7 / span 7;
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -20,7 +1758,7 @@
 }
 
 .experience-card-height {
-  @media (min-width: 1024px) {
+  @media (min-width: $breakpoint-lg) {
     flex: 1 1 0;
     min-height: 0;
     max-height: 100%;
@@ -28,6 +1766,11 @@
     flex-direction: column;
     overflow: hidden;
   }
+}
+
+// Avatar image
+.avatar-image {
+  mix-blend-mode: multiply;
 }
 
 // Status pulse animation
@@ -50,23 +1793,97 @@
   50% { opacity: 0; }
 }
 
-// Stat card hover
+// Stat card
 .stat-card {
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: rgba(241, 245, 249, 0.5);
+  border: 1px solid rgba(226, 232, 240, 0.5);
+  min-width: 0;
   transition: all 0.2s ease;
   overflow: hidden;
-  
+
+  @media (min-width: $breakpoint-md) {
+    padding: 0.75rem;
+  }
+
+  :host-context(.dark) &,
+  .dark & {
+    background-color: rgba(51, 65, 85, 0.3);
+    border-color: rgba(71, 85, 105, 0.3);
+  }
+
   &:hover {
     transform: translateY(-2px);
   }
 }
 
-// Skill tag hover
+// Skill tag base
 .skill-tag {
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-width: 1px;
   transition: all 0.2s ease;
   cursor: default;
-  
+
   &:hover {
     transform: translateY(-2px);
+  }
+}
+
+// Skill tag variants
+.skill-tag-purple {
+  background-color: rgba(243, 232, 255, 0.6);
+  color: rgba(126, 34, 206, 1);
+  border-color: rgba(196, 181, 253, 0.4);
+
+  :host-context(.dark) &,
+  .dark & {
+    background-color: rgba(88, 28, 135, 0.3);
+    color: rgba(196, 181, 253, 1);
+    border-color: rgba(139, 92, 246, 0.3);
+
+    &:hover {
+      border-color: rgba(139, 92, 246, 0.5);
+    }
+  }
+
+  &:hover {
+    border-color: rgba(167, 139, 250, 1);
+
+    :host-context(.dark) &,
+    .dark & {
+      border-color: rgba(167, 139, 250, 0.5);
+    }
+  }
+}
+
+.skill-tag-green {
+  background-color: rgba(220, 252, 231, 0.5);
+  color: rgba(21, 128, 61, 1);
+  border-color: rgba(134, 239, 172, 0.3);
+
+  :host-context(.dark) &,
+  .dark & {
+    background-color: rgba(20, 83, 45, 0.2);
+    color: rgba(134, 239, 172, 1);
+    border-color: rgba(34, 197, 94, 0.3);
+
+    &:hover {
+      border-color: rgba(34, 197, 94, 0.5);
+    }
+  }
+
+  &:hover {
+    border-color: rgba(34, 197, 94, 0.5);
+
+    :host-context(.dark) &,
+    .dark & {
+      border-color: rgba(34, 197, 94, 0.5);
+    }
   }
 }
 
@@ -76,24 +1893,26 @@
   scrollbar-color: rgba(136, 51, 204, 0.3) transparent;
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  
-  @media (min-width: 1024px) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  @media (min-width: $breakpoint-lg) {
     max-height: 100%;
   }
-  
+
   &::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: transparent;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: rgba(136, 51, 204, 0.3);
     border-radius: 3px;
-    
+
     &:hover {
       background: rgba(136, 51, 204, 0.5);
     }
@@ -103,18 +1922,18 @@
 // Git commit hover effects
 .git-commit {
   transition: all 0.3s ease;
-  
+
   &:hover {
     .git-content {
       transform: translateX(4px);
     }
-    
+
     .git-node {
       transform: scale(1.15);
       box-shadow: 0 0 15px rgba(136, 51, 204, 0.4);
     }
   }
-  
+
   &.git-commit-active {
     .git-node {
       animation: node-pulse 2s ease-in-out infinite;
@@ -135,28 +1954,391 @@
   transition: all 0.3s ease;
 }
 
-// Code line hover
+// Code content container
+.code-content {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+// Code line
 .code-line {
+  display: flex;
+  gap: 0;
+
   &:hover {
     background: rgba(136, 51, 204, 0.05);
     border-radius: 4px;
   }
 }
 
-// CTA button hover effect
-.cta-button {
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, #f29f67 0%, #8833cc 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
-  &:hover::before {
-    opacity: 1;
+// Line number
+.code-line-number {
+  width: 1.5rem;
+  color: rgba(148, 163, 184, 1);
+  text-align: right;
+  padding-right: 1rem;
+  user-select: none;
+  flex-shrink: 0;
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(71, 85, 105, 1);
   }
 }
+
+// Code syntax highlighting
+.code-text {
+  &--comment {
+    color: rgba(100, 116, 139, 1);
+    font-style: italic;
+
+    :host-context(.dark) &,
+    .dark & {
+      color: rgba(100, 116, 139, 1);
+    }
+  }
+
+  &--keyword {
+    color: rgba(147, 51, 234, 1);
+
+    :host-context(.dark) &,
+    .dark & {
+      color: rgba(196, 181, 253, 1);
+    }
+  }
+
+  &--variable {
+    color: rgba(14, 165, 233, 1);
+
+    :host-context(.dark) &,
+    .dark & {
+      color: rgba(125, 211, 252, 1);
+    }
+  }
+
+  &--string {
+    color: rgba(22, 163, 74, 1);
+
+    :host-context(.dark) &,
+    .dark & {
+      color: rgba(134, 239, 172, 1);
+    }
+  }
+
+  &--operator {
+    color: rgba(71, 85, 105, 1);
+
+    :host-context(.dark) &,
+    .dark & {
+      color: rgba(203, 213, 225, 1);
+    }
+  }
+
+  &--property {
+    color: rgba(99, 102, 241, 1);
+
+    :host-context(.dark) &,
+    .dark & {
+      color: rgba(165, 180, 252, 1);
+    }
+  }
+
+  &--default {
+    color: rgba(71, 85, 105, 1);
+
+    :host-context(.dark) &,
+    .dark & {
+      color: rgba(203, 213, 225, 1);
+    }
+  }
+}
+
+// Tech tag for experience items
+.tech-tag {
+  font-size: 0.625rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  background-color: rgba(226, 232, 240, 0.8);
+  color: rgba(71, 85, 105, 1);
+
+  :host-context(.dark) &,
+  .dark & {
+    background-color: rgba(51, 65, 85, 0.5);
+    color: rgba(203, 213, 225, 1);
+  }
+}
+
+// CTA button
+.cta-button {
+  position: relative;
+  overflow: hidden;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  color: rgba(255, 255, 255, 1);
+  background: linear-gradient(to right, var(--about-secondary-color), var(--about-primary-color));
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.25), 0 4px 6px -2px rgba(139, 92, 246, 0.1);
+    transform: translateY(-2px);
+
+    .cta-button-icon {
+      transform: translateX(4px);
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--about-primary-color);
+    outline-offset: 2px;
+  }
+}
+
+// Additional semantic classes
+.terminal-content {
+  padding: 1.5rem;
+
+  @media (min-width: $breakpoint-md) {
+    padding: 2rem;
+  }
+}
+
+.code-card-content {
+  padding: 1.25rem;
+}
+
+.code-header-text {
+  color: rgba(71, 85, 105, 1);
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(148, 163, 184, 1);
+  }
+}
+
+.code-header-dots {
+  display: flex;
+  gap: 0.25rem;
+}
+
+// Avatar wrapper
+.avatar-wrapper {
+  border: 1px solid transparent;
+}
+
+// Profile section
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.profile-name {
+  margin-bottom: 0.25rem;
+}
+
+.profile-title {
+  color: rgba(22, 163, 74, 1);
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(74, 222, 128, 1);
+  }
+}
+
+.profile-location {
+  margin-top: 0.5rem;
+}
+
+// Stats
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+
+  @media (min-width: $breakpoint-md) {
+    gap: 1rem;
+  }
+
+  @media (min-width: $breakpoint-lg) {
+    gap: 1.5rem;
+  }
+}
+
+.stat-value {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  @media (min-width: $breakpoint-md) {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+
+  @media (min-width: $breakpoint-lg) {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+}
+
+.stat-label {
+  font-size: 0.5625rem;
+  font-family: 'Inter', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+
+  @media (min-width: $breakpoint-md) {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+}
+
+// Left column
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  @media (min-width: $breakpoint-lg) {
+    grid-column: span 5 / span 5;
+  }
+}
+
+// Skills section
+.skills-section {
+  margin-bottom: 1rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.skills-section-title {
+  margin-bottom: 0.5rem;
+}
+
+// Education
+.education-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.education-icon {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+.education-institution {
+  margin-bottom: 0.25rem;
+}
+
+.education-degree {
+  margin-bottom: 0.25rem;
+}
+
+.education-period {
+  margin-top: 0.25rem;
+}
+
+// Git branch
+.git-branch-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+// Experience
+.experience-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.experience-company {
+  margin: 0;
+}
+
+.experience-role {
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.experience-period {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.experience-description {
+  margin: 0;
+}
+
+// Initial commit
+.initial-commit {
+  display: flex;
+  align-items: center;
+  padding-top: 0.5rem;
+}
+
+// CTA
+.cta-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  @media (min-width: $breakpoint-md) {
+    flex-direction: row;
+  }
+}
+
+.cta-text {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cta-icon {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  animation: bounce 1s infinite;
+}
+
+.cta-heading {
+  margin: 0;
+}
+
+.cta-subheading {
+  margin: 0;
+}
+
+.cta-button-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cta-button-icon {
+  width: 1rem;
+  height: 1rem;
+  transition: transform 0.3s ease;
+}
+

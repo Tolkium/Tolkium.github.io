@@ -168,8 +168,32 @@
                   <td class="git-cell git-cell-desktop #border-top-spacer-main"></td>
                   <!-- Content -->
                   <td class="git-content-cell">
-                    <p class="git-text">{{ experiences[0].icon }} {{ experiences[0].company }} - {{ experiences[0].role }}</p>
-                    <time class="git-period">{{ experiences[0].period }}</time>
+                    <div class="experience-header">
+                      <div class="experience-header-left">
+                        <h3 class="experience-company git-text">
+                          @if (experiences[0].logoUrl) {
+                            <img [src]="experiences[0].logoUrl" [alt]="experiences[0].company + ' logo'" class="company-logo">
+                          } @else {
+                            <span class="company-icon">{{ experiences[0].icon }}</span>
+                          }
+                          {{ experiences[0].company }}
+                          <time class="git-period experience-period">{{ experiences[0].period }}</time>
+                        </h3>
+                      </div>
+                      <span class="experience-role" [style.color]="experiences[0].color">
+                        {{ experiences[0].role }}
+                      </span>
+                    </div>
+                    <p class="experience-description">
+                      {{ experiences[0].description }}
+                    </p>
+                    @if (experiences[0].tech?.length) {
+                      <div class="experience-tech-list" role="list" aria-label="Technologies used at {{ experiences[0].company }}">
+                        @for (tech of experiences[0].tech!; track trackByTech($index, tech)) {
+                          <span class="tech-tag" role="listitem">{{ tech }}</span>
+                        }
+                      </div>
+                    }
                   </td>
                 </tr>
 
@@ -187,8 +211,32 @@
                   </td>
                   <!-- Content -->
                   <td class="git-content-cell">
-                    <p class="git-text">{{ experiences[1].icon }} {{ experiences[1].company }} - {{ experiences[1].role }}</p>
-                    <time class="git-period">{{ experiences[1].period }}</time>
+                    <div class="experience-header">
+                      <div class="experience-header-left">
+                        <h3 class="experience-company git-text">
+                          @if (experiences[1].logoUrl) {
+                            <img [src]="experiences[1].logoUrl" [alt]="experiences[1].company + ' logo'" class="company-logo">
+                          } @else {
+                            <span class="company-icon">{{ experiences[1].icon }}</span>
+                          }
+                          {{ experiences[1].company }}
+                          <time class="git-period experience-period">{{ experiences[1].period }}</time>
+                        </h3>
+                      </div>
+                      <span class="experience-role" [style.color]="experiences[1].color">
+                        {{ experiences[1].role }}
+                      </span>
+                    </div>
+                    <p class="experience-description">
+                      {{ experiences[1].description }}
+                    </p>
+                    @if (experiences[1].tech?.length) {
+                      <div class="experience-tech-list" role="list" aria-label="Technologies used at {{ experiences[1].company }}">
+                        @for (tech of experiences[1].tech!; track trackByTech($index, tech)) {
+                          <span class="tech-tag" role="listitem">{{ tech }}</span>
+                        }
+                      </div>
+                    }
                   </td>
                 </tr>
 
@@ -206,8 +254,32 @@
                   <td class="git-cell git-cell-desktop border-feature #border-top-spacer-main"></td>
                   <!-- Content -->
                   <td class="git-content-cell">
-                    <p class="git-text">{{ experiences[2].icon }} {{ experiences[2].company }} - {{ experiences[2].role }}</p>
-                    <time class="git-period">{{ experiences[2].period }}</time>
+                    <div class="experience-header">
+                      <div class="experience-header-left">
+                        <h3 class="experience-company git-text">
+                          @if (experiences[2].logoUrl) {
+                            <img [src]="experiences[2].logoUrl" [alt]="experiences[2].company + ' logo'" class="company-logo">
+                          } @else {
+                            <span class="company-icon">{{ experiences[2].icon }}</span>
+                          }
+                          {{ experiences[2].company }}
+                          <time class="git-period experience-period">{{ experiences[2].period }}</time>
+                        </h3>
+                      </div>
+                      <span class="experience-role" [style.color]="experiences[2].color">
+                        {{ experiences[2].role }}
+                      </span>
+                    </div>
+                    <p class="experience-description">
+                      {{ experiences[2].description }}
+                    </p>
+                    @if (experiences[2].tech?.length) {
+                      <div class="experience-tech-list" role="list" aria-label="Technologies used at {{ experiences[2].company }}">
+                        @for (tech of experiences[2].tech!; track trackByTech($index, tech)) {
+                          <span class="tech-tag" role="listitem">{{ tech }}</span>
+                        }
+                      </div>
+                    }
                   </td>
                 </tr>
 
@@ -225,8 +297,32 @@
                   <td class="git-cell git-cell-desktop border-feature border-merge-corner-tr border-merge-right"></td>
                   <!-- Content -->
                   <td class="git-content-cell">
-                    <p class="git-text">{{ experiences[3].icon }} {{ experiences[3].company }} - {{ experiences[3].role }}</p>
-                    <time class="git-period">{{ experiences[3].period }}</time>
+                    <div class="experience-header">
+                      <div class="experience-header-left">
+                        <h3 class="experience-company git-text">
+                          @if (experiences[3].logoUrl) {
+                            <img [src]="experiences[3].logoUrl" [alt]="experiences[3].company + ' logo'" class="company-logo">
+                          } @else {
+                            <span class="company-icon">{{ experiences[3].icon }}</span>
+                          }
+                          {{ experiences[3].company }}
+                          <time class="git-period experience-period">{{ experiences[3].period }}</time>
+                        </h3>
+                      </div>
+                      <span class="experience-role" [style.color]="experiences[3].color">
+                        {{ experiences[3].role }}
+                      </span>
+                    </div>
+                    <p class="experience-description">
+                      {{ experiences[3].description }}
+                    </p>
+                    @if (experiences[3].tech?.length) {
+                      <div class="experience-tech-list" role="list" aria-label="Technologies used at {{ experiences[3].company }}">
+                        @for (tech of experiences[3].tech!; track trackByTech($index, tech)) {
+                          <span class="tech-tag" role="listitem">{{ tech }}</span>
+                        }
+                      </div>
+                    }
                   </td>
                 </tr>
 
@@ -244,8 +340,32 @@
                   </td>
                   <!-- Content -->
                   <td class="git-content-cell">
-                    <p class="git-text">{{ experiences[4].icon }} {{ experiences[4].company }} - {{ experiences[4].role }}</p>
-                    <time class="git-period">{{ experiences[4].period }}</time>
+                    <div class="experience-header">
+                      <div class="experience-header-left">
+                        <h3 class="experience-company git-text">
+                          @if (experiences[4].logoUrl) {
+                            <img [src]="experiences[4].logoUrl" [alt]="experiences[4].company + ' logo'" class="company-logo">
+                          } @else {
+                            <span class="company-icon">{{ experiences[4].icon }}</span>
+                          }
+                          {{ experiences[4].company }}
+                          <time class="git-period experience-period">{{ experiences[4].period }}</time>
+                        </h3>
+                      </div>
+                      <span class="experience-role" [style.color]="experiences[4].color">
+                        {{ experiences[4].role }}
+                      </span>
+                    </div>
+                    <p class="experience-description">
+                      {{ experiences[4].description }}
+                    </p>
+                    @if (experiences[4].tech?.length) {
+                      <div class="experience-tech-list" role="list" aria-label="Technologies used at {{ experiences[4].company }}">
+                        @for (tech of experiences[4].tech!; track trackByTech($index, tech)) {
+                          <span class="tech-tag" role="listitem">{{ tech }}</span>
+                        }
+                      </div>
+                    }
                   </td>
                 </tr>
 
@@ -263,8 +383,32 @@
                   </td>
                   <!-- Content -->
                   <td class="git-content-cell">
-                    <p class="git-text">{{ experiences[5].icon }} {{ experiences[5].company }} - {{ experiences[5].role }}</p>
-                    <time class="git-period">{{ experiences[5].period }}</time>
+                    <div class="experience-header">
+                      <div class="experience-header-left">
+                        <h3 class="experience-company git-text">
+                          @if (experiences[5].logoUrl) {
+                            <img [src]="experiences[5].logoUrl" [alt]="experiences[5].company + ' logo'" class="company-logo">
+                          } @else {
+                            <span class="company-icon">{{ experiences[5].icon }}</span>
+                          }
+                          {{ experiences[5].company }}
+                          <time class="git-period experience-period">{{ experiences[5].period }}</time>
+                        </h3>
+                      </div>
+                      <span class="experience-role" [style.color]="experiences[5].color">
+                        {{ experiences[5].role }}
+                      </span>
+                    </div>
+                    <p class="experience-description">
+                      {{ experiences[5].description }}
+                    </p>
+                    @if (experiences[5].tech?.length) {
+                      <div class="experience-tech-list" role="list" aria-label="Technologies used at {{ experiences[5].company }}">
+                        @for (tech of experiences[5].tech!; track trackByTech($index, tech)) {
+                          <span class="tech-tag" role="listitem">{{ tech }}</span>
+                        }
+                      </div>
+                    }
                   </td>
                 </tr>
 
@@ -282,8 +426,32 @@
                   <td class="git-cell git-cell-desktop border-feature"></td>
                   <!-- Content -->
                   <td class="git-content-cell">
-                    <p class="git-text">{{ experiences[6].icon }} {{ experiences[6].company }} - {{ experiences[6].role }}</p>
-                    <time class="git-period">{{ experiences[6].period }}</time>
+                    <div class="experience-header">
+                      <div class="experience-header-left">
+                        <h3 class="experience-company git-text">
+                          @if (experiences[6].logoUrl) {
+                            <img [src]="experiences[6].logoUrl" [alt]="experiences[6].company + ' logo'" class="company-logo">
+                          } @else {
+                            <span class="company-icon">{{ experiences[6].icon }}</span>
+                          }
+                          {{ experiences[6].company }}
+                          <time class="git-period experience-period">{{ experiences[6].period }}</time>
+                        </h3>
+                      </div>
+                      <span class="experience-role" [style.color]="experiences[6].color">
+                        {{ experiences[6].role }}
+                      </span>
+                    </div>
+                    <p class="experience-description">
+                      {{ experiences[6].description }}
+                    </p>
+                    @if (experiences[6].tech?.length) {
+                      <div class="experience-tech-list" role="list" aria-label="Technologies used at {{ experiences[6].company }}">
+                        @for (tech of experiences[6].tech!; track trackByTech($index, tech)) {
+                          <span class="tech-tag" role="listitem">{{ tech }}</span>
+                        }
+                      </div>
+                    }
                   </td>
                 </tr>
 

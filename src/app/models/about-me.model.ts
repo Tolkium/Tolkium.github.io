@@ -14,7 +14,8 @@ export interface Experience {
   readonly role: string;
   readonly period: string;
   readonly description: string;
-  readonly icon: string;
+  readonly icon: string; // Emoji fallback
+  readonly logoUrl?: string; // Optional logo image URL
   readonly color: string;
   readonly tech?: readonly string[];
   // Branch visualization properties

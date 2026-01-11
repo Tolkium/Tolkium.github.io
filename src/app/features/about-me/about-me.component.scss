@@ -762,7 +762,7 @@ $branch-merge-bg-dark: #831843; // pink-900
     top: 0;
     right: -4px;
     width: calc(50% + 1px); // From right edge to center of main branch line
-    height: 6rem; // Height of the elbow (matches top-spacer)
+    height: 70rem; // Height of the elbow (matches top-spacer)
     border-top: 4px dashed $branch-feature-light;
     border-right: 4px dashed $branch-feature-light;
     border-top-right-radius: 0.5rem;
@@ -2296,7 +2296,8 @@ $branch-merge-bg-dark: #831843; // pink-900
 .company-logo {
   width: 1rem;
   height: 1rem;
-  object-fit: contain;
+  object-fit: cover;
+  border-radius: 50%;
   display: inline-block;
   vertical-align: baseline;
   margin-right: 0.25rem;
@@ -2319,7 +2320,7 @@ $branch-merge-bg-dark: #831843; // pink-900
 .experience-period {
   display: inline; // Inline to appear beside title
   margin: 0;
-  
+
   // When inside experience-company, add spacing
   .experience-company & {
     margin-left: 0.5rem;

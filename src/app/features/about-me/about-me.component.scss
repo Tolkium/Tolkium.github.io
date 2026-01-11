@@ -762,7 +762,7 @@ $branch-merge-bg-dark: #831843; // pink-900
     top: 0;
     right: -4px;
     width: calc(50% + 1px); // From right edge to center of main branch line
-    height: 70rem; // Height of the elbow (matches top-spacer)
+    height: 7rem; // Height of the elbow (matches top-spacer)
     border-top: 4px dashed $branch-feature-light;
     border-right: 4px dashed $branch-feature-light;
     border-top-right-radius: 0.5rem;

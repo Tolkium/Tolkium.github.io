@@ -10,8 +10,6 @@ $breakpoint-lg: 1024px;
   --about-primary-color: #f29f67;
   --about-secondary-color: #8833cc;
   --about-success-color: #10b981;
-  --about-gradient-start: #f29f67;
-  --about-gradient-end: #8833cc;
 }
 
 // ============================================
@@ -89,7 +87,7 @@ $breakpoint-lg: 1024px;
   width: 6rem;
   height: 6rem;
   border-radius: 9999px;
-  background: linear-gradient(to bottom right, var(--about-gradient-start), var(--about-gradient-end));
+  background: linear-gradient(to bottom right, var(--about-primary-color), var(--about-secondary-color));
   padding: 0.25rem;
 
   @media (min-width: $breakpoint-md) {
@@ -144,6 +142,7 @@ $breakpoint-lg: 1024px;
 
 .profile-name-prefix {
   color: var(--about-primary-color);
+  margin-right: 0.25rem; // Add space to the right
 }
 
 .profile-name-text {
@@ -187,7 +186,11 @@ $breakpoint-lg: 1024px;
 }
 
 .profile-location-icon {
-  color: var(--about-secondary-color);
+  color: var(--about-primary-color);
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  transform: translateY(-0.125rem); // Move icon up slightly to align with text baseline
 }
 
 // Code Header
@@ -352,17 +355,6 @@ $branch-merge-bg-dark: #831843; // pink-900
   tbody {
     display: table-row-group;
     height: 100%;
-
-    // Spacer row that grows to fill remaining space
-    tr.git-row-spacer {
-      height: 100%;
-
-      td {
-        height: 100%;
-        padding: 0;
-        vertical-align: top;
-      }
-    }
   }
 }
 
@@ -401,22 +393,48 @@ $branch-merge-bg-dark: #831843; // pink-900
 // Row styles
 .git-row {
   position: relative;
-  height: 2.5rem; // Reduced from 3rem
+  height: auto; // Auto height for mobile to accommodate content
+  min-height: 3.5rem; // Minimum height for mobile
+
+  @media (min-width: $breakpoint-md) {
+    height: 2.5rem; // Reduced from 3rem
+    min-height: 0;
+  }
 
   &.git-row-first {
-    height: 2.5rem; // Reduced from 3rem
+    min-height: 3.5rem; // Minimum height for mobile
+
+    @media (min-width: $breakpoint-md) {
+      height: 2.5rem; // Reduced from 3rem
+      min-height: 0;
+    }
   }
 
   &.git-row-tall {
-    height: 3rem; // Reduced from 3.5rem
+    min-height: 4rem; // Taller minimum for mobile
+
+    @media (min-width: $breakpoint-md) {
+      height: 3rem; // Reduced from 3.5rem
+      min-height: 0;
+    }
   }
 
   &.git-row-merge {
-    height: 2rem; // Reduced from 2.25rem
+    min-height: 3rem; // Minimum height for mobile
+
+    @media (min-width: $breakpoint-md) {
+      height: 2rem; // Reduced from 2.25rem
+      min-height: 0;
+    }
   }
 
   &.git-row-initial {
-    height: 2.5rem; // Reduced from 3rem
+    min-height: 3rem; // Minimum height for mobile
+
+    @media (min-width: $breakpoint-md) {
+      height: 2.5rem; // Reduced from 3rem
+      min-height: 0;
+    }
 
     // Apply opacity only to content, not borders
     .git-content-cell {
@@ -450,9 +468,17 @@ $branch-merge-bg-dark: #831843; // pink-900
 // Content cell
 .git-content-cell {
   vertical-align: top;
-  padding-left: 1.5rem; // ps-6
-  padding-top: 0.25rem; // Add small top padding for better alignment
-  padding-bottom: 0.25rem; // Add small bottom padding
+  padding-left: 1rem; // Reduced padding for mobile
+  padding-top: 0.5rem; // Increased top padding for mobile
+  padding-bottom: 0.75rem; // Increased bottom padding for mobile spacing
+  padding-right: 0.5rem; // Add right padding for mobile
+
+  @media (min-width: $breakpoint-md) {
+    padding-left: 1.5rem; // ps-6
+    padding-top: 0.25rem; // Add small top padding for better alignment
+    padding-bottom: 0.25rem; // Add small bottom padding
+    padding-right: 0;
+  }
 }
 
 .git-text {
@@ -544,7 +570,7 @@ $branch-merge-bg-dark: #831843; // pink-900
   border-radius: 9999px;
   border-width: 3px;
   border-style: solid;
-  background-color: rgba(255, 255, 255, 1);
+  background-color: #f4f5f7;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -552,7 +578,7 @@ $branch-merge-bg-dark: #831843; // pink-900
 
   :host-context(.dark) &,
   .dark & {
-    background-color: rgba(2, 6, 23, 1); // slate-950
+    background-color: #1a2537; // slate-950
   }
 }
 
@@ -625,7 +651,7 @@ $branch-merge-bg-dark: #831843; // pink-900
 
 // Dashed border style
 .border-dashed {
-  border-left-style: dashed;
+  border-style: dashed;
 }
 
 // Initial commit dashed border
@@ -665,17 +691,7 @@ $branch-merge-bg-dark: #831843; // pink-900
 
 }
 
-.border-top-spacer-feature {
-  // Feature branch top spacer - currently not used
-  // border-top: 1rem solid $branch-feature-bg-light;
-
-  // :host-context(.dark) &,
-  // .dark & {
-  //   border-top-color: $branch-feature-bg-dark;
-  // }
-  // Placeholder to avoid empty ruleset
-  display: table-cell;
-}
+// Removed unused class: border-top-spacer-feature
 
 // Merge line borders (horizontal connections)
 .border-merge-top {
@@ -705,14 +721,7 @@ $branch-merge-bg-dark: #831843; // pink-900
   }
 }
 
-.border-merge-right-dashed {
-  border-right: 4px solid $branch-feature-light;
-
-  :host-context(.dark) &,
-  .dark & {
-    border-right-color: $branch-feature-dark;
-  }
-}
+// Removed unused class: border-merge-right-dashed
 
 // Rounded corners for merge points - creates the corner where merge line meets feature branch
 .border-merge-corner-tr {
@@ -726,17 +735,7 @@ $branch-merge-bg-dark: #831843; // pink-900
   }
 }
 
-.border-merge-corner-tr-dashed {
-  position: relative;
-  border-top: 4px solid $branch-feature-light !important;
-  border-top-right-radius: 0.5rem;
-  border-style: dashed;
-
-  :host-context(.dark) &,
-  .dark & {
-    border-top-color: $branch-feature-dark !important;
-  }
-}
+// Removed unused class: border-merge-corner-tr-dashed
 
 
 .border-merge-corner-br {
@@ -840,36 +839,7 @@ $branch-merge-bg-dark: #831843; // pink-900
   }
 }
 
-.experience-tech-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.375rem;
-  margin-top: 0.75rem;
-}
-
-.git-commit-initial-opacity {
-  opacity: 0.6;
-}
-
-.initial-commit {
-  display: flex;
-  align-items: center;
-  padding-top: 0.5rem;
-}
-
-.initial-commit-text {
-  color: rgba(100, 116, 139, 1);
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  font-style: italic;
-  margin: 0;
-
-  :host-context(.dark) &,
-  .dark & {
-    color: rgba(100, 116, 139, 1);
-  }
-}
+// Removed unused classes: experience-tech-tags, git-commit-initial-opacity, initial-commit, initial-commit-text
 
 // Experience Card
 .experience-card {
@@ -942,67 +912,8 @@ $branch-merge-bg-dark: #831843; // pink-900
   }
 }
 
-// Flexbox utilities
-.flex {
-  display: flex;
-}
-
-.flex-col {
-  flex-direction: column;
-}
-
-.flex-row {
-  flex-direction: row;
-}
-
-.items-center {
-  align-items: center;
-}
-
-.items-start {
-  align-items: flex-start;
-}
-
-.justify-between {
-  justify-content: space-between;
-}
-
-.flex-1 {
-  flex: 1 1 0%;
-}
-
-.flex-wrap {
-  flex-wrap: wrap;
-}
-
-.flex-shrink-0 {
-  flex-shrink: 0;
-}
-
-// Grid utilities
-.grid {
-  display: grid;
-}
-
-.grid-cols-1 {
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-}
-
-.grid-cols-3 {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.grid-cols-12 {
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-}
-
-.grid-col-span-5 {
-  grid-column: span 5 / span 5;
-}
-
-.grid-col-span-7 {
-  grid-column: span 7 / span 7;
-}
+// Flexbox utilities - removed unused classes
+// Grid utilities - removed unused classes
 
 @media (min-width: $breakpoint-lg) {
   .lg\:grid-cols-12 {
@@ -1030,42 +941,13 @@ $branch-merge-bg-dark: #831843; // pink-900
   }
 }
 
-// Position utilities
-.relative {
-  position: relative;
-}
-
-.absolute {
-  position: absolute;
-}
+// Position utilities - removed unused classes
 
 // ============================================
 // Spacing Utilities
 // ============================================
 
-.gap-1 {
-  gap: 0.25rem;
-}
-
-.gap-1\.5 {
-  gap: 0.375rem;
-}
-
-.gap-2 {
-  gap: 0.5rem;
-}
-
-.gap-3 {
-  gap: 0.75rem;
-}
-
-.gap-4 {
-  gap: 1rem;
-}
-
-.gap-6 {
-  gap: 1.5rem;
-}
+// Gap utilities - removed unused classes (keeping media query variants)
 
 @media (min-width: $breakpoint-md) {
   .md\:gap-4 {
@@ -1079,64 +961,7 @@ $branch-merge-bg-dark: #831843; // pink-900
   }
 }
 
-.space-y-1 > * + * {
-  margin-top: 0.25rem;
-}
-
-// Padding
-.p-1 {
-  padding: 0.25rem;
-}
-
-.p-5 {
-  padding: 1.25rem;
-}
-
-.p-6 {
-  padding: 1.5rem;
-}
-
-.px-4 {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-.px-6 {
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-}
-
-.py-2 {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-
-.py-3 {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-}
-
-.py-4 {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-}
-
-.py-6 {
-  padding-top: 1.5rem;
-  padding-bottom: 1.5rem;
-}
-
-.pr-2 {
-  padding-right: 0.5rem;
-}
-
-.pr-4 {
-  padding-right: 1rem;
-}
-
-.pt-2 {
-  padding-top: 0.5rem;
-}
+// Spacing utilities - removed unused classes (keeping media query variants)
 
 @media (min-width: $breakpoint-md) {
   .md\:px-6 {
@@ -1154,108 +979,13 @@ $branch-merge-bg-dark: #831843; // pink-900
   }
 }
 
-// Margin
-.mb-1 {
-  margin-bottom: 0.25rem;
-}
-
-.mb-2 {
-  margin-bottom: 0.5rem;
-}
-
-.mb-4 {
-  margin-bottom: 1rem;
-}
-
-.mb-6 {
-  margin-bottom: 1.5rem;
-}
-
-.mt-1 {
-  margin-top: 0.25rem;
-}
-
-.mt-2 {
-  margin-top: 0.5rem;
-}
-
-.mt-3 {
-  margin-top: 0.75rem;
-}
-
-.mt-8 {
-  margin-top: 2rem;
-}
-
-// Negative margins
-.-bottom-1 {
-  bottom: -0.25rem;
-}
-
-.-right-1 {
-  right: -0.25rem;
-}
-
-.-translate-x-1\/2 {
-  transform: translateX(-50%);
-}
+// Margin utilities - removed unused classes
 
 // ============================================
 // Typography Utilities
 // ============================================
 
-// Font families
-.font-mono {
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-}
-
-.font-outfit {
-  font-family: 'Outfit', sans-serif;
-}
-
-.font-inter {
-  font-family: 'Inter', sans-serif;
-}
-
-// Font sizes
-.text-\[9px\] {
-  font-size: 0.5625rem;
-}
-
-.text-xs {
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
-
-.text-sm {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-
-.text-base {
-  font-size: 1rem;
-  line-height: 1.5rem;
-}
-
-.text-lg {
-  font-size: 1.125rem;
-  line-height: 1.75rem;
-}
-
-.text-2xl {
-  font-size: 1.5rem;
-  line-height: 2rem;
-}
-
-.text-3xl {
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-}
-
-.text-4xl {
-  font-size: 2.25rem;
-  line-height: 2.5rem;
-}
+// Typography utilities - removed unused classes (keeping media query variants)
 
 @media (min-width: $breakpoint-md) {
   .md\:text-xs {
@@ -1286,245 +1016,19 @@ $branch-merge-bg-dark: #831843; // pink-900
   }
 }
 
-// Font weights
-.font-semibold {
-  font-weight: 600;
-}
-
-.font-bold {
-  font-weight: 700;
-}
-
-.font-medium {
-  font-weight: 500;
-}
-
-// Text alignment
-.text-center {
-  text-align: center;
-}
-
-.text-right {
-  text-align: right;
-}
-
-// Text transforms
-.uppercase {
-  text-transform: uppercase;
-}
-
-.lowercase {
-  text-transform: lowercase;
-}
-
-.italic {
-  font-style: italic;
-}
-
-// Letter spacing
-.tracking-wider {
-  letter-spacing: 0.05em;
-}
-
-// Line height
-.leading-relaxed {
-  line-height: 1.625;
-}
-
-// Whitespace
-.whitespace-nowrap {
-  white-space: nowrap;
-}
+// Typography utilities - removed unused classes
 
 // ============================================
 // Color Utilities
 // ============================================
 
-// Text colors
-.text-slate-400 {
-  color: rgba(148, 163, 184, 1);
-
-  :host-context(.dark) &,
-  .dark & {
-    color: rgba(71, 85, 105, 1);
-  }
-}
-
-.text-slate-500 {
-  color: rgba(100, 116, 139, 1);
-
-  :host-context(.dark) &,
-  .dark & {
-    color: rgba(100, 116, 139, 1);
-  }
-}
-
-.text-slate-600 {
-  color: rgba(71, 85, 105, 1);
-
-  :host-context(.dark) &,
-  .dark & {
-    color: rgba(148, 163, 184, 1);
-  }
-}
-
-.text-slate-800 {
-  color: rgba(30, 41, 59, 1);
-
-  :host-context(.dark) &,
-  .dark & {
-    color: rgba(255, 255, 255, 1);
-  }
-}
-
-.text-slate-300 {
-  color: rgba(203, 213, 225, 1);
-}
-
-.text-green-400 {
-  color: rgba(74, 222, 128, 1);
-}
-
-.text-green-500 {
-  color: rgba(34, 197, 94, 1);
-}
-
-.text-green-600 {
-  color: rgba(22, 163, 74, 1);
-
-  :host-context(.dark) &,
-  .dark & {
-    color: rgba(74, 222, 128, 1);
-  }
-}
-
-.text-primary {
-  color: var(--about-primary-color);
-}
-
-.text-secondary {
-  color: var(--about-secondary-color);
-}
-
-// Background colors
-.bg-red-400 {
-  background-color: rgba(248, 113, 113, 1);
-}
-
-.bg-yellow-400 {
-  background-color: rgba(250, 204, 21, 1);
-}
-
-.bg-green-500 {
-  background-color: rgba(34, 197, 94, 1);
-}
-
-.bg-slate-100 {
-  background-color: rgba(241, 245, 249, 1);
-
-  :host-context(.dark) &,
-  .dark & {
-    background-color: rgba(30, 41, 59, 1);
-  }
-}
-
-.bg-slate-400 {
-  background-color: rgba(148, 163, 184, 1);
-
-  :host-context(.dark) &,
-  .dark & {
-    background-color: rgba(71, 85, 105, 1);
-  }
-}
-
-.bg-slate-600 {
-  background-color: rgba(71, 85, 105, 1);
-}
-
-// Gradient backgrounds
-.bg-gradient-primary {
-  background: linear-gradient(to bottom right, var(--about-gradient-start), var(--about-gradient-end));
-}
-
-.bg-gradient-primary-light {
-  background: linear-gradient(to bottom right, rgba(242, 159, 103, 0.2), rgba(136, 51, 204, 0.2));
-}
+// Color utilities - removed unused classes (keeping .dark for nested selectors)
 
 // ============================================
 // Sizing Utilities
 // ============================================
 
-.w-full {
-  width: 100%;
-}
-
-.w-2 {
-  width: 0.5rem;
-}
-
-.w-3 {
-  width: 0.75rem;
-}
-
-.w-6 {
-  width: 1.5rem;
-}
-
-.w-9 {
-  width: 2.25rem;
-}
-
-.w-10 {
-  width: 2.5rem;
-}
-
-.w-24 {
-  width: 6rem;
-}
-
-.h-2 {
-  height: 0.5rem;
-}
-
-.h-3 {
-  height: 0.75rem;
-}
-
-.h-5 {
-  height: 1.25rem;
-}
-
-.h-6 {
-  height: 1.5rem;
-}
-
-.h-9 {
-  height: 2.25rem;
-}
-
-.h-10 {
-  height: 2.5rem;
-}
-
-.h-24 {
-  height: 6rem;
-}
-
-.h-full {
-  height: 100%;
-}
-
-.min-h-screen {
-  min-height: 100vh;
-}
-
-.min-h-0 {
-  min-height: 0;
-}
-
-.max-h-full {
-  max-height: 100%;
-}
+// Sizing utilities - removed unused classes (keeping media query variants)
 
 @media (min-width: $breakpoint-md) {
   .md\:w-28 {
@@ -1540,124 +1044,19 @@ $branch-merge-bg-dark: #831843; // pink-900
 // Border Utilities
 // ============================================
 
-.border-4 {
-  border-width: 4px;
-}
-
-.border-white {
-  border-color: rgba(255, 255, 255, 1);
-
-  :host-context(.dark) &,
-  .dark & {
-    border-color: rgba(15, 23, 42, 1);
-  }
-}
-
-.border-slate-300 {
-  border-color: rgba(203, 213, 225, 1);
-
-  :host-context(.dark) &,
-  .dark & {
-    border-color: rgba(71, 85, 105, 1);
-  }
-}
-
-.border-slate-600 {
-  border-color: rgba(71, 85, 105, 1);
-}
-
-.border-slate-800 {
-  border-color: rgba(30, 41, 59, 1);
-}
-
-.border-\[3px\] {
-  border-width: 3px;
-}
-
-.border-2 {
-  border-width: 2px;
-}
-
-.border-dashed {
-  border-style: dashed;
-}
+// Border utilities - removed unused classes (border-dashed is used elsewhere)
 
 // ============================================
 // Border Radius Utilities
 // ============================================
 
-.rounded-full {
-  border-radius: 9999px;
-}
-
-.rounded-lg {
-  border-radius: 0.5rem;
-}
-
-.rounded-md {
-  border-radius: 0.375rem;
-}
-
-.rounded-xl {
-  border-radius: 0.75rem;
-}
-
-.rounded {
-  border-radius: 0.25rem;
-}
+// Border radius utilities - removed unused classes
 
 // ============================================
 // Other Utilities
 // ============================================
 
-.z-10 {
-  z-index: 10;
-}
-
-.object-cover {
-  object-fit: cover;
-}
-
-.overflow-hidden {
-  overflow: hidden;
-}
-
-.overflow-y-auto {
-  overflow-y: auto;
-}
-
-.opacity-60 {
-  opacity: 0.6;
-}
-
-.block {
-  display: block;
-}
-
-.left-1\/2 {
-  left: 50%;
-}
-
-.top-0 {
-  top: 0;
-}
-
-.top-5 {
-  top: 1.25rem;
-}
-
-.bottom-0 {
-  bottom: 0;
-}
-
-// Animations
-.animate-bounce {
-  animation: bounce 1s infinite;
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
+// Other utilities - removed unused classes
 
 @keyframes bounce {
   0%, 100% {
@@ -1904,6 +1303,11 @@ $branch-merge-bg-dark: #831843; // pink-900
   display: flex;
   flex-direction: column;
   height: 100%;
+  padding: 0.5rem; // Add padding for mobile
+
+  @media (min-width: $breakpoint-md) {
+    padding: 0; // Remove padding for desktop
+  }
 
   @media (min-width: $breakpoint-lg) {
     max-height: 100%;
@@ -1927,40 +1331,7 @@ $branch-merge-bg-dark: #831843; // pink-900
   }
 }
 
-// Git commit hover effects
-.git-commit {
-  transition: all 0.3s ease;
-
-  &:hover {
-    .git-content {
-      transform: translateX(4px);
-    }
-
-    .git-node {
-      transform: scale(1.15);
-      box-shadow: 0 0 15px rgba(136, 51, 204, 0.4);
-    }
-  }
-
-  &.git-commit-active {
-    .git-node {
-      animation: node-pulse 2s ease-in-out infinite;
-    }
-  }
-}
-
-@keyframes node-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(242, 159, 103, 0.4); }
-  50% { box-shadow: 0 0 0 8px rgba(242, 159, 103, 0); }
-}
-
-.git-content {
-  transition: transform 0.3s ease;
-}
-
-.git-node {
-  transition: all 0.3s ease;
-}
+// Removed unused git-commit hover effects (git-commit, git-commit-active, git-content, git-node not used in HTML)
 
 // Code content container
 .code-content {
@@ -2206,6 +1577,12 @@ $branch-merge-bg-dark: #831843; // pink-900
   text-transform: uppercase;
   letter-spacing: 0.05em;
   white-space: nowrap;
+  color: rgba(71, 85, 105, 1); // slate-600 for light mode visibility
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(255, 255, 255, 1); // Keep white in dark mode
+  }
 
   @media (min-width: $breakpoint-md) {
     font-size: 0.75rem;
@@ -2235,6 +1612,12 @@ $branch-merge-bg-dark: #831843; // pink-900
 
 .skills-section-title {
   margin-bottom: 0.5rem;
+  color: rgba(71, 85, 105, 1); // slate-600 for light mode visibility
+
+  :host-context(.dark) &,
+  .dark & {
+    color: rgba(255, 255, 255, 1); // Keep white in dark mode
+  }
 }
 
 // Education
@@ -2274,7 +1657,11 @@ $branch-merge-bg-dark: #831843; // pink-900
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.5rem;
-  margin-bottom: 0; // Remove margin to reduce gap
+  margin-bottom: 0; // No margin to keep spacing tight
+
+  @media (min-width: $breakpoint-md) {
+    margin-bottom: 0; // Remove margin to reduce gap
+  }
 }
 
 .experience-header-left {
@@ -2286,11 +1673,19 @@ $branch-merge-bg-dark: #831843; // pink-900
 
 .experience-company {
   margin: 0;
-  line-height: 1.125rem; // Tighter line-height to reduce space below
-  display: inline-flex;
+  line-height: 1.25rem; // Reduced line-height for tighter spacing on mobile
+  display: flex;
   align-items: baseline; // Align to baseline so period aligns with bottom of title
   gap: 0.5rem;
   flex-wrap: wrap;
+  margin-bottom: 0; // Remove bottom margin to reduce spacing
+  width: 100%; // Ensure full width so wrapped items align properly
+
+  @media (min-width: $breakpoint-md) {
+    line-height: 1.125rem; // Tighter line-height to reduce space below
+    display: inline-flex; // Use inline-flex for desktop to keep inline behavior
+    width: auto;
+  }
 }
 
 .company-logo {
@@ -2321,24 +1716,37 @@ $branch-merge-bg-dark: #831843; // pink-900
   display: inline; // Inline to appear beside title
   margin: 0;
 
-  // When inside experience-company, add spacing
+  // When inside experience-company, spacing is handled by gap property
+  // No margin-left needed to prevent indentation when wrapping
   .experience-company & {
-    margin-left: 0.5rem;
+    margin-left: 0;
   }
 }
 
 .experience-description {
   margin: 0;
   font-size: 0.8125rem; // Reduced from 0.875rem
-  line-height: 1.375; // Reduced from 1.5
-  margin-bottom: 0.25rem; // Add small bottom margin
+  line-height: 1.5; // Increased line-height for mobile readability
+  margin-top: 0; // No top margin to keep spacing tight
+  margin-bottom: 0.5rem; // Increased bottom margin for mobile spacing
+
+  @media (min-width: $breakpoint-md) {
+    line-height: 1.375; // Reduced from 1.5
+    margin-bottom: 0.25rem; // Add small bottom margin
+  }
 }
 
 .experience-tech-list {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem; // Reduced from 0.375rem
-  margin-top: 0.375rem; // Reduced from 0.75rem
+  margin-top: 0.75rem; // Increased spacing for mobile
+  margin-bottom: 0.5rem; // Add bottom margin to prevent collision
+
+  @media (min-width: $breakpoint-md) {
+    margin-top: 0.375rem; // Reduced from 0.75rem
+    margin-bottom: 0;
+  }
 }
 
 // Initial commit

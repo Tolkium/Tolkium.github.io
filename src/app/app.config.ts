@@ -54,8 +54,9 @@ import {
   heroCodeBracket,
   heroExclamationTriangle,
   heroInformationCircle,
+  heroMapPin,
 } from '@ng-icons/heroicons/outline';
-import { heroCheckCircleSolid } from '@ng-icons/heroicons/solid';
+import { heroCheckCircleSolid, heroMapPinSolid } from '@ng-icons/heroicons/solid';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -116,6 +117,8 @@ export const appConfig: ApplicationConfig = {
       heroCodeBracket,
       heroExclamationTriangle,
       heroInformationCircle,
+      heroMapPin,
+      heroMapPinSolid,
       heroCheckCircleSolid,
     })
   ],

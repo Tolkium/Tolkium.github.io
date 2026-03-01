@@ -1,80 +1,173 @@
-<div class="design-viewer">
-  <!-- Design selector bar -->
-  @if (hasDesigns()) {
-    <header class="design-bar">
-      <span class="design-bar-label">Designs</span>
-      <nav class="design-tabs" role="tablist">
-        @for (design of designs(); track design.url; let i = $index) {
-          <button
-            type="button"
-            role="tab"
-            [attr.aria-selected]="currentIndex() === i"
-            [class.active]="currentIndex() === i"
-            (click)="selectDesign(i)"
-            class="design-tab"
-          >
-            {{ design.name }}
-          </button>
-        }
-      </nav>
-    </header>
-  }
-
-  <!-- Empty state when no designs in URL -->
-  @if (!hasDesigns()) {
-    <div class="empty-state">
-      <h1 class="empty-title">Design Viewer</h1>
-      <p class="empty-desc">
-        Add design names and URLs in the address bar to compare them in mobile and desktop view.
-      </p>
-      <p class="empty-format">
-        <strong>Format:</strong> <code>?designs=Name1|https://site1.com;Name2|https://site2.com</code>
-      </p>
-      <p class="empty-example">
-        Example: <code>?designs=Version%20A|https://example.com/a;Version%20B|https://example.com/b</code>
-      </p>
-      <div class="empty-preset">
-        <span class="empty-preset-label">Try preview:</span>
-        <button type="button" class="empty-preset-btn" (click)="openExamplePreview()">
-          Google.sk + AutoSCELEM
-        </button>
-      </div>
-    </div>
-  }
-
-  <!-- Mobile + Desktop viewports -->
-  @if (hasDesigns() && currentSafeUrl(); as safeUrl) {
-    <main class="viewports">
-      <!-- Mobile phone frame -->
-      <section class="device-frame phone-frame" aria-label="Mobile view">
-        <div class="device-chassis phone-chassis">
-          <div class="phone-notch"></div>
-          <div class="device-screen phone-screen">
-            <iframe
-              [src]="safeUrl"
-              class="viewport-iframe"
-              title="Mobile preview"
-            ></iframe>
-          </div>
+<div class="design-viewer relative z-10 min-h-screen">
+  <div class="container mx-auto px-4 py-4 max-w-[1800px]">
+    <!-- Single window: Design Viewer with all content inside -->
+    <header class="design-viewer-window bg-white/50 dark:bg-slate-800/50 backdrop-blur-[10px] rounded-xl border border-slate-200/50 dark:border-slate-700/50 shadow-lg overflow-hidden">
+      <div class="terminal-bar flex items-center gap-3 px-4 py-3 bg-slate-100/50 dark:bg-slate-900/30 border-b border-slate-200/50 dark:border-slate-700/50">
+        <div class="flex gap-2">
+          <span class="w-3 h-3 rounded-full bg-red-400"></span>
+          <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
+          <span class="w-3 h-3 rounded-full bg-green-400"></span>
         </div>
-      </section>
+        <span class="flex-1 text-center text-xs font-mono text-slate-500 dark:text-slate-400">design-viewer</span>
+      </div>
+      <div class="terminal-content p-4 pb-6">
+        <h1 class="text-2xl font-bold font-outfit text-slate-800 dark:text-white">
+          <span class="text-[#f29f67] dark:text-[#8833cc]">&gt;</span> Design Viewer
+        </h1>
+        <p class="text-slate-600 dark:text-slate-400 text-sm mt-1 mb-6">
+          Compare designs in mobile and desktop view. Add designs via the link generator below.
+        </p>
 
-      <!-- Laptop frame -->
-      <section class="device-frame laptop-frame" aria-label="Desktop view">
-        <div class="device-chassis laptop-chassis">
-          <div class="laptop-lid">
-            <div class="laptop-camera"></div>
-            <div class="device-screen laptop-screen">
-              <iframe
-                [src]="safeUrl"
-                class="viewport-iframe"
-                title="Desktop preview"
-              ></iframe>
+        <!-- Version bar (only when designs from URL) -->
+        @if (hasDesigns()) {
+          <nav class="version-bar mb-6 flex flex-wrap gap-2 p-3 rounded-xl bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50">
+            @for (design of designs(); track design.url + design.name; let i = $index) {
+              <button
+                type="button"
+                (click)="setCurrentIndex(i)"
+                class="version-pill px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                [class.version-pill--active]="isCurrentIndex(i)"
+                [class.version-pill--inactive]="!isCurrentIndex(i)"
+              >
+                {{ design.name }}
+              </button>
+            }
+          </nav>
+        }
+
+        <!-- Empty state when no designs in URL -->
+        @if (!hasDesigns()) {
+          <div class="empty-state mb-6 p-8 rounded-xl bg-slate-100/50 dark:bg-slate-700/30 border border-slate-200/50 dark:border-slate-600/50 text-center">
+            <p class="text-slate-600 dark:text-slate-400">
+              No designs in URL. Use the <strong>Link generator</strong> at the bottom to add pages and generate a shareable link.
+            </p>
+          </div>
+        }
+
+        <!-- Viewports: mobile + laptop -->
+        @if (hasDesigns() && currentUrl(); as url) {
+          <div class="viewports flex flex-col lg:flex-row gap-8 justify-center items-start mb-16">
+            <!-- Mobile frame -->
+            <div class="mobile-frame-wrapper shrink-0">
+              <div class="phone-frame" aria-label="Mobile preview">
+                <div class="phone-screen">
+                  <div class="phone-status-bar">
+                    <span class="phone-status-time">{{ currentTime() }}</span>
+                    <div class="phone-status-battery" aria-hidden="true">
+                      <span class="phone-battery-level"></span>
+                      <span class="phone-battery-cap"></span>
+                    </div>
+                  </div>
+                  <div class="phone-iframe-wrap">
+                    <iframe
+                      [src]="url | trustedUrl"
+                      title="Mobile view"
+                      class="phone-iframe"
+                      loading="lazy"
+                    ></iframe>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Laptop frame -->
+            <div class="laptop-frame-wrapper shrink-0">
+              <div class="laptop-frame" aria-label="Desktop preview">
+                <div class="laptop-screen">
+                  <div class="laptop-screen-inner">
+                    <div class="laptop-iframe-wrap">
+                      <iframe
+                        [src]="url | trustedUrl"
+                        title="Desktop view"
+                        class="laptop-iframe"
+                        loading="lazy"
+                      ></iframe>
+                    </div>
+                  </div>
+                </div>
+                <div class="laptop-base"></div>
+              </div>
             </div>
           </div>
-          <div class="laptop-base"></div>
-        </div>
-      </section>
-    </main>
-  }
+        }
+
+        <!-- Link generator (collapsed by default) -->
+        <section class="link-generator mt-10 rounded-xl overflow-hidden border border-slate-200/50 dark:border-slate-700/50 bg-slate-100/50 dark:bg-slate-700/30">
+          <button
+            type="button"
+            (click)="toggleLinkGenerator()"
+            class="link-generator-toggle w-full flex items-center justify-between px-5 py-4 text-left font-semibold text-slate-800 dark:text-white hover:bg-slate-200/50 dark:hover:bg-slate-600/30 transition-colors"
+          >
+            <span>Link generator</span>
+            <span class="transition-transform duration-200" [class.rotate-180]="linkGeneratorOpen()">▼</span>
+          </button>
+          @if (linkGeneratorOpen()) {
+            <div class="link-generator-content p-5 space-y-4 border-t border-slate-200/50 dark:border-slate-700/50">
+              <p class="text-sm text-slate-600 dark:text-slate-400">
+                Add design name and URL. Then generate a link to open this page with all designs in the bar.
+              </p>
+              <div class="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="text"
+                  [ngModel]="builderName()"
+                  (ngModelChange)="builderName.set($event)"
+                  placeholder="Design name (e.g. Version A)"
+                  class="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 placeholder-slate-400"
+                />
+                <input
+                  type="url"
+                  [ngModel]="builderUrl()"
+                  (ngModelChange)="builderUrl.set($event)"
+                  placeholder="https://example.com/design"
+                  class="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 placeholder-slate-400"
+                />
+                <button
+                  type="button"
+                  (click)="addBuilderEntry()"
+                  class="px-4 py-2 rounded-lg bg-[#f29f67] dark:bg-[#8833cc] text-white font-medium hover:opacity-90 transition-opacity"
+                >
+                  Add
+                </button>
+              </div>
+              @if (builderEntries().length > 0) {
+                <ul class="space-y-2">
+                  @for (entry of builderEntries(); track entry.url + entry.name; let i = $index) {
+                    <li class="flex items-center gap-2 py-2 px-3 rounded-lg bg-white/80 dark:bg-slate-700/50">
+                      <span class="font-medium text-slate-800 dark:text-slate-200">{{ entry.name }}</span>
+                      <span class="truncate text-sm text-slate-500 dark:text-slate-400 flex-1 min-w-0">{{ entry.url }}</span>
+                      <button
+                        type="button"
+                        (click)="removeBuilderEntry(i)"
+                        class="shrink-0 text-red-600 dark:text-red-400 hover:underline"
+                        aria-label="Remove"
+                      >
+                        Remove
+                      </button>
+                    </li>
+                  }
+                </ul>
+                <div class="flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    (click)="generateAndCopyLink()"
+                    class="px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition-colors"
+                  >
+                    {{ linkCopied() ? 'Copied!' : 'Generate & copy link' }}
+                  </button>
+                  @if (generatedLink()) {
+                    <input
+                      type="text"
+                      [value]="generatedLink()"
+                      readonly
+                      class="flex-1 min-w-[200px] px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm"
+                    />
+                  }
+                </div>
+              }
+            </div>
+          }
+        </section>
+      </div>
+    </header>
+  </div>
 </div>

@@ -76,7 +76,7 @@ export const MENU_SECTIONS: MenuSection[] = [
         route: '/snippet-vault'
       },
       {
-        iconName: 'heroComputerDesktop',
+        iconName: 'heroDevicePhoneMobile',
         label: 'Design Viewer',
         route: '/design-viewer'
       },

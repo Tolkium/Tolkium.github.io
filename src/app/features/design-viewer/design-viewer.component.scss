@@ -1,244 +1,413 @@
-:host {
-  display: block;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-}
-
 .design-viewer {
-  padding: 1rem;
-  min-height: 100vh;
+  padding-bottom: 2rem;
+  overflow-x: hidden;
 }
 
-// ----- Design bar -----
-.design-bar {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  padding: 0.75rem 1rem;
-  margin-bottom: 1.5rem;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  backdrop-filter: blur(8px);
+.design-viewer-window {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
-.design-bar-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: rgba(255, 255, 255, 0.5);
+.design-viewer-window .terminal-content {
+  overflow-x: hidden;
 }
 
-.design-tabs {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.design-tab {
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
-}
-
-.design-tab:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-}
-
-.design-tab.active {
-  background: #f29f67;
-  border-color: #f29f67;
-  color: #1e293b;
-  box-shadow: 0 0 0 2px rgba(242, 159, 103, 0.3);
-}
-
-// ----- Empty state -----
-.empty-state {
-  max-width: 36rem;
-  margin: 4rem auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-.empty-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 0.75rem;
-}
-
-.empty-desc,
-.empty-format,
-.empty-example {
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  margin-bottom: 1rem;
-}
-
-.empty-state code {
-  display: inline-block;
-  padding: 0.2em 0.5em;
-  font-size: 0.85em;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 6px;
-  word-break: break-all;
-  color: #f29f67;
-}
-
-.empty-preset {
-  margin-top: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.empty-preset-label {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.empty-preset-btn {
-  padding: 0.6rem 1.25rem;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: #1e293b;
-  background: #f29f67;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
-}
-
-.empty-preset-btn:hover {
-  background: #f5b080;
-  transform: translateY(-1px);
-}
-
-// ----- Viewports (mobile + laptop) -----
-.viewports {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 2rem;
-  align-items: start;
-  justify-content: center;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-@media (max-width: 900px) {
-  .viewports {
-    grid-template-columns: 1fr;
-    justify-items: center;
+.version-bar {
+  .version-pill {
+    &--active {
+      background: var(--color-primary);
+      color: white;
+      box-shadow: 0 2px 8px rgba(242, 159, 103, 0.35);
+    }
+    .dark &--active {
+      background: var(--color-dark-primary);
+      box-shadow: 0 2px 8px rgba(136, 51, 204, 0.35);
+    }
+    &--inactive {
+      background: rgba(148, 163, 184, 0.3);
+      color: var(--color-text-light);
+    }
+    .dark &--inactive {
+      background: rgba(71, 85, 105, 0.5);
+      color: var(--color-text-dark);
+    }
+    &--inactive:hover {
+      background: rgba(148, 163, 184, 0.5);
+    }
+    .dark &--inactive:hover {
+      background: rgba(71, 85, 105, 0.7);
+    }
   }
 }
 
-// ----- Phone frame -----
-.phone-frame {
+.viewports {
+  min-height: 320px;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+// —— Mobile phone frame ——
+.mobile-frame-wrapper {
   display: flex;
   justify-content: center;
 }
 
-.phone-chassis {
-  width: 320px;
-  min-height: 640px;
-  background: #0f172a;
-  border-radius: 2.5rem;
-  padding: 12px;
+.phone-frame {
+  --phone-width: 390px;
+  --phone-height: 785px;
+  --phone-radius: 2.5rem;
+  --phone-bezel: 12px;
+  --notch-height: 28px;
+  --notch-width: 120px;
+
+  width: calc(var(--phone-width) + var(--phone-bezel) * 2);
+  height: calc(var(--phone-height) + var(--phone-bezel) * 2 + 3px);
+  padding: var(--phone-bezel);
+  background: linear-gradient(145deg, #e5e7eb 0%, #d1d5db 50%, #9ca3af 100%);
+  border-radius: calc(var(--phone-radius) + var(--phone-bezel));
   box-shadow:
-    0 0 0 3px #334155,
-    0 0 0 6px #1e293b,
-    0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    inset 0 0 0 2px rgba(255, 255, 255, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 20px 60px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(0, 0, 0, 0.08);
+  position: relative;
 }
 
-.phone-notch {
-  height: 28px;
-  margin: 0 auto 8px;
-  width: 120px;
-  background: #0f172a;
-  border-radius: 0 0 20px 20px;
+:host-context(html.dark) .phone-frame {
+  background: linear-gradient(145deg, #4b5563 0%, #374151 40%, #1f2937 100%);
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.18),
+    0 0 0 1px rgba(148, 163, 184, 0.35),
+    0 24px 48px rgba(0, 0, 0, 0.6),
+    0 12px 24px rgba(0, 0, 0, 0.5);
 }
 
 .phone-screen {
-  width: 100%;
-  height: 600px;
-  border-radius: 1.25rem;
+  width: var(--phone-width);
+  height: var(--phone-height);
+  background: #000;
+  border-radius: var(--phone-radius);
   overflow: hidden;
-  background: #fff;
+  position: relative;
+  box-shadow: inset 0 0 0 3px #374151, 0 0 0 1px rgba(0, 0, 0, 0.06);
 }
 
-// ----- Laptop frame -----
-.laptop-frame {
+:host-context(html.dark) .phone-screen {
+  box-shadow: inset 0 0 0 3px #334155, 0 0 0 1px rgba(148, 163, 184, 0.25);
+}
+
+.phone-screen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--notch-width);
+  height: var(--notch-height);
+  background: #000;
+  border-radius: 0 0 1rem 1rem;
+  z-index: 2;
+  pointer-events: none;
+}
+
+// Status bar (time + battery) on top of mobile screen
+.phone-status-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--notch-height) + 8px);
+  padding: 6px 28px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(90, 100, 130, 0.45);
+  z-index: 3;
+  pointer-events: none;
+  border-radius: var(--phone-radius) var(--phone-radius) 0 0;
+}
+
+:host-context(html:not(.dark)) .phone-status-bar {
+  background: rgba(220, 220, 230, 0.65);
+}
+
+.phone-status-time {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+
+:host-context(html:not(.dark)) .phone-status-time {
+  color: #1f2937;
+}
+
+.phone-status-battery {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.phone-battery-level {
+  width: 22px;
+  height: 10px;
+  border: 1.5px solid #fff;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #34c759 0%, #34c759 85%, transparent 85%);
+  box-sizing: border-box;
+}
+
+:host-context(html:not(.dark)) .phone-battery-level {
+  border-color: #374151;
+  background: linear-gradient(90deg, #34c759 0%, #34c759 85%, transparent 85%);
+}
+
+.phone-battery-cap {
+  width: 2px;
+  height: 4px;
+  background: #fff;
+  border-radius: 0 1px 1px 0;
+  margin-left: -1px;
+}
+
+:host-context(html:not(.dark)) .phone-battery-cap {
+  background: #374151;
+}
+
+// Embedded site gets fixed viewport width, then scaled to fit (smaller value = bigger content in frame)
+$phone-logical-width: 370px;
+
+.phone-iframe-wrap {
+  --phone-content-height: calc(var(--phone-height) - var(--notch-height) - 8px);
+  position: absolute;
+  top: calc(var(--notch-height) + 8px);
+  left: 0;
+  width: var(--phone-width);
+  height: var(--phone-content-height);
+  overflow: hidden;
+  border-radius: 0 0 var(--phone-radius) var(--phone-radius);
+  z-index: 1;
+}
+
+.phone-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: $phone-logical-width;
+  height: calc(var(--phone-content-height) * #{$phone-logical-width} / var(--phone-width));
+  border: none;
+  display: block;
+  background: #fff;
+  transform-origin: 0 0;
+  transform: scale(calc(var(--phone-width) / #{$phone-logical-width}));
+}
+
+// —— Laptop frame (16:9). Content is scaled so it looks like 2K 16:9 — smaller inside the window ——
+.laptop-frame-wrapper {
   display: flex;
   justify-content: center;
-  min-width: 0;
 }
 
-.laptop-chassis {
-  width: 100%;
-  max-width: 900px;
-}
+.laptop-frame {
+  --screen-width: 960px;
+  --screen-height: 540px; /* 16:9 to match content, no black bars */
+  --bezel: 14px;
+  --base-height: 24px;
+  // 2K logical size: iframe renders at this, then scaled down so content appears smaller
+  --content-width: 2560px;
+  --content-height: 1440px;
 
-.laptop-lid {
-  background: linear-gradient(160deg, #334155 0%, #1e293b 100%);
-  border: 3px solid #475569;
-  border-bottom: none;
-  border-radius: 12px 12px 0 0;
-  padding: 12px 12px 10px;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
-}
-
-.laptop-camera {
-  width: 10px;
-  height: 10px;
-  margin: 0 auto 8px;
-  background: #0f172a;
-  border-radius: 50%;
+  width: calc(var(--screen-width) + var(--bezel) * 2);
+  position: relative;
 }
 
 .laptop-screen {
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  min-height: 400px;
-  max-height: min(60vh, 550px);
-  border-radius: 6px;
+  width: calc(var(--screen-width) + var(--bezel) * 2);
+  height: calc(var(--screen-height) + var(--bezel) * 2);
+  padding: var(--bezel);
+  background: linear-gradient(180deg, #e5e7eb 0%, #d1d5db 15%, #9ca3af 100%);
+  border-radius: 8px 8px 0 0;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 0 0 1px rgba(0, 0, 0, 0.08),
+    0 10px 40px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+:host-context(html.dark) .laptop-screen {
+  background: linear-gradient(180deg, #4b5563 0%, #374151 20%, #1f2937 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+    0 0 0 1px rgba(148, 163, 184, 0.3),
+    0 12px 40px rgba(0, 0, 0, 0.6),
+    0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.laptop-screen::before {
+  content: '';
+  position: absolute;
+  top: var(--bezel);
+  left: var(--bezel);
+  right: var(--bezel);
+  bottom: var(--bezel);
+  background: #000;
+  border-radius: 4px;
+  z-index: 0;
+}
+
+.laptop-screen-inner {
+  position: relative;
+  z-index: 1;
+  width: var(--screen-width);
+  height: var(--screen-height);
   overflow: hidden;
+  border-radius: 2px;
+  background: #1c1917;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Wrapper matches 16:9 viewport; content fills with no black bars
+.laptop-iframe-wrap {
+  width: var(--screen-width);
+  height: var(--screen-height);
+  overflow: hidden;
+  border-radius: 2px;
   background: #fff;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.laptop-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--content-width);
+  height: var(--content-height);
+  border: none;
+  background: #fff;
+  transform-origin: 0 0;
+  transform: scale(calc(var(--screen-width) / var(--content-width)));
 }
 
 .laptop-base {
-  height: 20px;
-  background: linear-gradient(180deg, #475569 0%, #334155 100%);
-  border: 3px solid #475569;
-  border-top: none;
+  height: var(--base-height);
+  margin: 0 calc(var(--bezel) * -0.5);
+  background: linear-gradient(180deg, #d1d5db 0%, #9ca3af 50%, #6b7280 100%);
   border-radius: 0 0 12px 12px;
-  margin: 0 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-}
-
-// ----- Shared device screen + iframe -----
-.device-screen {
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.5),
+    0 4px 0 #6b7280,
+    0 8px 20px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(0, 0, 0, 0.06);
   position: relative;
-  width: 100%;
-  height: 100%;
 }
 
-.viewport-iframe {
+:host-context(html.dark) .laptop-base {
+  background: linear-gradient(180deg, #4b5563 0%, #374151 50%, #1f2937 100%);
+  box-shadow:
+    0 4px 0 #0f172a,
+    0 0 0 1px rgba(148, 163, 184, 0.3),
+    0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.laptop-base::after {
+  content: '';
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
-  display: block;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: #4b5563;
+  border-radius: 2px;
+}
+
+// Responsive: stack earlier and shrink to fit narrow screens
+@media (max-width: 1200px) {
+  .viewports {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .phone-frame {
+    --phone-width: 360px;
+    --phone-height: 720px;
+  }
+
+  .laptop-frame {
+    --screen-width: 640px;
+    --screen-height: 360px;
+    --bezel: 10px;
+    --base-height: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .phone-frame {
+    --phone-width: 320px;
+    --phone-height: 640px;
+  }
+
+  .laptop-frame {
+    --screen-width: 520px;
+    --screen-height: 293px;
+    --bezel: 10px;
+    --base-height: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .phone-frame {
+    --phone-width: 260px;
+    --phone-height: 520px;
+    --phone-bezel: 8px;
+  }
+
+  .laptop-frame {
+    --screen-width: 300px;
+    --screen-height: 169px;
+    --bezel: 8px;
+    --base-height: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .phone-frame {
+    --phone-width: 220px;
+    --phone-height: 440px;
+    --phone-bezel: 6px;
+  }
+
+  .laptop-frame {
+    --screen-width: 260px;
+    --screen-height: 146px;
+    --bezel: 6px;
+    --base-height: 12px;
+  }
+}
+
+// Actual mobile viewport: smaller mockups so they're not zoomed / cramped
+@media (max-width: 400px) {
+  .phone-frame {
+    --phone-width: 200px;
+    --phone-height: 400px;
+    --phone-bezel: 6px;
+    --phone-radius: 1.75rem;
+  }
+
+  .laptop-frame {
+    --screen-width: 220px;
+    --screen-height: 124px;
+    --bezel: 5px;
+    --base-height: 10px;
+  }
+}
+
+.link-generator-toggle span:last-child {
+  font-size: 0.75rem;
 }

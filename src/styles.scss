@@ -123,3 +123,31 @@ html.scrollbar-hidden .main-content::-webkit-scrollbar {
   height: 0 !important;
   display: none !important;
 }
+
+/* Design viewer: make phone and laptop frames more visible in dark mode (global so they always apply) */
+html.dark app-design-viewer .phone-frame {
+  background: linear-gradient(145deg, #4b5563 0%, #374151 40%, #1f2937 100%) !important;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.18),
+    0 0 0 1px rgba(148, 163, 184, 0.35),
+    0 24px 48px rgba(0, 0, 0, 0.6),
+    0 12px 24px rgba(0, 0, 0, 0.5) !important;
+}
+html.dark app-design-viewer .phone-screen {
+  box-shadow: inset 0 0 0 3px #334155, 0 0 0 1px rgba(148, 163, 184, 0.25) !important;
+}
+html.dark app-design-viewer .laptop-screen {
+  background: linear-gradient(180deg, #4b5563 0%, #374151 20%, #1f2937 100%) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+    0 0 0 1px rgba(148, 163, 184, 0.3),
+    0 12px 40px rgba(0, 0, 0, 0.6),
+    0 6px 20px rgba(0, 0, 0, 0.5) !important;
+}
+html.dark app-design-viewer .laptop-base {
+  background: linear-gradient(180deg, #4b5563 0%, #374151 50%, #1f2937 100%) !important;
+  box-shadow:
+    0 4px 0 #0f172a,
+    0 0 0 1px rgba(148, 163, 184, 0.3),
+    0 8px 24px rgba(0, 0, 0, 0.6) !important;
+}

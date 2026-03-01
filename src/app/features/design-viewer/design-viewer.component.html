@@ -32,16 +32,6 @@
                 {{ design.name }}
               </button>
             }
-            @if (currentUrl(); as url) {
-              <a
-                [href]="url"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="open-website-btn ml-auto px-4 py-2 rounded-lg font-medium transition-all duration-200 bg-slate-200/80 dark:bg-slate-600/80 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-500/80 shrink-0"
-              >
-                Open Website
-              </a>
-            }
           </nav>
         }
 
@@ -56,7 +46,7 @@
 
         <!-- Viewports: mobile + laptop -->
         @if (hasDesigns() && currentUrl(); as url) {
-          <div class="viewports flex flex-col lg:flex-row gap-8 justify-center items-start mb-16">
+          <div class="viewports flex flex-col lg:flex-row gap-8 justify-center items-start mb-6">
             <!-- Mobile frame -->
             <div class="mobile-frame-wrapper shrink-0">
               <div class="phone-frame" aria-label="Mobile preview">
@@ -99,10 +89,22 @@
               </div>
             </div>
           </div>
+
+          <!-- Open Website: fills space under viewports, above link generator -->
+          <div class="open-website-bar w-full flex justify-center items-center py-4">
+            <a
+              [href]="url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="open-website-btn w-full max-w-2xl py-3 px-6 rounded-xl font-semibold text-center text-white bg-[#f29f67] dark:bg-[#8833cc] hover:opacity-90 transition-opacity shadow-md"
+            >
+              Open Website
+            </a>
+          </div>
         }
 
         <!-- Link generator (collapsed by default) -->
-        <section class="link-generator mt-10 rounded-xl overflow-hidden border border-slate-200/50 dark:border-slate-700/50 bg-slate-100/50 dark:bg-slate-700/30">
+        <section class="link-generator mt-6 rounded-xl overflow-hidden border border-slate-200/50 dark:border-slate-700/50 bg-slate-100/50 dark:bg-slate-700/30">
           <button
             type="button"
             (click)="toggleLinkGenerator()"

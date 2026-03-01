@@ -47,6 +47,17 @@
   margin-right: auto;
 }
 
+.open-website-bar {
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
+
+  @media (min-width: 1024px) {
+    .open-website-btn {
+      max-width: none;
+    }
+  }
+}
+
 // —— Mobile phone frame ——
 .mobile-frame-wrapper {
   display: flex;

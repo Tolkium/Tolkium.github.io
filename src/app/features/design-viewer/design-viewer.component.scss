@@ -1,0 +1,244 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+}
+
+.design-viewer {
+  padding: 1rem;
+  min-height: 100vh;
+}
+
+// ----- Design bar -----
+.design-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+}
+
+.design-bar-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.design-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.design-tab {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.design-tab:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.design-tab.active {
+  background: #f29f67;
+  border-color: #f29f67;
+  color: #1e293b;
+  box-shadow: 0 0 0 2px rgba(242, 159, 103, 0.3);
+}
+
+// ----- Empty state -----
+.empty-state {
+  max-width: 36rem;
+  margin: 4rem auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.empty-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.75rem;
+}
+
+.empty-desc,
+.empty-format,
+.empty-example {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.empty-state code {
+  display: inline-block;
+  padding: 0.2em 0.5em;
+  font-size: 0.85em;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  word-break: break-all;
+  color: #f29f67;
+}
+
+.empty-preset {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.empty-preset-label {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.empty-preset-btn {
+  padding: 0.6rem 1.25rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1e293b;
+  background: #f29f67;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.empty-preset-btn:hover {
+  background: #f5b080;
+  transform: translateY(-1px);
+}
+
+// ----- Viewports (mobile + laptop) -----
+.viewports {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2rem;
+  align-items: start;
+  justify-content: center;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+  .viewports {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}
+
+// ----- Phone frame -----
+.phone-frame {
+  display: flex;
+  justify-content: center;
+}
+
+.phone-chassis {
+  width: 320px;
+  min-height: 640px;
+  background: #0f172a;
+  border-radius: 2.5rem;
+  padding: 12px;
+  box-shadow:
+    0 0 0 3px #334155,
+    0 0 0 6px #1e293b,
+    0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.phone-notch {
+  height: 28px;
+  margin: 0 auto 8px;
+  width: 120px;
+  background: #0f172a;
+  border-radius: 0 0 20px 20px;
+}
+
+.phone-screen {
+  width: 100%;
+  height: 600px;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  background: #fff;
+}
+
+// ----- Laptop frame -----
+.laptop-frame {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.laptop-chassis {
+  width: 100%;
+  max-width: 900px;
+}
+
+.laptop-lid {
+  background: linear-gradient(160deg, #334155 0%, #1e293b 100%);
+  border: 3px solid #475569;
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  padding: 12px 12px 10px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.laptop-camera {
+  width: 10px;
+  height: 10px;
+  margin: 0 auto 8px;
+  background: #0f172a;
+  border-radius: 50%;
+}
+
+.laptop-screen {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  min-height: 400px;
+  max-height: min(60vh, 550px);
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.laptop-base {
+  height: 20px;
+  background: linear-gradient(180deg, #475569 0%, #334155 100%);
+  border: 3px solid #475569;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  margin: 0 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+// ----- Shared device screen + iframe -----
+.device-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.viewport-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}

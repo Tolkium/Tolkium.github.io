@@ -42,6 +42,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/snippet-vault/snippet-vault.component').then(m => m.SnippetVaultComponent)
   },
+  {
+    path: 'design-viewer',
+    loadComponent: () =>
+      import('./features/design-viewer/design-viewer.component').then(m => m.DesignViewerComponent)
+  },
   // Add other routes as needed
   { path: '**', redirectTo: 'about' }
 ];

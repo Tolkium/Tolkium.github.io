@@ -1,0 +1,80 @@
+<div class="design-viewer">
+  <!-- Design selector bar -->
+  @if (hasDesigns()) {
+    <header class="design-bar">
+      <span class="design-bar-label">Designs</span>
+      <nav class="design-tabs" role="tablist">
+        @for (design of designs(); track design.url; let i = $index) {
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="currentIndex() === i"
+            [class.active]="currentIndex() === i"
+            (click)="selectDesign(i)"
+            class="design-tab"
+          >
+            {{ design.name }}
+          </button>
+        }
+      </nav>
+    </header>
+  }
+
+  <!-- Empty state when no designs in URL -->
+  @if (!hasDesigns()) {
+    <div class="empty-state">
+      <h1 class="empty-title">Design Viewer</h1>
+      <p class="empty-desc">
+        Add design names and URLs in the address bar to compare them in mobile and desktop view.
+      </p>
+      <p class="empty-format">
+        <strong>Format:</strong> <code>?designs=Name1|https://site1.com;Name2|https://site2.com</code>
+      </p>
+      <p class="empty-example">
+        Example: <code>?designs=Version%20A|https://example.com/a;Version%20B|https://example.com/b</code>
+      </p>
+      <div class="empty-preset">
+        <span class="empty-preset-label">Try preview:</span>
+        <button type="button" class="empty-preset-btn" (click)="openExamplePreview()">
+          Google.sk + AutoSCELEM
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Mobile + Desktop viewports -->
+  @if (hasDesigns() && currentSafeUrl(); as safeUrl) {
+    <main class="viewports">
+      <!-- Mobile phone frame -->
+      <section class="device-frame phone-frame" aria-label="Mobile view">
+        <div class="device-chassis phone-chassis">
+          <div class="phone-notch"></div>
+          <div class="device-screen phone-screen">
+            <iframe
+              [src]="safeUrl"
+              class="viewport-iframe"
+              title="Mobile preview"
+            ></iframe>
+          </div>
+        </div>
+      </section>
+
+      <!-- Laptop frame -->
+      <section class="device-frame laptop-frame" aria-label="Desktop view">
+        <div class="device-chassis laptop-chassis">
+          <div class="laptop-lid">
+            <div class="laptop-camera"></div>
+            <div class="device-screen laptop-screen">
+              <iframe
+                [src]="safeUrl"
+                class="viewport-iframe"
+                title="Desktop preview"
+              ></iframe>
+            </div>
+          </div>
+          <div class="laptop-base"></div>
+        </div>
+      </section>
+    </main>
+  }
+</div>

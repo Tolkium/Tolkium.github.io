@@ -76,6 +76,11 @@ export const MENU_SECTIONS: MenuSection[] = [
         route: '/snippet-vault'
       },
       {
+        iconName: 'heroComputerDesktop',
+        label: 'Design Viewer',
+        route: '/design-viewer'
+      },
+      {
         iconName: 'heroDevicePhoneMobile',
         label: 'Local Storage Viewer',
         route: '/SkillMatrix'

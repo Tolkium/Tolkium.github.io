@@ -157,7 +157,7 @@
             <span class="stat-value">{{ metrics()!.dom.listenerCount }}</span>
           </div>
           <div class="stat-item">
-            <span class="stat-label">Active Effects</span>
+            <span class="stat-label">Enabled Effects</span>
             <span class="stat-value">{{ metrics()!.activeEffects }}/3</span>
           </div>
           <div class="stat-item">
@@ -172,9 +172,6 @@
         <div class="metric-section stats-grid angular-stats">
           <div class="stat-item">
             <span class="stat-label">
-              <svg class="tiny-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-              </svg>
               Components
             </span>
             <span class="stat-value angular-highlight">{{ metrics()!.angular.componentCount }}</span>
@@ -184,15 +181,13 @@
             <span class="stat-value angular-highlight">{{ metrics()!.angular.zoneTasksExecuted }}</span>
           </div>
           <div class="stat-item">
-            <span class="stat-label">Events Fired</span>
+            <span class="stat-label">Events Fired (500ms)</span>
             <span class="stat-value angular-highlight">{{ metrics()!.angular.eventListenersTriggered }}</span>
           </div>
-          @if (metrics()!.angular.lastRouteChangeTime > 0) {
-            <div class="stat-item">
-              <span class="stat-label">Route Load</span>
-              <span class="stat-value angular-highlight">{{ metrics()!.angular.lastRouteChangeTime.toFixed(0) }}ms</span>
-            </div>
-          }
+          <div class="stat-item">
+            <span class="stat-label">Route Change Load</span>
+            <span class="stat-value angular-highlight">{{ metrics()!.angular.lastRouteChangeTime.toFixed(0) }}ms</span>
+          </div>
         </div>
       }
 
@@ -215,13 +210,13 @@
         <div class="metric-section stats-grid">
           @if (paintMetrics().fcp) {
             <div class="stat-item">
-              <span class="stat-label">FCP</span>
+              <span class="stat-label">Initial FCP</span>
               <span class="stat-value">{{ (paintMetrics().fcp! / 1000).toFixed(2) }}s</span>
             </div>
           }
           @if (paintMetrics().lcp) {
             <div class="stat-item">
-              <span class="stat-label">LCP</span>
+              <span class="stat-label">Initial LCP</span>
               <span class="stat-value">{{ (paintMetrics().lcp! / 1000).toFixed(2) }}s</span>
             </div>
           }

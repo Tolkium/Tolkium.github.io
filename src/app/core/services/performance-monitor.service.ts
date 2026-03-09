@@ -1,9 +1,9 @@
-import { Injectable, NgZone, inject, PLATFORM_ID, ApplicationRef } from '@angular/core';
+import { Injectable, NgZone, inject, PLATFORM_ID, ApplicationRef, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, NavigationStart, NavigationCancel, NavigationError } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable, BehaviorSubject, interval } from 'rxjs';
-import { map, filter } from 'rxjs/operators';
+import { BehaviorSubject, Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { 
   selectEnableSparkleEffect, 
   selectEnable3DTiltEffect, 
@@ -72,7 +72,7 @@ export interface ChartDataPoint {
 @Injectable({
   providedIn: 'root'
 })
-export class PerformanceMonitorService {
+export class PerformanceMonitorService implements OnDestroy {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly ngZone = inject(NgZone);
   private readonly store = inject(Store);
@@ -99,7 +99,7 @@ export class PerformanceMonitorService {
   private longTaskObserver: PerformanceObserver | null = null;
   private paintMetrics: PaintMetrics = { fcp: null, lcp: null };
   private paintObserver: PerformanceObserver | null = null;
-
+  private lcpObserver: PerformanceObserver | null = null;
   private networkRequestCount = 0;
   private networkTransferredBytes = 0;
   private resourceObserver: PerformanceObserver | null = null;
@@ -113,6 +113,7 @@ export class PerformanceMonitorService {
   private zoneTasksExecuted = 0;
   private eventListenersTriggered = 0;
   private lastRouteChangeTime = 0;
+  private routeNavigationStartTime: number | null = null;
   private cdStartTime = 0;
   private originalTick: any = null;
 
@@ -123,7 +124,33 @@ export class PerformanceMonitorService {
   private busyTime = 0;
   private totalTime = 0;
   private cpuMeasurementInterval: any = null;
-
+  private zoneTaskInterval: any = null;
+  private cpuIdleCallbackId: number | null = null;
+  private isCPUTrackingActive = false;
+  private isMonitoring = false;
+  private readonly destroy$ = new Subject<void>();
+  private readonly subscriptions = new Subscription();
+  private sparkleEnabled = false;
+  private tiltEnabled = false;
+  private holographicEnabled = false;
+  private readonly trackedEventTypes = [
+    'click',
+    'dblclick',
+    'keydown',
+    'keyup',
+    'input',
+    'change',
+    'submit',
+    'pointerdown',
+    'pointerup',
+    'touchstart',
+    'touchend',
+    'wheel',
+    'scroll'
+  ] as const;
+  private readonly globalEventHandler = () => {
+    this.eventListenersTriggered++;
+  };
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
       // Delay initialization slightly to ensure Angular is fully bootstrapped
@@ -135,15 +162,24 @@ export class PerformanceMonitorService {
 
   private initialize(): void {
     // Subscribe to active effects
-    this.store.select(selectEnableSparkleEffect).subscribe(enabled => {
-      this.updateActiveEffects();
-    });
-    this.store.select(selectEnable3DTiltEffect).subscribe(enabled => {
-      this.updateActiveEffects();
-    });
-    this.store.select(selectEnableHolographicEffect).subscribe(enabled => {
-      this.updateActiveEffects();
-    });
+    this.subscriptions.add(
+      this.store.select(selectEnableSparkleEffect).pipe(takeUntil(this.destroy$)).subscribe(enabled => {
+        this.sparkleEnabled = enabled;
+        this.updateActiveEffects();
+      })
+    );
+    this.subscriptions.add(
+      this.store.select(selectEnable3DTiltEffect).pipe(takeUntil(this.destroy$)).subscribe(enabled => {
+        this.tiltEnabled = enabled;
+        this.updateActiveEffects();
+      })
+    );
+    this.subscriptions.add(
+      this.store.select(selectEnableHolographicEffect).pipe(takeUntil(this.destroy$)).subscribe(enabled => {
+        this.holographicEnabled = enabled;
+        this.updateActiveEffects();
+      })
+    );
 
     // Initialize performance observers
     this.initializeLongTaskObserver();
@@ -159,11 +195,8 @@ export class PerformanceMonitorService {
   }
 
   private updateActiveEffects(): void {
-    let count = 0;
-    this.store.select(selectEnableSparkleEffect).subscribe(e => e && count++).unsubscribe();
-    this.store.select(selectEnable3DTiltEffect).subscribe(e => e && count++).unsubscribe();
-    this.store.select(selectEnableHolographicEffect).subscribe(e => e && count++).unsubscribe();
-    this.activeEffectsCount = count;
+    this.activeEffectsCount =
+      Number(this.sparkleEnabled) + Number(this.tiltEnabled) + Number(this.holographicEnabled);
   }
 
   private initializeLongTaskObserver(): void {
@@ -184,7 +217,7 @@ export class PerformanceMonitorService {
       if ('PerformanceObserver' in window) {
         // Observe paint timing
         try {
-          const paintObserver = new PerformanceObserver((list) => {
+          this.paintObserver = new PerformanceObserver((list) => {
             const entries = list.getEntries();
             entries.forEach(entry => {
               if (entry.name === 'first-contentful-paint') {
@@ -192,21 +225,21 @@ export class PerformanceMonitorService {
               }
             });
           });
-          paintObserver.observe({ type: 'paint', buffered: true });
+          this.paintObserver.observe({ type: 'paint', buffered: true });
         } catch (e) {
           console.warn('[PerfMonitor] Paint observer not supported:', e);
         }
 
         // Observe LCP separately
         try {
-          const lcpObserver = new PerformanceObserver((list) => {
+          this.lcpObserver = new PerformanceObserver((list) => {
             const entries = list.getEntries();
             const lastEntry = entries[entries.length - 1];
             if (lastEntry) {
               this.paintMetrics.lcp = lastEntry.startTime;
             }
           });
-          lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+          this.lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
         } catch (e) {
           console.warn('[PerfMonitor] LCP observer not supported:', e);
         }
@@ -239,20 +272,36 @@ export class PerformanceMonitorService {
 
   private initializeAngularTracking(): void {
     // Track route changes
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: any) => {
-      const navEntry = performance.getEntriesByType('navigation')[0] as any;
-      if (navEntry) {
-        this.lastRouteChangeTime = navEntry.duration || 0;
-      }
-    });
+    this.subscriptions.add(
+      this.router.events.pipe(takeUntil(this.destroy$)).subscribe((event) => {
+        if (event instanceof NavigationStart) {
+          this.routeNavigationStartTime = performance.now();
+          this.lastRouteChangeTime = 0;
+          return;
+        }
+
+        if (event instanceof NavigationEnd) {
+          if (this.routeNavigationStartTime !== null) {
+            this.lastRouteChangeTime = performance.now() - this.routeNavigationStartTime;
+            this.routeNavigationStartTime = null;
+          }
+          return;
+        }
+
+        if (event instanceof NavigationCancel || event instanceof NavigationError) {
+          this.routeNavigationStartTime = null;
+        }
+      })
+    );
 
     // Hook into ApplicationRef to track change detection
     this.patchChangeDetection();
 
     // Hook into Zone.js to track tasks
     this.trackZoneTasks();
+
+    // Count user-driven DOM events in capture phase.
+    this.setupEventTracking();
   }
 
   private patchChangeDetection(): void {
@@ -294,30 +343,34 @@ export class PerformanceMonitorService {
       // onStable = change detection completes
       if (this.ngZone) {
         // Capture start time when change detection begins
-        this.ngZone.onUnstable.subscribe(() => {
-          this.cdStartTime = performance.now();
-        });
+        this.subscriptions.add(
+          this.ngZone.onUnstable.pipe(takeUntil(this.destroy$)).subscribe(() => {
+            this.cdStartTime = performance.now();
+          })
+        );
         
         // Capture end time and calculate duration when change detection completes
-        this.ngZone.onStable.subscribe(() => {
-          // On stable is called after change detection completes
-          // This is the most reliable way to track all change detection
-          const cdEnd = performance.now();
-          this.changeDetectionCycles++;
-          
-          // Measure actual change detection duration
-          if (this.cdStartTime > 0) {
-            this.changeDetectionTime = cdEnd - this.cdStartTime;
-            // Cap at reasonable maximum (100ms) to avoid outliers
-            if (this.changeDetectionTime > 100) {
-              this.changeDetectionTime = 100;
+        this.subscriptions.add(
+          this.ngZone.onStable.pipe(takeUntil(this.destroy$)).subscribe(() => {
+            // On stable is called after change detection completes
+            // This is the most reliable way to track all change detection
+            const cdEnd = performance.now();
+            this.changeDetectionCycles++;
+            
+            // Measure actual change detection duration
+            if (this.cdStartTime > 0) {
+              this.changeDetectionTime = cdEnd - this.cdStartTime;
+              // Cap at reasonable maximum (100ms) to avoid outliers
+              if (this.changeDetectionTime > 100) {
+                this.changeDetectionTime = 100;
+              }
+            } else {
+              // Fallback if start time wasn't captured
+              this.changeDetectionTime = 0;
             }
-          } else {
-            // Fallback if start time wasn't captured
-            this.changeDetectionTime = 0;
-          }
-          this.cdStartTime = 0; // Reset for next cycle
-        });
+            this.cdStartTime = 0; // Reset for next cycle
+          })
+        );
       }
     } catch (error) {
       console.warn('[PerfMonitor] Failed to patch change detection:', error);
@@ -340,7 +393,7 @@ export class PerformanceMonitorService {
       const zone = (window as any).Zone;
       if (zone && zone.current) {
         // Estimate zone tasks from zone properties (less invasive)
-        setInterval(() => {
+        this.zoneTaskInterval = setInterval(() => {
           if (zone.current) {
             // This is a rough estimate
             this.zoneTasksExecuted++;
@@ -352,10 +405,26 @@ export class PerformanceMonitorService {
     }
   }
 
+  private setupEventTracking(): void {
+    for (const eventType of this.trackedEventTypes) {
+      window.addEventListener(eventType, this.globalEventHandler, { capture: true, passive: true });
+    }
+  }
+
+  private cleanupEventTracking(): void {
+    for (const eventType of this.trackedEventTypes) {
+      window.removeEventListener(eventType, this.globalEventHandler, true);
+    }
+  }
+
   public startMonitoring(): void {
     if (!isPlatformBrowser(this.platformId)) {
       return;
     }
+    if (this.isMonitoring) {
+      return;
+    }
+    this.isMonitoring = true;
 
     this.ngZone.runOutsideAngular(() => {
       // Start FPS tracking
@@ -375,6 +444,8 @@ export class PerformanceMonitorService {
   }
 
   public stopMonitoring(): void {
+    this.isMonitoring = false;
+
     if (this.animationFrameId !== null) {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
@@ -390,10 +461,27 @@ export class PerformanceMonitorService {
       this.cpuMeasurementInterval = null;
     }
 
+    this.isCPUTrackingActive = false;
+    if (this.cpuIdleCallbackId !== null && 'cancelIdleCallback' in window) {
+      (window as any).cancelIdleCallback(this.cpuIdleCallbackId);
+      this.cpuIdleCallbackId = null;
+    }
+
+    if (this.zoneTaskInterval !== null) {
+      clearInterval(this.zoneTaskInterval);
+      this.zoneTaskInterval = null;
+    }
+    this.cleanupEventTracking();
+
     // Clean up observers
     this.longTaskObserver?.disconnect();
     this.paintObserver?.disconnect();
+    this.lcpObserver?.disconnect();
     this.resourceObserver?.disconnect();
+    this.longTaskObserver = null;
+    this.paintObserver = null;
+    this.lcpObserver = null;
+    this.resourceObserver = null;
 
     // Restore original change detection if patched
     if (this.originalTick) {
@@ -404,6 +492,13 @@ export class PerformanceMonitorService {
 
     // Clean up window reference
     delete (window as any).__perfMonitorService;
+  }
+
+  public ngOnDestroy(): void {
+    this.stopMonitoring();
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.subscriptions.unsubscribe();
   }
 
   private trackFPS(): void {
@@ -432,6 +527,7 @@ export class PerformanceMonitorService {
    */
   private startCPUTracking(): void {
     if (!isPlatformBrowser(this.platformId)) return;
+    this.isCPUTrackingActive = true;
 
     const measurementWindow = 1000; // Measure over 1 second
     let lastMeasurement = performance.now();
@@ -452,8 +548,12 @@ export class PerformanceMonitorService {
 
     // Use requestIdleCallback to detect idle time (when browser is not busy)
     const scheduleIdleMeasurement = () => {
-      if ('requestIdleCallback' in window) {
-        (window as any).requestIdleCallback((deadline: IdleDeadline) => {
+      if (this.isCPUTrackingActive && 'requestIdleCallback' in window) {
+        this.cpuIdleCallbackId = (window as any).requestIdleCallback((deadline: IdleDeadline) => {
+          if (!this.isCPUTrackingActive) {
+            return;
+          }
+
           // Time remaining means we were idle
           const idleTime = deadline.timeRemaining();
           const totalElapsed = performance.now() - measurementStart;
@@ -564,6 +664,8 @@ export class PerformanceMonitorService {
     // Reset counter for next collection interval to track rate
     // This way the chart shows CD cycles per 500ms interval
     this.changeDetectionCycles = 0;
+    // Keep this metric as events fired in the last 500ms window.
+    this.eventListenersTriggered = 0;
 
     this.metricsSubject.next(metrics);
   }
@@ -612,17 +714,18 @@ export class PerformanceMonitorService {
   }
 
   private getAngularMetrics(): AngularMetrics {
-    // Count Angular components by finding elements with Angular-specific attributes
+    // Approximate component instances by counting Angular component host elements.
+    // _ngcontent-* appears on many child nodes and overcounts heavily.
     let componentCount = 0;
     try {
-      // Count all elements and filter for Angular attributes
+      // Count all elements and look for _nghost-* attributes only.
       const allElements = document.querySelectorAll('*');
       for (let i = 0; i < allElements.length; i++) {
         const element = allElements[i];
-        // Check if element has any Angular-specific attributes
+        // _nghost-* marks component host nodes in Angular's emulated encapsulation.
         for (let j = 0; j < element.attributes.length; j++) {
           const attrName = element.attributes[j].name;
-          if (attrName.startsWith('_ngcontent-') || attrName.startsWith('_nghost-') || attrName === 'ng-version') {
+          if (attrName.startsWith('_nghost-')) {
             componentCount++;
             break; // Count each element only once
           }

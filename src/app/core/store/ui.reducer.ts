@@ -2,15 +2,6 @@ import { createReducer, on } from '@ngrx/store';
 import { initialUiState } from './ui.state';
 import * as UiActions from './ui.actions';
 
-// Helper to save numeric values to localStorage
-const saveToStorage = (key: string, value: number | boolean | string): void => {
-  try {
-    localStorage.setItem(key, typeof value === 'number' ? value.toString() : JSON.stringify(value));
-  } catch (e) {
-    console.warn(`[UI] Failed to save ${key} to localStorage:`, e);
-  }
-};
-
 export const uiReducer = createReducer(
   initialUiState,
   on(UiActions.toggleDarkMode, state => ({
@@ -73,293 +64,114 @@ export const uiReducer = createReducer(
     ...state,
     showPerformanceMonitor
   })),
-  on(UiActions.setPerformanceMonitorThemeColor, (state, { themeColor }) => {
-    // Save to localStorage
-    try {
-      localStorage.setItem('performanceMonitorThemeColor', themeColor);
-    } catch (e) {
-      console.warn('[UI] Failed to save theme color to localStorage:', e);
-    }
-    return {
-      ...state,
-      performanceMonitorThemeColor: themeColor
-    };
-  }),
-  on(UiActions.toggleBackgroundAnimation, state => {
-    const newValue = !state.enableBackgroundAnimation;
-    // Save to localStorage
-    try {
-      localStorage.setItem('enableBackgroundAnimation', JSON.stringify(newValue));
-    } catch (e) {
-      console.warn('[UI] Failed to save background animation state to localStorage:', e);
-    }
-    return {
-      ...state,
-      enableBackgroundAnimation: newValue
-    };
-  }),
-  on(UiActions.setBackgroundAnimation, (state, { enableBackgroundAnimation }) => {
-    // Save to localStorage
-    try {
-      localStorage.setItem('enableBackgroundAnimation', JSON.stringify(enableBackgroundAnimation));
-    } catch (e) {
-      console.warn('[UI] Failed to save background animation state to localStorage:', e);
-    }
-    return {
-      ...state,
-      enableBackgroundAnimation
-    };
-  }),
-  // Particle physics reducers
-  on(UiActions.toggleMagneticForce, state => {
-    const newValue = !state.enableMagneticForce;
-    try {
-      localStorage.setItem('enableMagneticForce', JSON.stringify(newValue));
-    } catch (e) {
-      console.warn('[UI] Failed to save magnetic force state to localStorage:', e);
-    }
-    return {
-      ...state,
-      enableMagneticForce: newValue
-    };
-  }),
-  on(UiActions.setMagneticForce, (state, { enableMagneticForce }) => {
-    try {
-      localStorage.setItem('enableMagneticForce', JSON.stringify(enableMagneticForce));
-    } catch (e) {
-      console.warn('[UI] Failed to save magnetic force state to localStorage:', e);
-    }
-    return {
-      ...state,
-      enableMagneticForce
-    };
-  }),
-  on(UiActions.toggleRepulsionForce, state => {
-    const newValue = !state.enableRepulsionForce;
-    try {
-      localStorage.setItem('enableRepulsionForce', JSON.stringify(newValue));
-    } catch (e) {
-      console.warn('[UI] Failed to save repulsion force state to localStorage:', e);
-    }
-    return {
-      ...state,
-      enableRepulsionForce: newValue
-    };
-  }),
-  on(UiActions.setRepulsionForce, (state, { enableRepulsionForce }) => {
-    try {
-      localStorage.setItem('enableRepulsionForce', JSON.stringify(enableRepulsionForce));
-    } catch (e) {
-      console.warn('[UI] Failed to save repulsion force state to localStorage:', e);
-    }
-    return {
-      ...state,
-      enableRepulsionForce
-    };
-  }),
-  on(UiActions.toggleDamping, state => {
-    const newValue = !state.enableDamping;
-    try {
-      localStorage.setItem('enableDamping', JSON.stringify(newValue));
-    } catch (e) {
-      console.warn('[UI] Failed to save damping state to localStorage:', e);
-    }
-    return {
-      ...state,
-      enableDamping: newValue
-    };
-  }),
-  on(UiActions.setDamping, (state, { enableDamping }) => {
-    try {
-      localStorage.setItem('enableDamping', JSON.stringify(enableDamping));
-    } catch (e) {
-      console.warn('[UI] Failed to save damping state to localStorage:', e);
-    }
-    return {
-      ...state,
-      enableDamping
-    };
-  }),
-  on(UiActions.toggleBrownianMotion, state => {
-    const newValue = !state.enableBrownianMotion;
-    try {
-      localStorage.setItem('enableBrownianMotion', JSON.stringify(newValue));
-    } catch (e) {
-      console.warn('[UI] Failed to save Brownian motion state to localStorage:', e);
-    }
-    return {
-      ...state,
-      enableBrownianMotion: newValue
-    };
-  }),
-  on(UiActions.setBrownianMotion, (state, { enableBrownianMotion }) => {
-    try {
-      localStorage.setItem('enableBrownianMotion', JSON.stringify(enableBrownianMotion));
-    } catch (e) {
-      console.warn('[UI] Failed to save Brownian motion state to localStorage:', e);
-    }
-    return {
-      ...state,
-      enableBrownianMotion
-    };
-  }),
-  on(UiActions.toggleClusterBreaking, state => {
-    const newValue = !state.enableClusterBreaking;
-    try {
-      localStorage.setItem('enableClusterBreaking', JSON.stringify(newValue));
-    } catch (e) {
-      console.warn('[UI] Failed to save cluster breaking state to localStorage:', e);
-    }
-    return {
-      ...state,
-      enableClusterBreaking: newValue
-    };
-  }),
-  on(UiActions.setClusterBreaking, (state, { enableClusterBreaking }) => {
-    saveToStorage('enableClusterBreaking', enableClusterBreaking);
-    return { ...state, enableClusterBreaking };
-  }),
-  // Animation configuration reducers
-  on(UiActions.setNumPoints, (state, { value }) => {
-    saveToStorage('numPoints', value);
-    return { ...state, numPoints: value };
-  }),
-  on(UiActions.setConnectionRadius, (state, { value }) => {
-    saveToStorage('connectionRadius', value);
-    return { ...state, connectionRadius: value };
-  }),
-  on(UiActions.setMagneticRadius, (state, { value }) => {
-    saveToStorage('magneticRadius', value);
-    return { ...state, magneticRadius: value };
-  }),
-  on(UiActions.setMagneticStrengthValue, (state, { value }) => {
-    saveToStorage('magneticStrength', value);
-    return { ...state, magneticStrength: value };
-  }),
-  on(UiActions.setMinSpeed, (state, { value }) => {
-    saveToStorage('minSpeed', value);
-    return { ...state, minSpeed: value };
-  }),
-  on(UiActions.setMaxSpeed, (state, { value }) => {
-    saveToStorage('maxSpeed', value);
-    return { ...state, maxSpeed: value };
-  }),
-  on(UiActions.setPointsSize, (state, { value }) => {
-    saveToStorage('pointsSize', value);
-    return { ...state, pointsSize: value };
-  }),
-  on(UiActions.setLineWidth, (state, { value }) => {
-    saveToStorage('lineWidth', value);
-    return { ...state, lineWidth: value };
-  }),
-  on(UiActions.setRepulsionRadiusValue, (state, { value }) => {
-    saveToStorage('repulsionRadius', value);
-    return { ...state, repulsionRadius: value };
-  }),
-  on(UiActions.setRepulsionStrengthValue, (state, { value }) => {
-    saveToStorage('repulsionStrength', value);
-    return { ...state, repulsionStrength: value };
-  }),
-  on(UiActions.setDampingFactorValue, (state, { value }) => {
-    saveToStorage('dampingFactor', value);
-    return { ...state, dampingFactor: value };
-  }),
-  on(UiActions.setBrownianStrengthValue, (state, { value }) => {
-    saveToStorage('brownianStrength', value);
-    return { ...state, brownianStrength: value };
-  }),
-  on(UiActions.setClusterThresholdValue, (state, { value }) => {
-    saveToStorage('clusterThreshold', value);
-    return { ...state, clusterThreshold: value };
-  }),
-  on(UiActions.setExplosionForceValue, (state, { value }) => {
-    saveToStorage('explosionForce', value);
-    return { ...state, explosionForce: value };
-  }),
-  on(UiActions.setClusterCheckIntervalValue, (state, { value }) => {
-    saveToStorage('clusterCheckInterval', value);
-    return { ...state, clusterCheckInterval: value };
-  }),
-  on(UiActions.setMinClusterSizeValue, (state, { value }) => {
-    saveToStorage('minClusterSize', value);
-    return { ...state, minClusterSize: value };
-  }),
-  // Magnetic behavior extensions
-  on(UiActions.setMagneticMode, (state, { mode }) => {
-    try { localStorage.setItem('magneticMode', mode); } catch {}
-    return { ...state, magneticMode: mode };
-  }),
-  on(UiActions.setMagneticMinStrengthValue, (state, { value }) => {
-    saveToStorage('magneticMinStrength', value);
-    return { ...state, magneticMinStrength: value };
-  }),
-  on(UiActions.setMagneticMaxStrengthValue, (state, { value }) => {
-    saveToStorage('magneticMaxStrength', value);
-    return { ...state, magneticMaxStrength: value };
-  }),
-  on(UiActions.setMagneticInverseCoefficientValue, (state, { value }) => {
-    saveToStorage('magneticInverseCoefficient', value);
-    return { ...state, magneticInverseCoefficient: value };
-  }),
-  on(UiActions.setMagneticFluctuationSpeedValue, (state, { value }) => {
-    saveToStorage('magneticFluctuationSpeed', value);
-    return { ...state, magneticFluctuationSpeed: value };
-  }),
-  on(UiActions.togglePolygonStabilizer, state => {
-    const newValue = !state.enablePolygonStabilizer;
-    saveToStorage('enablePolygonStabilizer', newValue);
-    return { ...state, enablePolygonStabilizer: newValue };
-  }),
-  on(UiActions.setPolygonStabilizer, (state, { enablePolygonStabilizer }) => {
-    saveToStorage('enablePolygonStabilizer', enablePolygonStabilizer);
-    return { ...state, enablePolygonStabilizer };
-  }),
-  on(UiActions.setPolygonTargetSpacingValue, (state, { value }) => {
-    saveToStorage('polygonTargetSpacing', value);
-    return { ...state, polygonTargetSpacing: value };
-  }),
-  on(UiActions.setPolygonStrengthValue, (state, { value }) => {
-    saveToStorage('polygonStrength', value);
-    return { ...state, polygonStrength: value };
-  }),
-  // Reset all animation settings
-  on(UiActions.resetAnimationSettings, state => {
-    // Clear all animation-related localStorage items
-    const animKeys = ['numPoints', 'connectionRadius', 'magneticRadius', 'magneticStrength',
-      'minSpeed', 'maxSpeed', 'pointsSize', 'lineWidth', 'repulsionRadius', 'repulsionStrength',
-      'dampingFactor', 'brownianStrength', 'clusterThreshold', 'explosionForce',
-      'clusterCheckInterval', 'minClusterSize',
-      'magneticMinStrength', 'magneticMaxStrength', 'magneticInverseCoefficient', 'magneticFluctuationSpeed',
-      'enablePolygonStabilizer', 'polygonTargetSpacing', 'polygonStrength'];
-    animKeys.forEach(key => {
-      try { localStorage.removeItem(key); } catch { /* ignore */ }
-    });
-    return {
-      ...state,
-      numPoints: 100,
-      connectionRadius: 200,
-      magneticRadius: 100,
-      magneticStrength: 0.0005,
-      minSpeed: 0.25,
-      maxSpeed: 0.6,
-      pointsSize: 5,
-      lineWidth: 5,
-      repulsionRadius: 30,
-      repulsionStrength: 1.2,
-      dampingFactor: 0.95,
-      brownianStrength: 0.02,
-      clusterThreshold: 20,
-      explosionForce: 300,
-      clusterCheckInterval: 180,
-      minClusterSize: 8,
-      // Do not force magneticMode here; keep current choice
-      magneticMinStrength: 0.0001,
-      magneticMaxStrength: 0.003,
-      magneticInverseCoefficient: 1.0,
-      magneticFluctuationSpeed: 7.5, // Period in seconds (5-10 range)
-      enablePolygonStabilizer: true,
-      polygonTargetSpacing: 120,
-      polygonStrength: 0.0008
-    };
-  })
+  on(UiActions.setPerformanceMonitorThemeColor, (state, { themeColor }) => ({
+    ...state,
+    performanceMonitorThemeColor: themeColor
+  })),
+  on(UiActions.toggleBackgroundAnimation, state => ({
+    ...state,
+    enableBackgroundAnimation: !state.enableBackgroundAnimation
+  })),
+  on(UiActions.setBackgroundAnimation, (state, { enableBackgroundAnimation }) => ({
+    ...state,
+    enableBackgroundAnimation
+  })),
+  on(UiActions.toggleMagneticForce, state => ({
+    ...state,
+    enableMagneticForce: !state.enableMagneticForce
+  })),
+  on(UiActions.setMagneticForce, (state, { enableMagneticForce }) => ({
+    ...state,
+    enableMagneticForce
+  })),
+  on(UiActions.toggleRepulsionForce, state => ({
+    ...state,
+    enableRepulsionForce: !state.enableRepulsionForce
+  })),
+  on(UiActions.setRepulsionForce, (state, { enableRepulsionForce }) => ({
+    ...state,
+    enableRepulsionForce
+  })),
+  on(UiActions.toggleDamping, state => ({
+    ...state,
+    enableDamping: !state.enableDamping
+  })),
+  on(UiActions.setDamping, (state, { enableDamping }) => ({
+    ...state,
+    enableDamping
+  })),
+  on(UiActions.toggleBrownianMotion, state => ({
+    ...state,
+    enableBrownianMotion: !state.enableBrownianMotion
+  })),
+  on(UiActions.setBrownianMotion, (state, { enableBrownianMotion }) => ({
+    ...state,
+    enableBrownianMotion
+  })),
+  on(UiActions.toggleClusterBreaking, state => ({
+    ...state,
+    enableClusterBreaking: !state.enableClusterBreaking
+  })),
+  on(UiActions.setClusterBreaking, (state, { enableClusterBreaking }) => ({
+    ...state,
+    enableClusterBreaking
+  })),
+  on(UiActions.setNumPoints, (state, { value }) => ({ ...state, numPoints: value })),
+  on(UiActions.setConnectionRadius, (state, { value }) => ({ ...state, connectionRadius: value })),
+  on(UiActions.setMagneticRadius, (state, { value }) => ({ ...state, magneticRadius: value })),
+  on(UiActions.setMagneticStrengthValue, (state, { value }) => ({ ...state, magneticStrength: value })),
+  on(UiActions.setMinSpeed, (state, { value }) => ({ ...state, minSpeed: value })),
+  on(UiActions.setMaxSpeed, (state, { value }) => ({ ...state, maxSpeed: value })),
+  on(UiActions.setPointsSize, (state, { value }) => ({ ...state, pointsSize: value })),
+  on(UiActions.setLineWidth, (state, { value }) => ({ ...state, lineWidth: value })),
+  on(UiActions.setRepulsionRadiusValue, (state, { value }) => ({ ...state, repulsionRadius: value })),
+  on(UiActions.setRepulsionStrengthValue, (state, { value }) => ({ ...state, repulsionStrength: value })),
+  on(UiActions.setDampingFactorValue, (state, { value }) => ({ ...state, dampingFactor: value })),
+  on(UiActions.setBrownianStrengthValue, (state, { value }) => ({ ...state, brownianStrength: value })),
+  on(UiActions.setClusterThresholdValue, (state, { value }) => ({ ...state, clusterThreshold: value })),
+  on(UiActions.setExplosionForceValue, (state, { value }) => ({ ...state, explosionForce: value })),
+  on(UiActions.setClusterCheckIntervalValue, (state, { value }) => ({ ...state, clusterCheckInterval: value })),
+  on(UiActions.setMinClusterSizeValue, (state, { value }) => ({ ...state, minClusterSize: value })),
+  on(UiActions.setMagneticMode, (state, { mode }) => ({ ...state, magneticMode: mode })),
+  on(UiActions.setMagneticMinStrengthValue, (state, { value }) => ({ ...state, magneticMinStrength: value })),
+  on(UiActions.setMagneticMaxStrengthValue, (state, { value }) => ({ ...state, magneticMaxStrength: value })),
+  on(UiActions.setMagneticInverseCoefficientValue, (state, { value }) => ({ ...state, magneticInverseCoefficient: value })),
+  on(UiActions.setMagneticFluctuationSpeedValue, (state, { value }) => ({ ...state, magneticFluctuationSpeed: value })),
+  on(UiActions.togglePolygonStabilizer, state => ({
+    ...state,
+    enablePolygonStabilizer: !state.enablePolygonStabilizer
+  })),
+  on(UiActions.setPolygonStabilizer, (state, { enablePolygonStabilizer }) => ({
+    ...state,
+    enablePolygonStabilizer
+  })),
+  on(UiActions.setPolygonTargetSpacingValue, (state, { value }) => ({ ...state, polygonTargetSpacing: value })),
+  on(UiActions.setPolygonStrengthValue, (state, { value }) => ({ ...state, polygonStrength: value })),
+  on(UiActions.resetAnimationSettings, state => ({
+    ...state,
+    numPoints: 100,
+    connectionRadius: 200,
+    magneticRadius: 100,
+    magneticStrength: 0.0005,
+    minSpeed: 0.25,
+    maxSpeed: 0.6,
+    pointsSize: 5,
+    lineWidth: 5,
+    repulsionRadius: 30,
+    repulsionStrength: 1.2,
+    dampingFactor: 0.95,
+    brownianStrength: 0.02,
+    clusterThreshold: 20,
+    explosionForce: 300,
+    clusterCheckInterval: 180,
+    minClusterSize: 8,
+    // Do not force magneticMode here; keep current choice
+    magneticMinStrength: 0.0001,
+    magneticMaxStrength: 0.003,
+    magneticInverseCoefficient: 1.0,
+    magneticFluctuationSpeed: 7.5,
+    enablePolygonStabilizer: true,
+    polygonTargetSpacing: 120,
+    polygonStrength: 0.0008
+  }))
 );

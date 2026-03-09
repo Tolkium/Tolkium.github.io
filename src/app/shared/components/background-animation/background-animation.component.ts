@@ -1,64 +1,66 @@
-// components/background-animation.component.ts
 import {
   Component,
   ElementRef,
-  OnInit,
-  OnDestroy,
-  ViewChild,
-  PLATFORM_ID,
   ErrorHandler,
   NgZone,
+  OnDestroy,
+  OnInit,
+  PLATFORM_ID,
+  ViewChild,
   inject
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { fromEvent, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import {
-  Point,
-  RGB,
-  ANIMATION_CONSTANTS
-} from '../../../models/animation.constants';
+import { ANIMATION_CONSTANTS, Point, RGB } from '../../../models/animation.constants';
 import { QuadTree } from '../../../utils/quad-tree';
 import {
+  selectBrownianStrength,
+  selectClusterCheckInterval,
+  selectClusterThreshold,
+  selectConnectionRadius,
+  selectDampingFactor,
   selectEnableBackgroundAnimation,
-  selectEnableMagneticForce,
-  selectEnableRepulsionForce,
-  selectEnableDamping,
   selectEnableBrownianMotion,
   selectEnableClusterBreaking,
-  selectNumPoints,
-  selectConnectionRadius,
+  selectEnableDamping,
+  selectEnableMagneticForce,
+  selectEnablePolygonStabilizer,
+  selectEnableRepulsionForce,
+  selectExplosionForce,
+  selectLineWidth,
+  selectMagneticFluctuationSpeed,
+  selectMagneticInverseCoefficient,
+  selectMagneticMaxStrength,
+  selectMagneticMinStrength,
+  selectMagneticMode,
   selectMagneticRadius,
   selectMagneticStrength,
-  selectMinSpeed,
   selectMaxSpeed,
-  selectPointsSize,
-  selectLineWidth,
-  selectRepulsionRadius,
-  selectRepulsionStrength,
-  selectDampingFactor,
-  selectBrownianStrength,
-  selectClusterThreshold,
-  selectExplosionForce,
-  selectClusterCheckInterval,
   selectMinClusterSize,
-  selectMagneticMode,
-  selectMagneticMinStrength,
-  selectMagneticMaxStrength,
-  selectMagneticInverseCoefficient,
-  selectMagneticFluctuationSpeed,
-  selectEnablePolygonStabilizer,
+  selectMinSpeed,
+  selectNumPoints,
+  selectPointsSize,
+  selectPolygonStrength,
   selectPolygonTargetSpacing,
-  selectPolygonStrength
+  selectRepulsionRadius,
+  selectRepulsionStrength
 } from '../../../core/store/ui.selectors';
 import { ParticlePhysicsService } from '../../../core/services/particle-physics.service';
+
+interface ConnectionPair {
+  point: Point;
+  otherPoint: Point;
+  distance: number;
+}
 
 @Component({
   selector: 'app-background-animation',
   standalone: true,
   template: `
-    <canvas #canvas
+    <canvas
+      #canvas
       class="fixed top-0 left-0 w-screen h-screen"
       style="width: 100vw; height: 100vh;"
       [attr.aria-label]="'Background animation'"
@@ -75,34 +77,25 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
   @ViewChild('canvas', { static: true })
   private readonly canvasRef!: ElementRef<HTMLCanvasElement>;
 
+  private readonly subscriptions = new Subscription();
+  private readonly EPSILON = 1e-6;
+  private readonly BOUNCE_COEFFICIENT = 0.95;
+
   private ctx!: CanvasRenderingContext2D;
   private points: Point[] = [];
-  private animationId: number = 0;
+  private connectionPairs: ConnectionPair[] = [];
+  private animationId = 0;
   private isRunning = false;
   private isAnimationEnabled = true;
-  private lastFrameTime: number = 0;
-  private frameCount: number = 0;
-  private currentTimeMs: number = 0;
-
-  // Subscriptions
-  private resizeSubscription?: Subscription;
-  private scrollSubscription?: Subscription;
-  private animationStateSubscription?: Subscription;
-  private magneticForceSubscription?: Subscription;
-  private repulsionForceSubscription?: Subscription;
-  private dampingSubscription?: Subscription;
-  private brownianMotionSubscription?: Subscription;
-  private clusterBreakingSubscription?: Subscription;
-  private polygonStabilizerSubscription?: Subscription;
-  private windowBlurSubscription?: Subscription;
-  private windowFocusSubscription?: Subscription;
-  private scrollTimeout: ReturnType<typeof setTimeout> | undefined;
-
-  /**
-   * Tracks if animation was running before window lost focus
-   * Used to resume animation when window regains focus after ALT+TAB
-   */
   private wasRunningBeforeBlur = false;
+  private lastFrameTime = 0;
+  private frameCount = 0;
+  private currentTimeMs = 0;
+  private scrollPauseTimeout: ReturnType<typeof setTimeout> | undefined;
+
+  private viewportWidth = 0;
+  private viewportHeight = 0;
+  private devicePixelRatio = 1;
 
   // Physics toggle states
   private enableMagneticForce = true;
@@ -112,7 +105,6 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
   private enableClusterBreaking = true;
   private enablePolygonStabilizer = false;
 
-  // Dynamic configuration from store (mutable copy)
   private config = {
     showBorder: false,
     glowPoints: true,
@@ -135,7 +127,6 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
     EXPLOSION_FORCE: ANIMATION_CONSTANTS.EXPLOSION_FORCE,
     CLUSTER_CHECK_INTERVAL: ANIMATION_CONSTANTS.CLUSTER_CHECK_INTERVAL,
     MIN_CLUSTER_SIZE: ANIMATION_CONSTANTS.MIN_CLUSTER_SIZE,
-    // Magnetic behavior extensions
     MAGNETIC_MODE: 'classic' as 'classic' | 'inverse' | 'fluctuating',
     MAGNETIC_MIN_STRENGTH: 0.0001,
     MAGNETIC_MAX_STRENGTH: 0.003,
@@ -145,290 +136,286 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
     POLYGON_STRENGTH: 0.0008
   };
 
-  // Subscriptions for config values
-  private configSubscriptions: Subscription[] = [];
-
   public ngOnInit(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
 
     try {
       this.initializeCanvas();
+      this.bindStoreState();
+      this.bindWindowEvents();
 
-      // Subscribe to animation state from store
-      this.animationStateSubscription = this.store
-        .select(selectEnableBackgroundAnimation)
-        .subscribe(enabled => {
-          this.isAnimationEnabled = enabled;
-
-          if (enabled && !this.isRunning) {
-            // Resume animation - reset lastFrameTime to prevent jump
-            this.isRunning = true;
-            this.lastFrameTime = performance.now();
-            this.ngZone.runOutsideAngular(() => {
-              this.animate(performance.now());
-            });
-          } else if (!enabled && this.isRunning) {
-            // Pause animation - render one final frame then stop
-            this.isRunning = false;
-            if (this.animationId) {
-              cancelAnimationFrame(this.animationId);
-              this.animationId = 0;
-            }
-            // Calculate connections before rendering static frame
-            this.calculateConnectionsForStaticRender();
-            // Clear and render static frame
-            this.ctx.clearRect(0, 0, this.canvasRef.nativeElement.width, this.canvasRef.nativeElement.height);
-            this.drawScene();
-          }
-        });
-
-      // Subscribe to physics toggle states
-      this.magneticForceSubscription = this.store
-        .select(selectEnableMagneticForce)
-        .subscribe(enabled => this.enableMagneticForce = enabled);
-
-      this.repulsionForceSubscription = this.store
-        .select(selectEnableRepulsionForce)
-        .subscribe(enabled => this.enableRepulsionForce = enabled);
-
-      this.dampingSubscription = this.store
-        .select(selectEnableDamping)
-        .subscribe(enabled => this.enableDamping = enabled);
-
-      this.brownianMotionSubscription = this.store
-        .select(selectEnableBrownianMotion)
-        .subscribe(enabled => this.enableBrownianMotion = enabled);
-
-      this.clusterBreakingSubscription = this.store
-        .select(selectEnableClusterBreaking)
-        .subscribe(enabled => this.enableClusterBreaking = enabled);
-
-      this.polygonStabilizerSubscription = this.store
-        .select(selectEnablePolygonStabilizer)
-        .subscribe(enabled => this.enablePolygonStabilizer = enabled);
-
-      // Subscribe to all config value changes
-      this.configSubscriptions.push(
-        this.store.select(selectNumPoints).subscribe(v => {
-          const oldCount = this.config.NUM_POINTS;
-          this.config.NUM_POINTS = v;
-          // Dynamically adjust particle count
-          if (oldCount !== v && this.points.length > 0) {
-            this.adjustParticleCount(oldCount, v);
-          }
-        }),
-        this.store.select(selectConnectionRadius).subscribe(v => this.config.CONNECTION_RADIUS = v),
-        this.store.select(selectMagneticRadius).subscribe(v => this.config.MAGNETIC_RADIUS = v),
-        this.store.select(selectMagneticStrength).subscribe(v => this.config.MAGNETIC_STRENGTH = v),
-        this.store.select(selectMagneticMode).subscribe(v => this.config.MAGNETIC_MODE = v),
-        this.store.select(selectMagneticMinStrength).subscribe(v => this.config.MAGNETIC_MIN_STRENGTH = v),
-        this.store.select(selectMagneticMaxStrength).subscribe(v => this.config.MAGNETIC_MAX_STRENGTH = v),
-        this.store.select(selectMagneticInverseCoefficient).subscribe(v => this.config.MAGNETIC_INVERSE_COEFFICIENT = v),
-        this.store.select(selectMagneticFluctuationSpeed).subscribe(v => this.config.MAGNETIC_FLUCTUATION_SPEED = v),
-        this.store.select(selectPolygonTargetSpacing).subscribe(v => this.config.POLYGON_TARGET_SPACING = v),
-        this.store.select(selectPolygonStrength).subscribe(v => this.config.POLYGON_STRENGTH = v),
-        this.store.select(selectMinSpeed).subscribe(v => this.config.MIN_SPEED = v),
-        this.store.select(selectMaxSpeed).subscribe(v => this.config.MAX_SPEED = v),
-        this.store.select(selectPointsSize).subscribe(v => this.config.POINTS_SIZE = v),
-        this.store.select(selectLineWidth).subscribe(v => this.config.LINE_WIDTH = v),
-        this.store.select(selectRepulsionRadius).subscribe(v => this.config.REPULSION_RADIUS = v),
-        this.store.select(selectRepulsionStrength).subscribe(v => this.config.REPULSION_STRENGTH = v),
-        this.store.select(selectDampingFactor).subscribe(v => this.config.DAMPING_FACTOR = v),
-        this.store.select(selectBrownianStrength).subscribe(v => this.config.BROWNIAN_STRENGTH = v),
-        this.store.select(selectClusterThreshold).subscribe(v => this.config.CLUSTER_THRESHOLD = v),
-        this.store.select(selectExplosionForce).subscribe(v => this.config.EXPLOSION_FORCE = v),
-        this.store.select(selectClusterCheckInterval).subscribe(v => this.config.CLUSTER_CHECK_INTERVAL = v),
-        this.store.select(selectMinClusterSize).subscribe(v => this.config.MIN_CLUSTER_SIZE = v)
-      );
-
-      // Handle window resize events with debouncing for performance
-      this.resizeSubscription = fromEvent(window, 'resize')
-        .pipe(debounceTime(250))
-        .subscribe(() => this.handleResize());
-
-      /**
-       * Scroll event listener
-       * Temporarily pauses animation during scrolling for better performance
-       * Resumes automatically after scrolling stops (150ms delay)
-       */
-      this.scrollSubscription = fromEvent(window, 'scroll')
-        .pipe(debounceTime(50))
-        .subscribe(() => {
-          if (!this.isAnimationEnabled) return; // Don't handle scroll if animation is disabled
-
-          this.isRunning = false;
-          clearTimeout(this.scrollTimeout);
-
-          // Resume animation after scrolling stops (150ms delay)
-          this.scrollTimeout = setTimeout(() => {
-            if (this.isAnimationEnabled) {
-              this.isRunning = true;
-              this.lastFrameTime = performance.now(); // Reset to prevent time jump
-              this.animate(performance.now());
-            }
-          }, 150);
-        });
-
-      /**
-       * Window blur/focus event listeners
-       * Pauses animation when user ALT+TABs away or switches to another application
-       * Resumes animation when the window regains focus
-       */
-      this.windowBlurSubscription = fromEvent(window, 'blur')
-        .subscribe(() => {
-          // Store current running state so we can resume later
-          this.wasRunningBeforeBlur = this.isRunning;
-
-          // Pause animation when window loses focus (e.g., ALT+TAB to another app)
-          // Just stop the animation loop - canvas keeps the last rendered frame
-          if (this.isRunning) {
-            this.isRunning = false;
-            if (this.animationId) {
-              cancelAnimationFrame(this.animationId);
-              this.animationId = 0;
-            }
-            // Don't clear or redraw - keep the current frame visible
-          }
-        });
-
-      this.windowFocusSubscription = fromEvent(window, 'focus')
-        .subscribe(() => {
-          /**
-           * Resume animation when window regains focus
-           * Only resumes if:
-           * - Animation was running before window lost focus
-           * - Animation is enabled in settings
-           * - Animation is not currently running
-           */
-          if (this.wasRunningBeforeBlur && this.isAnimationEnabled && !this.isRunning) {
-            this.isRunning = true;
-            this.lastFrameTime = performance.now(); // Reset to prevent time jump
-            this.ngZone.runOutsideAngular(() => {
-              this.animate(performance.now());
-            });
-            // Reset flag after resuming
-            this.wasRunningBeforeBlur = false;
-          }
-        });
-
-      // Run animation outside Angular's zone for better performance (if enabled)
-      // If disabled, render one static frame
       if (this.isAnimationEnabled) {
-        this.ngZone.runOutsideAngular(() => {
-          this.animate(performance.now());
-        });
+        this.startAnimation();
       } else {
-        // Calculate connections before rendering initial static frame
-        this.calculateConnectionsForStaticRender();
-        // Render initial static frame when animation is disabled
-        this.ctx.clearRect(0, 0, this.canvasRef.nativeElement.width, this.canvasRef.nativeElement.height);
-        this.drawScene();
+        this.renderStaticFrame();
       }
     } catch (error) {
       this.errorHandler.handleError(error);
+      this.stopAnimation();
     }
   }
 
   public ngOnDestroy(): void {
-    this.cleanup();
-    if (this.scrollTimeout) {
-      clearTimeout(this.scrollTimeout);
+    this.stopAnimation();
+    if (this.scrollPauseTimeout) {
+      clearTimeout(this.scrollPauseTimeout);
     }
-    this.scrollSubscription?.unsubscribe();
-    this.animationStateSubscription?.unsubscribe();
-    this.magneticForceSubscription?.unsubscribe();
-    this.repulsionForceSubscription?.unsubscribe();
-    this.dampingSubscription?.unsubscribe();
-    this.brownianMotionSubscription?.unsubscribe();
-    this.clusterBreakingSubscription?.unsubscribe();
-    this.polygonStabilizerSubscription?.unsubscribe();
-    this.windowBlurSubscription?.unsubscribe();
-    this.windowFocusSubscription?.unsubscribe();
-    this.configSubscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions.unsubscribe();
   }
 
   private initializeCanvas(): void {
-    const canvas = this.canvasRef.nativeElement;
-    const context = canvas.getContext('2d', { alpha: true });
-
+    const context = this.canvasRef.nativeElement.getContext('2d', { alpha: true });
     if (!context) {
       throw new Error('Canvas 2D context not supported in this browser');
     }
 
     this.ctx = context;
-    this.handleResize();
-    this.initPoints();
-    this.isRunning = true;
+    this.handleResize(true);
   }
 
-  private handleResize = (): void => {
+  private bindStoreState(): void {
+    this.subscriptions.add(
+      this.store.select(selectEnableBackgroundAnimation).subscribe(enabled => {
+        this.isAnimationEnabled = enabled;
+
+        if (enabled) {
+          this.startAnimation();
+        } else {
+          this.stopAnimation();
+          this.renderStaticFrame();
+        }
+      })
+    );
+
+    this.subscriptions.add(
+      this.store.select(selectEnableMagneticForce).subscribe(enabled => (this.enableMagneticForce = enabled))
+    );
+    this.subscriptions.add(
+      this.store.select(selectEnableRepulsionForce).subscribe(enabled => (this.enableRepulsionForce = enabled))
+    );
+    this.subscriptions.add(
+      this.store.select(selectEnableDamping).subscribe(enabled => (this.enableDamping = enabled))
+    );
+    this.subscriptions.add(
+      this.store.select(selectEnableBrownianMotion).subscribe(enabled => (this.enableBrownianMotion = enabled))
+    );
+    this.subscriptions.add(
+      this.store.select(selectEnableClusterBreaking).subscribe(enabled => (this.enableClusterBreaking = enabled))
+    );
+    this.subscriptions.add(
+      this.store.select(selectEnablePolygonStabilizer).subscribe(enabled => (this.enablePolygonStabilizer = enabled))
+    );
+
+    this.subscriptions.add(
+      this.store.select(selectNumPoints).subscribe(value => {
+        const oldCount = this.config.NUM_POINTS;
+        this.config.NUM_POINTS = value;
+        if (this.points.length > 0 && oldCount !== value) {
+          this.adjustParticleCount(value);
+          this.renderStaticFrameIfPaused();
+        }
+      })
+    );
+
+    this.bindNumericConfig(selectConnectionRadius, value => (this.config.CONNECTION_RADIUS = value));
+    this.bindNumericConfig(selectMagneticRadius, value => (this.config.MAGNETIC_RADIUS = value));
+    this.bindNumericConfig(selectMagneticStrength, value => (this.config.MAGNETIC_STRENGTH = value));
+    this.bindNumericConfig(selectMagneticMinStrength, value => (this.config.MAGNETIC_MIN_STRENGTH = value));
+    this.bindNumericConfig(selectMagneticMaxStrength, value => (this.config.MAGNETIC_MAX_STRENGTH = value));
+    this.bindNumericConfig(selectMagneticInverseCoefficient, value => (this.config.MAGNETIC_INVERSE_COEFFICIENT = value));
+    this.bindNumericConfig(selectMagneticFluctuationSpeed, value => (this.config.MAGNETIC_FLUCTUATION_SPEED = value));
+    this.bindNumericConfig(selectPolygonTargetSpacing, value => (this.config.POLYGON_TARGET_SPACING = value));
+    this.bindNumericConfig(selectPolygonStrength, value => (this.config.POLYGON_STRENGTH = value));
+    this.bindNumericConfig(selectMinSpeed, value => (this.config.MIN_SPEED = value));
+    this.bindNumericConfig(selectMaxSpeed, value => (this.config.MAX_SPEED = value));
+    this.bindNumericConfig(selectPointsSize, value => (this.config.POINTS_SIZE = value));
+    this.bindNumericConfig(selectLineWidth, value => (this.config.LINE_WIDTH = value));
+    this.bindNumericConfig(selectRepulsionRadius, value => (this.config.REPULSION_RADIUS = value));
+    this.bindNumericConfig(selectRepulsionStrength, value => (this.config.REPULSION_STRENGTH = value));
+    this.bindNumericConfig(selectDampingFactor, value => (this.config.DAMPING_FACTOR = value));
+    this.bindNumericConfig(selectBrownianStrength, value => (this.config.BROWNIAN_STRENGTH = value));
+    this.bindNumericConfig(selectClusterThreshold, value => (this.config.CLUSTER_THRESHOLD = value));
+    this.bindNumericConfig(selectExplosionForce, value => (this.config.EXPLOSION_FORCE = value));
+    this.bindNumericConfig(selectClusterCheckInterval, value => (this.config.CLUSTER_CHECK_INTERVAL = value));
+    this.bindNumericConfig(selectMinClusterSize, value => (this.config.MIN_CLUSTER_SIZE = value));
+
+    this.subscriptions.add(
+      this.store.select(selectMagneticMode).subscribe(mode => {
+        this.config.MAGNETIC_MODE = mode;
+        this.renderStaticFrameIfPaused();
+      })
+    );
+  }
+
+  private bindWindowEvents(): void {
+    this.subscriptions.add(
+      fromEvent(window, 'resize')
+        .pipe(debounceTime(200))
+        .subscribe(() => this.handleResize(false))
+    );
+
+    this.subscriptions.add(
+      fromEvent(window, 'scroll')
+        .pipe(debounceTime(40))
+        .subscribe(() => this.pauseForScroll())
+    );
+
+    this.subscriptions.add(
+      fromEvent(window, 'blur').subscribe(() => {
+        this.wasRunningBeforeBlur = this.isRunning;
+        this.stopAnimation();
+      })
+    );
+
+    this.subscriptions.add(
+      fromEvent(window, 'focus').subscribe(() => {
+        if (this.wasRunningBeforeBlur && this.isAnimationEnabled) {
+          this.startAnimation();
+          this.wasRunningBeforeBlur = false;
+        }
+      })
+    );
+  }
+
+  private bindNumericConfig(selector: Parameters<Store['select']>[0], assign: (value: number) => void): void {
+    this.subscriptions.add(
+      this.store.select(selector).subscribe(value => {
+        assign(value as number);
+        this.renderStaticFrameIfPaused();
+      })
+    );
+  }
+
+  private startAnimation(): void {
+    if (this.isRunning) {
+      return;
+    }
+
+    this.isRunning = true;
+    this.lastFrameTime = performance.now();
+    this.ngZone.runOutsideAngular(() => {
+      this.animationId = requestAnimationFrame(this.animate);
+    });
+  }
+
+  private stopAnimation(): void {
+    this.isRunning = false;
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = 0;
+    }
+  }
+
+  private pauseForScroll(): void {
+    if (!this.isAnimationEnabled) {
+      return;
+    }
+
+    this.stopAnimation();
+    if (this.scrollPauseTimeout) {
+      clearTimeout(this.scrollPauseTimeout);
+    }
+
+    this.scrollPauseTimeout = setTimeout(() => {
+      if (this.isAnimationEnabled) {
+        this.startAnimation();
+      }
+    }, 150);
+  }
+
+  private handleResize(forceReinitialize: boolean): void {
+    const previousArea = this.viewportWidth * this.viewportHeight;
+
+    this.viewportWidth = document.documentElement.clientWidth;
+    this.viewportHeight = document.documentElement.clientHeight;
+    this.devicePixelRatio = window.devicePixelRatio || 1;
+
     const canvas = this.canvasRef.nativeElement;
-    const dpr = window.devicePixelRatio || 1;
-
-    // Get the actual viewport dimensions
-    const width = document.documentElement.clientWidth;
-    const height = document.documentElement.clientHeight;
-
-    // Set display size using viewport units
     canvas.style.width = '100vw';
     canvas.style.height = '100vh';
+    canvas.width = Math.max(1, Math.floor(this.viewportWidth * this.devicePixelRatio));
+    canvas.height = Math.max(1, Math.floor(this.viewportHeight * this.devicePixelRatio));
 
-    // Set actual size in memory (accounting for device pixel ratio)
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
+    this.ctx.setTransform(this.devicePixelRatio, 0, 0, this.devicePixelRatio, 0, 0);
 
-    // Scale context to ensure correct drawing operations
-    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const currentArea = this.viewportWidth * this.viewportHeight;
+    const relativeDelta = previousArea > 0 ? Math.abs(currentArea - previousArea) / previousArea : 1;
+    const shouldReinitialize = forceReinitialize || this.points.length === 0 || relativeDelta > 0.2;
 
-    // Reinitialize points when viewport size changes significantly
-    const currentArea = width * height;
-    const previousArea = (canvas.width / dpr) * (canvas.height / dpr);
-    if (Math.abs(currentArea - previousArea) / previousArea > 0.2) {
+    if (shouldReinitialize) {
       this.initPoints();
+    } else {
+      this.clampPointsToViewport();
     }
 
-    // If animation is disabled, re-render the static frame after resize
-    if (!this.isAnimationEnabled && this.ctx) {
-      // Recalculate connections after resize for static render
-      this.calculateConnectionsForStaticRender();
-      this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-      this.drawScene();
+    if (!this.isAnimationEnabled) {
+      this.renderStaticFrame();
     }
-  };
+  }
 
   private initPoints(): void {
-    const canvas = this.canvasRef.nativeElement;
-    this.points = Array.from({ length: this.config.NUM_POINTS }, (_, i) => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 4,
-      vy: (Math.random() - 0.5) * 4,
-      color: i % 2 === 0 ? this.config.COLORS.ORANGE : this.config.COLORS.PURPLE,
+    this.points = Array.from({ length: this.config.NUM_POINTS }, (_, index) => this.createRandomPoint(index));
+    this.collectConnections(false);
+  }
+
+  private createRandomPoint(index: number): Point {
+    const angle = Math.random() * Math.PI * 2;
+    const speedRange = Math.max(0, this.config.MAX_SPEED - this.config.MIN_SPEED);
+    const speed = Math.max(this.config.MIN_SPEED, this.config.MIN_SPEED + Math.random() * speedRange);
+
+    return {
+      x: Math.random() * this.viewportWidth,
+      y: Math.random() * this.viewportHeight,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      color: index % 2 === 0 ? this.config.COLORS.ORANGE : this.config.COLORS.PURPLE,
       connections: 0
-    }));
+    };
+  }
+
+  private adjustParticleCount(newCount: number): void {
+    if (newCount > this.points.length) {
+      const start = this.points.length;
+      for (let i = start; i < newCount; i++) {
+        this.points.push(this.createRandomPoint(i));
+      }
+      return;
+    }
+
+    if (newCount < this.points.length) {
+      this.points = this.points.slice(0, newCount);
+    }
+  }
+
+  private clampPointsToViewport(): void {
+    for (const point of this.points) {
+      point.x = Math.min(this.viewportWidth, Math.max(0, point.x));
+      point.y = Math.min(this.viewportHeight, Math.max(0, point.y));
+    }
   }
 
   private animate = (timestamp: number): void => {
-    if (!this.ctx || !this.isRunning || !this.isAnimationEnabled) return;
+    if (!this.ctx || !this.isRunning || !this.isAnimationEnabled) {
+      return;
+    }
 
     try {
-      const deltaTime = timestamp - this.lastFrameTime;
+      const deltaMs = timestamp - this.lastFrameTime;
       this.lastFrameTime = timestamp;
       this.currentTimeMs = timestamp;
-
-      // Increment frame counter
       this.frameCount++;
 
-      // Clear canvas
-      this.ctx.clearRect(0, 0, this.canvasRef.nativeElement.width, this.canvasRef.nativeElement.height);
+      const deltaTime = Math.max(0.1, Math.min(3, deltaMs / 16.67));
+      this.updatePoints(deltaTime);
+      this.drawFrame();
 
-      // Update and draw
-      this.updatePoints(deltaTime / 16.67);
-      this.drawScene();
-
-      // Check for cluster breaking periodically
-      if (this.enableClusterBreaking &&
-          this.frameCount % this.config.CLUSTER_CHECK_INTERVAL === 0) {
+      if (
+        this.enableClusterBreaking &&
+        this.config.CLUSTER_CHECK_INTERVAL > 0 &&
+        this.frameCount % this.config.CLUSTER_CHECK_INTERVAL === 0
+      ) {
         this.physicsService.breakUpClusters(
           this.points,
           this.config.CLUSTER_THRESHOLD,
@@ -440,249 +427,200 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
       this.animationId = requestAnimationFrame(this.animate);
     } catch (error) {
       this.errorHandler.handleError(error);
-      this.cleanup();
+      this.stopAnimation();
     }
   };
 
   private updatePoints(deltaTime: number): void {
-    const canvas = this.canvasRef.nativeElement;
-    const quadTree = new QuadTree({
-      x: 0,
-      y: 0,
-      width: canvas.width,
-      height: canvas.height
-    });
+    this.collectConnections(true);
 
-    // Reset connections and populate quadtree
-    this.points.forEach(point => {
-      point.connections = 0;
-      quadTree.insert(point);
-    });
-
-    // Update point positions and handle interactions
-    this.points.forEach(point => {
-      // Find nearby points using quadtree (performance optimization)
-      const searchBounds = {
-        x: point.x - this.config.CONNECTION_RADIUS,
-        y: point.y - this.config.CONNECTION_RADIUS,
-        width: this.config.CONNECTION_RADIUS * 2,
-        height: this.config.CONNECTION_RADIUS * 2
-      };
-
-      const nearbyPoints = quadTree.query(searchBounds);
-
-      // Apply physics forces to nearby points
-      nearbyPoints.forEach(otherPoint => {
-        if (point === otherPoint) return;
-
-        // Calculate distance once for performance (avoid repeated calculation)
-        const distance = this.physicsService.getDistance(point, otherPoint);
-
-        if (distance < this.config.CONNECTION_RADIUS) {
-          point.connections++;
-          otherPoint.connections++;
-
-          // Apply repulsion force at very close range (prevents sticking)
-          if (this.enableRepulsionForce && distance < this.config.REPULSION_RADIUS) {
-            this.physicsService.applyRepulsionForce(
-              point,
-              otherPoint,
-              distance,
-              this.config.REPULSION_RADIUS,
-              this.config.REPULSION_STRENGTH
-            );
-          }
-          // Apply magnetic attraction at medium distance (creates clustering)
-          else if (this.enableMagneticForce && distance < this.config.MAGNETIC_RADIUS) {
-            if (this.config.MAGNETIC_MODE === 'classic') {
-              this.physicsService.applyMagneticForce(
-                point,
-                otherPoint,
-                distance,
-                this.config.MAGNETIC_RADIUS,
-                this.config.MAGNETIC_STRENGTH
-              );
-            } else if (this.config.MAGNETIC_MODE === 'inverse') {
-              this.physicsService.applyMagneticForceInverse(
-                point,
-                otherPoint,
-                distance,
-                this.config.MAGNETIC_RADIUS,
-                this.config.MAGNETIC_MIN_STRENGTH,
-                this.config.MAGNETIC_MAX_STRENGTH,
-                this.config.MAGNETIC_INVERSE_COEFFICIENT
-              );
-            } else if (this.config.MAGNETIC_MODE === 'fluctuating') {
-              const dynamicStrength = this.physicsService.computeFluctuatingStrength(
-                this.config.MAGNETIC_MIN_STRENGTH,
-                this.config.MAGNETIC_MAX_STRENGTH,
-                this.config.MAGNETIC_FLUCTUATION_SPEED,
-                this.currentTimeMs
-              );
-              this.physicsService.applyMagneticForce(
-                point,
-                otherPoint,
-                distance,
-                this.config.MAGNETIC_RADIUS,
-                dynamicStrength
-              );
-            }
-          }
-
-          if (this.enablePolygonStabilizer && distance < this.config.CONNECTION_RADIUS) {
-            this.physicsService.applyPolygonStabilizer(
-              point,
-              otherPoint,
-              distance,
-              this.config.POLYGON_TARGET_SPACING,
-              this.config.POLYGON_STRENGTH
-            );
-          }
-        }
-      });
-
-      // Apply Brownian motion (random micro-movements)
+    for (const point of this.points) {
       if (this.enableBrownianMotion) {
         this.physicsService.applyBrownianMotion(point, this.config.BROWNIAN_STRENGTH);
       }
 
-      // Update position based on velocity
       point.x += point.vx * deltaTime;
       point.y += point.vy * deltaTime;
 
-      // Handle boundary collisions first
-      this.handleBoundaryCollision(point, canvas);
+      this.handleBoundaryCollision(point);
 
-      // Apply velocity damping AFTER position update to avoid vibration
-      // (damping before speed constraint would cause oscillation)
       if (this.enableDamping) {
         this.physicsService.applyDamping(point, this.config.DAMPING_FACTOR);
       }
 
-      // Constrain speed to min/max limits AFTER damping
       this.physicsService.constrainSpeed(point, this.config.MIN_SPEED, this.config.MAX_SPEED);
-    });
+    }
   }
 
-  private drawScene(): void {
-    this.withCanvasState(() => {
-      // Draw connections first
-      this.drawConnections();
-      // Then draw points on top
-      this.drawPoints();
+  private collectConnections(applyForces: boolean): void {
+    const quadTree = new QuadTree({
+      x: 0,
+      y: 0,
+      width: this.viewportWidth,
+      height: this.viewportHeight
     });
+    const pointIndex = new Map<Point, number>();
+
+    this.connectionPairs = [];
+    this.points.forEach((point, index) => {
+      point.connections = 0;
+      pointIndex.set(point, index);
+      quadTree.insert(point);
+    });
+
+    const connectionRadius = this.config.CONNECTION_RADIUS;
+    const searchDiameter = connectionRadius * 2;
+
+    for (let i = 0; i < this.points.length; i++) {
+      const point = this.points[i];
+      const nearbyPoints = quadTree.query({
+        x: point.x - connectionRadius,
+        y: point.y - connectionRadius,
+        width: searchDiameter,
+        height: searchDiameter
+      });
+
+      for (const otherPoint of nearbyPoints) {
+        const otherIndex = pointIndex.get(otherPoint);
+        if (otherIndex === undefined || otherIndex <= i) {
+          continue;
+        }
+
+        const distance = this.physicsService.getDistance(point, otherPoint);
+        if (distance >= connectionRadius) {
+          continue;
+        }
+
+        point.connections++;
+        otherPoint.connections++;
+        this.connectionPairs.push({ point, otherPoint, distance });
+
+        if (applyForces) {
+          this.applyPairForces(point, otherPoint, distance);
+        }
+      }
+    }
   }
 
-  private handleBoundaryCollision(point: Point, canvas: HTMLCanvasElement): void {
-    const bounceCoefficient = 0.95; // Energy loss on collision
-    const margin = this.config.POINTS_SIZE; // Prevent points from getting stuck in boundaries
+  private applyPairForces(point: Point, otherPoint: Point, distance: number): void {
+    if (this.enableRepulsionForce && distance < this.config.REPULSION_RADIUS) {
+      this.physicsService.applyRepulsionForce(
+        point,
+        otherPoint,
+        distance,
+        this.config.REPULSION_RADIUS,
+        this.config.REPULSION_STRENGTH
+      );
+    } else if (this.enableMagneticForce && distance < this.config.MAGNETIC_RADIUS) {
+      if (this.config.MAGNETIC_MODE === 'classic') {
+        this.physicsService.applyMagneticForce(
+          point,
+          otherPoint,
+          distance,
+          this.config.MAGNETIC_RADIUS,
+          this.config.MAGNETIC_STRENGTH
+        );
+      } else if (this.config.MAGNETIC_MODE === 'inverse') {
+        this.physicsService.applyMagneticForceInverse(
+          point,
+          otherPoint,
+          distance,
+          this.config.MAGNETIC_RADIUS,
+          this.config.MAGNETIC_MIN_STRENGTH,
+          this.config.MAGNETIC_MAX_STRENGTH,
+          this.config.MAGNETIC_INVERSE_COEFFICIENT
+        );
+      } else {
+        const dynamicStrength = this.physicsService.computeFluctuatingStrength(
+          this.config.MAGNETIC_MIN_STRENGTH,
+          this.config.MAGNETIC_MAX_STRENGTH,
+          this.config.MAGNETIC_FLUCTUATION_SPEED,
+          this.currentTimeMs
+        );
+        this.physicsService.applyMagneticForce(
+          point,
+          otherPoint,
+          distance,
+          this.config.MAGNETIC_RADIUS,
+          dynamicStrength
+        );
+      }
+    }
 
-    // Handle horizontal boundaries
+    if (this.enablePolygonStabilizer) {
+      this.physicsService.applyPolygonStabilizer(
+        point,
+        otherPoint,
+        distance,
+        this.config.POLYGON_TARGET_SPACING,
+        this.config.POLYGON_STRENGTH
+      );
+    }
+  }
+
+  private handleBoundaryCollision(point: Point): void {
+    const margin = this.config.POINTS_SIZE;
+
     if (point.x - margin < 0) {
       point.x = margin;
-      point.vx = Math.abs(point.vx) * bounceCoefficient;
-    } else if (point.x + margin > canvas.width) {
-      point.x = canvas.width - margin;
-      point.vx = -Math.abs(point.vx) * bounceCoefficient;
+      point.vx = Math.abs(point.vx) * this.BOUNCE_COEFFICIENT;
+    } else if (point.x + margin > this.viewportWidth) {
+      point.x = this.viewportWidth - margin;
+      point.vx = -Math.abs(point.vx) * this.BOUNCE_COEFFICIENT;
     }
 
-    // Handle vertical boundaries
     if (point.y - margin < 0) {
       point.y = margin;
-      point.vy = Math.abs(point.vy) * bounceCoefficient;
-    } else if (point.y + margin > canvas.height) {
-      point.y = canvas.height - margin;
-      point.vy = -Math.abs(point.vy) * bounceCoefficient;
+      point.vy = Math.abs(point.vy) * this.BOUNCE_COEFFICIENT;
+    } else if (point.y + margin > this.viewportHeight) {
+      point.y = this.viewportHeight - margin;
+      point.vy = -Math.abs(point.vy) * this.BOUNCE_COEFFICIENT;
     }
 
-    // Apply minimum speed after collision to prevent sticking
     const speed = Math.hypot(point.vx, point.vy);
     if (speed < this.config.MIN_SPEED) {
-      const scale = this.config.MIN_SPEED / speed;
-      point.vx *= scale;
-      point.vy *= scale;
+      if (speed <= this.EPSILON) {
+        const angle = Math.random() * Math.PI * 2;
+        point.vx = Math.cos(angle) * this.config.MIN_SPEED;
+        point.vy = Math.sin(angle) * this.config.MIN_SPEED;
+      } else {
+        const scale = this.config.MIN_SPEED / speed;
+        point.vx *= scale;
+        point.vy *= scale;
+      }
     }
   }
 
-  private drawPoints(): void {
-    this.points.forEach(point => {
-      if (!this.isInViewport(point)) return;
-
-      this.withCanvasState(() => {
-        if (this.config.glowPoints) {
-          this.ctx.shadowBlur = this.config.GLOW.POINTS_INTENSITY;
-          this.ctx.shadowColor = point.color;
-        }
-
-        this.ctx.beginPath();
-        this.ctx.arc(point.x, point.y, this.config.POINTS_SIZE, 0, Math.PI * 2);
-        this.ctx.fillStyle = point.color;
-        this.ctx.fill();
-      });
-    });
+  private renderStaticFrameIfPaused(): void {
+    if (!this.isAnimationEnabled) {
+      this.renderStaticFrame();
+    }
   }
 
-  /**
-   * Calculates connections for static rendering when animation is disabled.
-   * This ensures points have proper connection counts for color blending.
-   */
-  private calculateConnectionsForStaticRender(): void {
-    // Reset all connections
-    this.points.forEach(point => {
-      point.connections = 0;
-    });
+  private renderStaticFrame(): void {
+    this.collectConnections(false);
+    this.drawFrame();
+  }
 
-    // Calculate connections based on proximity
-    this.points.forEach((point, i) => {
-      this.points.slice(i + 1).forEach(otherPoint => {
-        const distance = this.physicsService.getDistance(point, otherPoint);
-        if (distance < this.config.CONNECTION_RADIUS) {
-          point.connections++;
-          otherPoint.connections++;
-        }
-      });
-    });
+  private drawFrame(): void {
+    this.ctx.clearRect(0, 0, this.viewportWidth, this.viewportHeight);
+    this.drawConnections();
+    this.drawPoints();
   }
 
   private drawConnections(): void {
-    this.points.forEach((point, i) => {
-      if (!this.isInViewport(point)) return;
-
-      this.points.slice(i + 1).forEach(otherPoint => {
-        if (!this.isInViewport(otherPoint)) return;
-
-        const distance = this.physicsService.getDistance(point, otherPoint);
-        if (distance < this.config.CONNECTION_RADIUS) {
-          this.drawConnection(point, otherPoint, distance);
-        }
-      });
-    });
-  }
-
-  private hexToRgb(hex: string): RGB {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : { r: 0, g: 0, b: 0 };
-  }
-
-  private blendColors(color1: string, color2: string, weight: number): string {
-    const c1 = this.hexToRgb(color1);
-    const c2 = this.hexToRgb(color2);
-
-    const r = Math.round(c1.r * weight + c2.r * (1 - weight));
-    const g = Math.round(c1.g * weight + c2.g * (1 - weight));
-    const b = Math.round(c1.b * weight + c2.b * (1 - weight));
-
-    return `rgb(${r},${g},${b})`;
+    for (const { point, otherPoint, distance } of this.connectionPairs) {
+      if (!this.isInViewport(point) && !this.isInViewport(otherPoint)) {
+        continue;
+      }
+      this.drawConnection(point, otherPoint, distance);
+    }
   }
 
   private drawConnection(point: Point, otherPoint: Point, distance: number): void {
     this.withCanvasState(() => {
       const totalConnections = point.connections + otherPoint.connections;
-      const weight = point.connections / totalConnections;
+      const weight = totalConnections > 0 ? point.connections / totalConnections : 0.5;
       const connectionColor = this.blendColors(point.color, otherPoint.color, weight);
 
       if (this.config.glowLines) {
@@ -695,20 +633,31 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
       this.ctx.lineTo(otherPoint.x, otherPoint.y);
       this.ctx.strokeStyle = connectionColor;
       this.ctx.lineWidth = this.config.LINE_WIDTH;
-      this.ctx.globalAlpha = 1 - (distance / this.config.CONNECTION_RADIUS);
+      this.ctx.globalAlpha = Math.max(0, 1 - distance / this.config.CONNECTION_RADIUS);
       this.ctx.stroke();
     });
   }
 
-  private cleanup(): void {
-    this.isRunning = false;
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
+  private drawPoints(): void {
+    for (const point of this.points) {
+      if (!this.isInViewport(point)) {
+        continue;
+      }
+
+      this.withCanvasState(() => {
+        if (this.config.glowPoints) {
+          this.ctx.shadowBlur = this.config.GLOW.POINTS_INTENSITY;
+          this.ctx.shadowColor = point.color;
+        }
+
+        this.ctx.beginPath();
+        this.ctx.arc(point.x, point.y, this.config.POINTS_SIZE, 0, Math.PI * 2);
+        this.ctx.fillStyle = point.color;
+        this.ctx.fill();
+      });
     }
-    this.resizeSubscription?.unsubscribe();
   }
 
-  // Utility methods
   private withCanvasState(callback: () => void): void {
     this.ctx.save();
     callback();
@@ -717,39 +666,36 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
 
   private isInViewport(point: Point): boolean {
     const margin = this.config.CONNECTION_RADIUS;
-    const canvas = this.canvasRef.nativeElement;
-    return point.x + margin >= 0 &&
-           point.x - margin <= canvas.width &&
-           point.y + margin >= 0 &&
-           point.y - margin <= canvas.height;
+    return (
+      point.x + margin >= 0 &&
+      point.x - margin <= this.viewportWidth &&
+      point.y + margin >= 0 &&
+      point.y - margin <= this.viewportHeight
+    );
   }
 
-  /**
-   * Dynamically adjusts the number of particles when the config changes.
-   * Adds new particles or removes excess ones while maintaining animation continuity.
-   */
-  private adjustParticleCount(oldCount: number, newCount: number): void {
-    const canvas = this.canvasRef.nativeElement;
-
-    if (newCount > oldCount) {
-      // Add new particles
-      const toAdd = newCount - oldCount;
-      for (let i = 0; i < toAdd; i++) {
-        this.points.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          vx: (Math.random() - 0.5) * 4,
-          vy: (Math.random() - 0.5) * 4,
-          color: i % 2 === 0 ? this.config.COLORS.ORANGE : this.config.COLORS.PURPLE,
-          connections: 0
-        });
-      }
-    } else if (newCount < oldCount) {
-      // Remove excess particles
-      this.points = this.points.slice(0, newCount);
+  private hexToRgb(hex: string): RGB {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if (!result) {
+      return { r: 0, g: 0, b: 0 };
     }
+
+    return {
+      r: Number.parseInt(result[1], 16),
+      g: Number.parseInt(result[2], 16),
+      b: Number.parseInt(result[3], 16)
+    };
   }
 
-  // Note: getDistance, applyMagneticEffect, applyRepulsionForce, applyDamping,
-  // applyBrownianMotion, and constrainSpeed are now handled by ParticlePhysicsService
+  private blendColors(color1: string, color2: string, weight: number): string {
+    const c1 = this.hexToRgb(color1);
+    const c2 = this.hexToRgb(color2);
+    const clampedWeight = Math.max(0, Math.min(1, weight));
+
+    const r = Math.round(c1.r * clampedWeight + c2.r * (1 - clampedWeight));
+    const g = Math.round(c1.g * clampedWeight + c2.g * (1 - clampedWeight));
+    const b = Math.round(c1.b * clampedWeight + c2.b * (1 - clampedWeight));
+
+    return `rgb(${r},${g},${b})`;
+  }
 }

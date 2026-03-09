@@ -1,0 +1,230 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  --coming-primary: #f29f67;
+  --coming-secondary: #8833cc;
+}
+
+.coming-page-wrapper {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+}
+
+.coming-container {
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 0.5rem;
+}
+
+.terminal-header {
+  position: relative;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 1rem;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+  overflow: hidden;
+}
+
+:host-context(.dark) .terminal-header,
+.dark .terminal-header {
+  background: rgba(15, 23, 42, 0.78);
+  border-color: rgba(148, 163, 184, 0.25);
+  box-shadow: 0 16px 36px rgba(2, 6, 23, 0.45);
+}
+
+.planned-ribbon {
+  position: absolute;
+  top: 3rem;
+  right: -10.5rem;
+  width: 32rem;
+  text-align: center;
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: #0f172a;
+  background: linear-gradient(135deg, #fcd34d, #fb7185);
+  border: 1px solid rgba(15, 23, 42, 0.25);
+  padding: 0.32rem 0;
+  transform: rotate(36deg);
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.18);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.terminal-window-controls {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.terminal-dot {
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 999px;
+}
+
+.terminal-dot-red { background: #f87171; }
+.terminal-dot-yellow { background: #facc15; }
+.terminal-dot-green { background: #22c55e; }
+
+.terminal-title {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.terminal-content {
+  padding: 1.25rem;
+  position: relative;
+}
+
+.feature-title {
+  margin: 0;
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(1.7rem, 2vw + 1rem, 2.4rem);
+  line-height: 1.2;
+  color: #1e293b;
+}
+
+:host-context(.dark) .feature-title,
+.dark .feature-title {
+  color: #e2e8f0;
+}
+
+.feature-subtitle {
+  margin: 0.7rem 0 1.1rem;
+  color: #475569;
+  font-size: 1rem;
+  max-width: 58ch;
+}
+
+:host-context(.dark) .feature-subtitle,
+.dark .feature-subtitle {
+  color: #94a3b8;
+}
+
+.code-card {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 0.8rem;
+  overflow: hidden;
+  background: rgba(248, 250, 252, 0.88);
+}
+
+:host-context(.dark) .code-card,
+.dark .code-card {
+  border-color: rgba(148, 163, 184, 0.25);
+  background: rgba(30, 41, 59, 0.7);
+}
+
+.code-card-header {
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.code-header-text {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.code-header-command {
+  color: var(--coming-primary);
+}
+
+.code-card-content {
+  padding: 0.9rem;
+}
+
+.status-note {
+  margin: 0;
+  color: #1e293b;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.status-note-light {
+  margin-top: 0.55rem;
+  color: #475569;
+}
+
+:host-context(.dark) .status-note,
+.dark .status-note {
+  color: #e2e8f0;
+}
+
+:host-context(.dark) .status-note-light,
+.dark .status-note-light {
+  color: #94a3b8;
+}
+
+.action-row {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  display: inline-block;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  text-decoration: none;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.action-btn-primary {
+  color: #fff;
+  background: linear-gradient(135deg, var(--coming-primary), var(--coming-secondary));
+}
+
+.action-btn-secondary {
+  color: #334155;
+  background: rgba(148, 163, 184, 0.18);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+:host-context(.dark) .action-btn-secondary,
+.dark .action-btn-secondary {
+  color: #cbd5e1;
+  background: rgba(100, 116, 139, 0.22);
+  border-color: rgba(148, 163, 184, 0.28);
+}
+
+@media (max-width: 640px) {
+  .planned-ribbon {
+    top: 2.1rem;
+    right: -11rem;
+    transform: rotate(38deg) scale(0.9);
+  }
+}
+
+
+
+
+
+
+
+:host-context(.dark) .planned-ribbon,
+.dark .planned-ribbon {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+
+

@@ -1,0 +1,42 @@
+<div class="coming-page-wrapper">
+  <div class="coming-container">
+    <header class="terminal-header">
+      <div class="planned-ribbon" aria-label="Planned ribbon">PLANNED</div>
+
+      <div class="terminal-bar">
+        <div class="terminal-window-controls">
+          <span class="terminal-dot terminal-dot-red"></span>
+          <span class="terminal-dot terminal-dot-yellow"></span>
+          <span class="terminal-dot terminal-dot-green"></span>
+        </div>
+        <span class="terminal-title">build@tolkium:~</span>
+      </div>
+
+      <div class="terminal-content">
+        <h1 class="feature-title">{{ featureName }}</h1>
+        <p class="feature-subtitle">{{ subtitle }}</p>
+
+        <section class="code-card" aria-label="Planned status">
+          <div class="code-card-header">
+            <span class="code-header-text"><span class="code-header-command">$</span> roadmap --item</span>
+          </div>
+          <div class="code-card-content">
+            @if (statusNote) {
+              <p class="status-note">{{ statusNote }}</p>
+            }
+            <p class="status-note status-note-light">
+              Factual state: for now, it only has its own Jira ticket. :D
+            </p>
+          </div>
+        </section>
+
+        <div class="action-row">
+          <a routerLink="/about" class="action-btn action-btn-primary">Back to Home</a>
+          <a routerLink="/projects" class="action-btn action-btn-secondary">See Projects</a>
+        </div>
+      </div>
+    </header>
+  </div>
+</div>
+
+

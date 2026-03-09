@@ -12,7 +12,7 @@ import {
 import { isPlatformBrowser } from '@angular/common';
 import { fromEvent, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { Store } from '@ngrx/store';
+import { MemoizedSelector, Store } from '@ngrx/store';
 import { ANIMATION_CONSTANTS, Point, RGB } from '../../../models/animation.constants';
 import { QuadTree } from '../../../utils/quad-tree';
 import {
@@ -279,7 +279,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
     );
   }
 
-  private bindNumericConfig(selector: Parameters<Store['select']>[0], assign: (value: number) => void): void {
+  private bindNumericConfig(selector: MemoizedSelector<object, number>, assign: (value: number) => void): void {
     this.subscriptions.add(
       this.store.select(selector).subscribe(value => {
         assign(value as number);
@@ -699,3 +699,4 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
     return `rgb(${r},${g},${b})`;
   }
 }
+

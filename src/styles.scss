@@ -59,6 +59,15 @@ html, body {
   --scrollbar-thumb-hover: rgba(203, 213, 225, 0.4);
 }
 
+/* Norbert Gift page: neutral/black dark backgrounds instead of slate-blue */
+html.dark body.norbert-gift-active {
+  --color-bg-dark: #18181b;
+  --color-text-dark: #d4d4d8;
+  --hover-text-color: #cc0000;
+  --hover-bg-color: rgba(204, 0, 0, 0.1);
+  background: #000;
+}
+
 /* Firefox */
 html {
   scrollbar-width: thin;

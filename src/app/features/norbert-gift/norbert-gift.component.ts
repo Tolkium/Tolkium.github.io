@@ -1,5 +1,5 @@
-import { Component, ChangeDetectionStrategy, signal, computed, inject, DestroyRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, signal, computed, inject, DestroyRef, Renderer2, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser, CommonModule } from '@angular/common';
 import {
   GIFTS,
   TOTAL_GOAL,
@@ -28,6 +28,8 @@ import {
 })
 export class NorbertGiftComponent {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly renderer = inject(Renderer2);
+  private readonly platformId = inject(PLATFORM_ID);
   readonly gifts = GIFTS;
   readonly totalGoal = TOTAL_GOAL;
   readonly paymentInfo: PaymentInfo = PAYMENT_INFO;
@@ -223,6 +225,10 @@ export class NorbertGiftComponent {
   }
 
   constructor() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.renderer.addClass(document.body, 'norbert-gift-active');
+    }
+
     const intervalTime = 8000;
     this.textRotationInterval = setInterval(() => {
       this.textIndex.update(i => (i + 1) % 6);
@@ -239,6 +245,9 @@ export class NorbertGiftComponent {
     }, intervalTime);
     this.destroyRef.onDestroy(() => {
       if (this.textRotationInterval) clearInterval(this.textRotationInterval);
+      if (isPlatformBrowser(this.platformId)) {
+        this.renderer.removeClass(document.body, 'norbert-gift-active');
+      }
     });
   }
 }

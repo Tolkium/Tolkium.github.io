@@ -1,0 +1,416 @@
+<div class="relative z-10 min-h-screen pb-8">
+  <button
+    (click)="toggleLanguage()"
+    class="fixed top-2 right-2 sm:top-4 sm:right-[8rem] z-50 w-10 h-10 flex items-center justify-center backdrop-blur-sm bg-white/50 dark:bg-zinc-900/50 text-zinc-700 dark:text-zinc-300 hover:text-[#cc0000] dark:hover:text-[#cc0000] rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-outfit font-semibold text-sm"
+  >
+    {{ t().translateButton }}
+  </button>
+
+  @if (hoveredContributorIndex() !== null && tooltipPosition()) {
+    @let contributor = overallContributors()[hoveredContributorIndex()!];
+    @let pos = tooltipPosition()!;
+    <div 
+      class="fixed pointer-events-none z-[99999]"
+      [style.left.px]="pos.x"
+      [style.top.px]="pos.y"
+      [style.transform]="pos.placement === 'top' ? 'translateY(-100%)' : 'none'"
+    >
+      <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md text-zinc-800 dark:text-zinc-100 text-xs px-3 py-2 rounded-lg shadow-xl border border-zinc-300/50 dark:border-zinc-700/50 min-w-[150px]">
+        <div class="font-semibold mb-1 text-zinc-900 dark:text-zinc-100">{{ contributor.name }}</div>
+        <div class="text-zinc-700 dark:text-zinc-300">{{ t().total }}: {{ contributor.amount }}€</div>
+      </div>
+    </div>
+  }
+
+  <div class="container mx-auto px-4 py-2 md:px-6 md:py-4 max-w-7xl">
+
+    <!-- Hero Header -->
+    <div class="mb-6">
+      <h1 class="text-3xl sm:text-5xl md:text-6xl font-bold mb-0 leading-tight bg-gradient-to-r from-[#cc0000] via-[#8b0000] to-[#a0a0a0] bg-clip-text text-transparent font-metal">
+        {{ t().pageTitle }}
+      </h1>
+      <p class="text-sm sm:text-base md:text-xl text-zinc-600 dark:text-zinc-300 font-inter rotating-subtitle mb-2 leading-tight">
+        <span 
+          class="rotating-text font-bold" 
+          data-variant="gift"
+          [attr.data-key]="textKey()">
+          {{ getCurrentText() }}
+        </span>
+      </p>
+    </div>
+
+    <!-- Overall Progress Bar -->
+    <div class="dashboard-card mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-lg font-semibold text-zinc-800 dark:text-white font-metal">{{ t().overallProgress }}</h3>
+        <div class="text-right">
+          <span class="text-3xl font-bold bg-gradient-to-r from-[#cc0000] to-[#8b0000] bg-clip-text text-transparent font-outfit">
+            {{ overallPercentage() | number:'1.0-0' }}%
+          </span>
+        </div>
+      </div>
+      <div class="relative h-3 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+        <div 
+          class="absolute top-0 left-0 h-full bg-gradient-to-r from-[#cc0000] to-[#8b0000] rounded-full transition-all duration-500"
+          [style.width.%]="overallPercentage()"
+          [style.box-shadow]="overallPercentage() > 0 ? '0 0 15px rgba(204, 0, 0, 0.4)' : 'none'"
+        ></div>
+      </div>
+      <div class="flex items-center justify-between mt-2 text-sm text-zinc-600 dark:text-zinc-400 font-inter">
+        <span>{{ overallRaised() | number:'1.0-0' }}€ {{ t().raised }}</span>
+        <span>{{ totalGoal }}€ {{ t().totalGoal }}</span>
+      </div>
+    </div>
+
+    <!-- Accordion Gift Items -->
+    <div class="space-y-4 mb-6">
+      @for (gift of gifts; track gift.id; let i = $index) {
+        <div class="dashboard-card gift-accordion-item" [class.expanded]="activeGiftIndex() === i">
+          <!-- Accordion Header -->
+          <button
+            (click)="toggleGift(i)"
+            class="w-full flex items-center justify-between text-left gift-accordion-header"
+          >
+            <div class="flex items-center gap-3">
+              <span class="text-2xl sm:text-3xl">{{ gift.icon }}</span>
+              <div>
+                <h3 class="text-sm sm:text-lg md:text-xl font-bold text-zinc-800 dark:text-white font-metal">{{ gift.brand }} {{ gift.name }}</h3>
+                <p class="text-sm text-zinc-500 dark:text-zinc-400 font-inter">{{ gift.category }} — {{ gift.price }}€</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right hidden sm:block">
+                <div class="text-sm font-semibold text-zinc-700 dark:text-zinc-300 font-outfit">
+                  {{ getGiftRaised(gift) | number:'1.0-0' }}€ / {{ gift.price }}€
+                </div>
+                <div class="text-xs text-zinc-500 dark:text-zinc-400 font-inter">{{ t().raised }}</div>
+              </div>
+              <div 
+                class="w-8 h-8 flex items-center justify-center rounded-full border-2 border-zinc-300 dark:border-zinc-600 transition-transform duration-300"
+                [class.rotate-180]="activeGiftIndex() === i"
+              >
+                <svg class="w-4 h-4 text-zinc-600 dark:text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </button>
+
+          <!-- Accordion Content -->
+          @if (activeGiftIndex() === i) {
+            <div class="gift-accordion-content mt-6 pt-6 border-t border-zinc-200/50 dark:border-zinc-700/50">
+              <!-- Product Image + Quick Specs -->
+              <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6">
+                <div class="lg:col-span-3">
+                  @if (gift.imageUrl) {
+                    <div class="relative rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-900 aspect-video flex items-center justify-center">
+                      <img 
+                        [src]="gift.imageUrl" 
+                        [alt]="gift.brand + ' ' + gift.name"
+                        class="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                      <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                    </div>
+                  } @else {
+                    <div class="rounded-xl bg-gradient-to-br from-[#cc0000]/20 to-[#8b0000]/20 dark:from-[#cc0000]/10 dark:to-[#8b0000]/10 aspect-video flex items-center justify-center">
+                      <span class="text-8xl opacity-50">{{ gift.icon }}</span>
+                    </div>
+                  }
+                </div>
+                <div class="lg:col-span-2 space-y-4">
+                  <div>
+                    <h4 class="text-sm font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider font-inter">{{ t().description }}</h4>
+                    <p class="text-sm text-zinc-700 dark:text-zinc-300 mt-1 font-inter leading-relaxed">
+                      {{ gift.longDescription }}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider font-inter">{{ t().specs }}</h4>
+                    <div class="mt-1 space-y-1">
+                      @for (spec of gift.specs; track spec.label) {
+                        <div class="flex justify-between text-xs py-0.5 border-b border-zinc-100 dark:border-zinc-700/50">
+                          <span class="text-zinc-600 dark:text-zinc-400 font-inter">{{ spec.label }}</span>
+                          <span class="text-zinc-800 dark:text-zinc-200 font-semibold font-inter">{{ spec.value }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Per-Gift Progress -->
+              <div class="mb-4">
+                <div class="flex items-center justify-between mb-1">
+                  <h4 class="text-sm font-semibold text-zinc-600 dark:text-zinc-400 font-inter">{{ t().giftProgress }}</h4>
+                  <span class="text-lg font-bold text-zinc-800 dark:text-white font-outfit">
+                    {{ getGiftPercentage(gift) | number:'1.0-0' }}%
+                  </span>
+                </div>
+                <div class="relative h-2 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                  <div 
+                    class="absolute top-0 left-0 h-full rounded-full transition-all duration-500"
+                    [style.width.%]="getGiftPercentage(gift)"
+                    [style.background-color]="gift.color"
+                  ></div>
+                </div>
+                <div class="flex justify-between text-xs text-zinc-500 dark:text-zinc-400 mt-1 font-inter">
+                  <span>{{ getGiftRaised(gift) }}€ {{ t().raised }}</span>
+                  <span>{{ gift.price }}€</span>
+                </div>
+              </div>
+
+              <!-- Gift Contributors -->
+              <div>
+                <h4 class="text-sm font-semibold text-zinc-600 dark:text-zinc-400 mb-2 font-inter">{{ t().contributors }}</h4>
+                @if (gift.contributors.length > 0) {
+                  <div class="space-y-1.5">
+                    @for (contributor of gift.contributors; track $index) {
+                      <div class="flex items-center gap-2">
+                        <span 
+                          class="w-2 h-2 rounded-full flex-shrink-0" 
+                          [style.background-color]="contributor.color"
+                        ></span>
+                        <span class="text-xs text-zinc-700 dark:text-zinc-300 font-inter flex-1">{{ contributor.name }}</span>
+                        <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 font-outfit">{{ contributor.amount }}€</span>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <p class="text-xs text-zinc-400 dark:text-zinc-400 italic font-inter">{{ t().beFirst }}</p>
+                }
+              </div>
+
+              <!-- Donate Button -->
+              <button
+                (click)="openModal()"
+                class="mt-4 w-full py-3 px-4 bg-gradient-to-r from-[#cc0000] to-[#8b0000] text-white font-bold text-sm rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300 font-outfit"
+              >
+                {{ t().donateToThis }}
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Stats + Charts Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+      <!-- Left: Stats Cards -->
+      <div class="lg:col-span-8 space-y-6">
+
+        <!-- Stats Cards Row -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="dashboard-card-small">
+            <div class="text-sm text-zinc-600 dark:text-zinc-400 mb-1 font-inter">{{ t().statsGrowth }}</div>
+            <div class="text-3xl font-bold text-zinc-800 dark:text-white mb-1 font-outfit">{{ overallChartData().growth | number:'1.2-2' }}%</div>
+            <div class="flex items-center gap-1 text-green-600 dark:text-green-400 text-xs">
+              <span>↑</span>
+            </div>
+          </div>
+          <div class="dashboard-card-small">
+            <div class="text-sm text-zinc-600 dark:text-zinc-400 mb-1 font-inter">{{ t().statsTotalContributors }}</div>
+            <div class="text-3xl font-bold text-zinc-800 dark:text-white mb-1 font-outfit">{{ uniqueContributorCount() }}</div>
+            <div class="text-xs text-zinc-500 dark:text-zinc-400 font-inter">{{ t().people }}</div>
+          </div>
+          <div class="dashboard-card-small">
+            <div class="text-sm text-zinc-600 dark:text-zinc-400 mb-1 font-inter">{{ t().statsEarnings }}</div>
+            <div class="text-3xl font-bold text-zinc-800 dark:text-white mb-1 font-outfit">{{ overallRaised() | number:'1.0-0' }}€</div>
+            <div class="text-xs text-zinc-500 dark:text-zinc-400 font-inter">{{ t().raised }}</div>
+          </div>
+          <div class="dashboard-card-small">
+            <div class="text-sm text-zinc-600 dark:text-zinc-400 mb-1 font-inter">{{ t().statsGifts }}</div>
+            <div class="text-3xl font-bold text-zinc-800 dark:text-white mb-1 font-outfit">{{ gifts.length }}</div>
+            <div class="text-xs text-zinc-500 dark:text-zinc-400 font-inter">{{ t().giftItems }}</div>
+          </div>
+        </div>
+
+        <!-- Donation Activity Chart -->
+        <div class="dashboard-card">
+          <h3 class="text-lg font-semibold text-zinc-800 dark:text-white mb-4 font-metal">{{ t().statsEarnings }}</h3>
+          <div class="flex items-end justify-between gap-2 donation-chart-container">
+            @for (donation of overallChartData().dailyDonations; track $index) {
+              <div class="flex-1 flex flex-col items-center gap-1 h-full">
+                <div class="relative w-full h-full flex items-end justify-center">
+                  <div
+                    class="w-full max-w-[50px] mx-auto rounded-t-lg transition-all duration-500"
+                    [style.height.%]="getBarWidth(donation)"
+                    [style.min-height.px]="donation > 0 ? 8 : 0"
+                    [style.background-color]="getBarColor(donation)"
+                  ></div>
+                </div>
+                <div class="flex flex-col items-center gap-0">
+                  <span class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">{{ donation }}€</span>
+                  <span class="text-[9px] text-zinc-500 dark:text-zinc-400 font-inter">{{ overallChartData().days[$index] }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Friendly Disclaimer -->
+        <div class="dashboard-card border-l-4 border-[#cc0000] dark:border-[#8b0000] disclaimer-card-compact">
+          <div class="flex items-start gap-3">
+            <div class="text-2xl">🎸</div>
+            <div class="flex-1">
+              <h3 class="text-sm font-semibold text-zinc-800 dark:text-white mb-1 font-metal">{{ t().friendlyDisclaimerTitle }}</h3>
+              <p class="text-sm text-zinc-600 dark:text-zinc-400 font-inter leading-tight">
+                {{ t().friendlyDisclaimerText }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Sidebar -->
+      <div class="lg:col-span-4 flex flex-col gap-6">
+
+        <!-- Thank You Card -->
+        <div class="dashboard-card relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-[#cc0000]/5 to-[#8b0000]/5"></div>
+          <div class="relative z-10">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <span class="text-2xl">💜</span>
+                <h3 class="text-lg font-semibold bg-gradient-to-r from-[#cc0000] to-[#8b0000] bg-clip-text text-transparent font-metal">{{ t().thankYouTitle }}</h3>
+              </div>
+              <div class="text-right">
+                <div class="text-2xl font-bold text-[#cc0000] font-outfit">{{ uniqueContributorCount() }}</div>
+                <div class="text-[10px] text-zinc-500 dark:text-zinc-400 font-inter uppercase">{{ t().people }}</div>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              @for (contributor of overallContributors(); track contributor.name) {
+                <span 
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full border transition-all hover:scale-105"
+                  [style.background-color]="contributor.color + '15'"
+                  [style.border-color]="contributor.color + '40'"
+                  [style.color]="contributor.color"
+                >
+                  <span class="w-2 h-2 rounded-full" [style.background-color]="contributor.color"></span>
+                  {{ contributor.name }}
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Contributors Pie Chart -->
+        <div class="dashboard-card flex-grow">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-1 h-8 bg-gradient-to-b from-[#cc0000] to-[#8b0000] rounded-full"></div>
+              <div>
+                <h3 class="text-lg font-semibold text-zinc-800 dark:text-white font-metal">{{ t().contributors }}</h3>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400 font-inter">{{ uniqueContributorCount() }} {{ t().total | lowercase }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="relative w-full aspect-square max-w-[200px] mx-auto mb-4">
+            <svg class="w-full h-full relative z-10" viewBox="0 0 100 100">
+              @for (segment of pieSegments(); track $index; let idx = $index) {
+                <path
+                  [attr.d]="segment.d"
+                  [attr.fill]="segment.color"
+                  [attr.fill-opacity]="segment.name === 'Šimon' ? '0.5' : '1'"
+                  class="pie-segment"
+                  (mouseenter)="onContributorHover(idx, $event)"
+                  (mousemove)="onContributorHover(idx, $event)"
+                  (mouseleave)="onContributorHover(null)"
+                />
+              }
+              <circle cx="50" cy="50" r="25" class="pie-center-circle"/>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div class="text-center">
+                <div class="text-2xl font-bold bg-gradient-to-r from-[#cc0000] to-[#8b0000] bg-clip-text text-transparent font-outfit">
+                  {{ overallRaised() }}€
+                </div>
+                <div class="text-[10px] text-zinc-500 dark:text-zinc-400 font-inter uppercase tracking-wider">{{ t().total }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Contributor -->
+        @if (topContributor().name) {
+          <div class="dashboard-card py-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">🏆</span>
+                <div>
+                  <div class="text-xs text-zinc-500 dark:text-zinc-400 font-inter uppercase">{{ t().topContributor }}</div>
+                  <div class="text-sm font-semibold text-zinc-800 dark:text-white font-metal">{{ topContributor().name }}</div>
+                </div>
+              </div>
+              <div class="text-2xl font-bold bg-gradient-to-r from-[#cc0000] to-[#8b0000] bg-clip-text text-transparent font-outfit">
+                {{ topContributor().amount }}€
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Donation Modal -->
+  @if (showModal()) {
+    <div 
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md"
+      (click)="closeModal()"
+    >
+      <div 
+        class="modal-card max-w-md w-full mx-4 p-6"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-2xl font-bold bg-gradient-to-r from-[#cc0000] to-[#8b0000] bg-clip-text text-transparent font-metal">
+            {{ t().modalTitle }}
+          </h3>
+          <button 
+            (click)="closeModal()"
+            class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors text-xl"
+          >
+            ✕
+          </button>
+        </div>
+        <div>
+          <p class="text-zinc-700 dark:text-zinc-300 mb-6 font-inter">
+            {{ t().modalDescription }}
+          </p>
+          <div class="bg-zinc-100 dark:bg-zinc-900/50 p-4 rounded-lg mb-4 space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 font-inter">{{ t().modalName }}</label>
+              <code class="block text-base font-mono text-zinc-900 dark:text-white break-all bg-white dark:bg-zinc-900/50 p-2 rounded border border-zinc-200 dark:border-zinc-700">
+                {{ paymentInfo.name }}
+              </code>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 font-inter">{{ t().modalIban }}</label>
+              <div class="flex items-center gap-2">
+                <code class="flex-1 text-base font-mono text-zinc-900 dark:text-white break-all bg-white dark:bg-zinc-900/50 p-2 rounded border border-zinc-200 dark:border-zinc-700">
+                  {{ formatIBAN(paymentInfo.iban) }}
+                </code>
+                <button
+                  (click)="copyToClipboard(paymentInfo.iban)"
+                  class="px-4 py-2 bg-gradient-to-r from-[#cc0000] to-[#8b0000] text-white rounded-lg hover:opacity-90 transition-opacity font-inter text-sm font-semibold"
+                >
+                  {{ t().modalCopy }}
+                </button>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 font-inter">{{ t().modalBicSwift }}</label>
+              <code class="block text-base font-mono text-zinc-900 dark:text-white break-all bg-white dark:bg-zinc-900/50 p-2 rounded border border-zinc-200 dark:border-zinc-700">
+                {{ paymentInfo.bicSwift }}
+              </code>
+            </div>
+          </div>
+          <div class="text-xs text-zinc-600 dark:text-zinc-400 font-inter">
+            {{ t().modalThankYou }}
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

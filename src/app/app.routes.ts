@@ -38,6 +38,11 @@ export const routes: Routes = [
       import('./features/christmas-gift/christmas-gift.component').then(m => m.ChristmasGiftComponent)
   },
   {
+    path: 'norbert-gift',
+    loadComponent: () =>
+      import('./features/norbert-gift/norbert-gift.component').then(m => m.NorbertGiftComponent)
+  },
+  {
     path: 'snippet-vault',
     loadComponent: () =>
       import('./features/snippet-vault/snippet-vault.component').then(m => m.SnippetVaultComponent)

@@ -1,0 +1,180 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+:host-context(.dark) {
+  background: #000000;
+}
+
+.dashboard-card {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.disclaimer-card-compact {
+  padding: 12px 16px;
+}
+
+.modal-card {
+  background: white;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+::ng-deep .dark .modal-card {
+  background: rgb(28, 28, 28);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dashboard-card-small {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+::ng-deep .dark .dashboard-card {
+  background: rgba(24, 24, 24, 0.85) !important;
+}
+
+::ng-deep .dark .dashboard-card-small {
+  background: rgba(24, 24, 24, 0.85) !important;
+}
+
+.gift-accordion-item {
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &.expanded {
+    border-left: 3px solid #cc0000;
+  }
+}
+
+.gift-accordion-header {
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    .text-zinc-800 {
+      color: #cc0000;
+    }
+  }
+}
+
+.gift-accordion-content {
+  animation: accordionSlideIn 0.3s ease-out;
+}
+
+@keyframes accordionSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+.donation-chart-container {
+  height: 180px;
+}
+
+.pie-segment {
+  transition: opacity 0.25s ease-out, filter 0.25s ease-out;
+  opacity: 0.9;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 1;
+    filter: brightness(1.3) saturate(1.3);
+  }
+}
+
+.pie-center-circle {
+  fill: white;
+  pointer-events: none;
+}
+
+::ng-deep .dark .pie-center-circle {
+  fill: rgb(24, 24, 24);
+}
+
+.rotating-subtitle {
+  position: relative;
+  min-height: 1.2em;
+  display: inline-block;
+  margin-top: 0.25rem;
+}
+
+.rotating-text {
+  display: inline-block;
+  will-change: transform, opacity;
+  animation: none;
+}
+
+.rotating-text[data-key]:not([data-key=""]) {
+  animation: wipeRight 2.5s ease-in-out;
+}
+
+@keyframes wipeRight {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0% 0 0);
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-card {
+    padding: 16px;
+  }
+  .dashboard-card-small {
+    padding: 12px;
+  }
+  .donation-chart-container {
+    height: 120px;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(204, 0, 0, 0.3);
+  border-radius: 3px;
+  &:hover {
+    background: rgba(204, 0, 0, 0.5);
+  }
+}

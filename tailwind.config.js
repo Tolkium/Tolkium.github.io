@@ -9,6 +9,7 @@ module.exports = {
       fontFamily: {
         'outfit': ['Outfit', 'sans-serif'],
         'inter': ['Inter', 'sans-serif'],
+        'metal': ['Metal Mania', 'cursive'],
       }
     },
   },

@@ -108,14 +108,6 @@ export const uiReducer = createReducer(
     ...state,
     enableBrownianMotion
   })),
-  on(UiActions.toggleClusterBreaking, state => ({
-    ...state,
-    enableClusterBreaking: !state.enableClusterBreaking
-  })),
-  on(UiActions.setClusterBreaking, (state, { enableClusterBreaking }) => ({
-    ...state,
-    enableClusterBreaking
-  })),
   on(UiActions.setNumPoints, (state, { value }) => ({ ...state, numPoints: value })),
   on(UiActions.setConnectionRadius, (state, { value }) => ({ ...state, connectionRadius: value })),
   on(UiActions.setMagneticRadius, (state, { value }) => ({ ...state, magneticRadius: value })),
@@ -128,15 +120,6 @@ export const uiReducer = createReducer(
   on(UiActions.setRepulsionStrengthValue, (state, { value }) => ({ ...state, repulsionStrength: value })),
   on(UiActions.setDampingFactorValue, (state, { value }) => ({ ...state, dampingFactor: value })),
   on(UiActions.setBrownianStrengthValue, (state, { value }) => ({ ...state, brownianStrength: value })),
-  on(UiActions.setClusterThresholdValue, (state, { value }) => ({ ...state, clusterThreshold: value })),
-  on(UiActions.setExplosionForceValue, (state, { value }) => ({ ...state, explosionForce: value })),
-  on(UiActions.setClusterCheckIntervalValue, (state, { value }) => ({ ...state, clusterCheckInterval: value })),
-  on(UiActions.setMinClusterSizeValue, (state, { value }) => ({ ...state, minClusterSize: value })),
-  on(UiActions.setMagneticMode, (state, { mode }) => ({ ...state, magneticMode: mode })),
-  on(UiActions.setMagneticMinStrengthValue, (state, { value }) => ({ ...state, magneticMinStrength: value })),
-  on(UiActions.setMagneticMaxStrengthValue, (state, { value }) => ({ ...state, magneticMaxStrength: value })),
-  on(UiActions.setMagneticInverseCoefficientValue, (state, { value }) => ({ ...state, magneticInverseCoefficient: value })),
-  on(UiActions.setMagneticFluctuationSpeedValue, (state, { value }) => ({ ...state, magneticFluctuationSpeed: value })),
   on(UiActions.togglePolygonStabilizer, state => ({
     ...state,
     enablePolygonStabilizer: !state.enablePolygonStabilizer
@@ -147,6 +130,17 @@ export const uiReducer = createReducer(
   })),
   on(UiActions.setPolygonTargetSpacingValue, (state, { value }) => ({ ...state, polygonTargetSpacing: value })),
   on(UiActions.setPolygonStrengthValue, (state, { value }) => ({ ...state, polygonStrength: value })),
+  on(UiActions.toggleCooldownAttraction, state => ({
+    ...state,
+    enableCooldownAttraction: !state.enableCooldownAttraction
+  })),
+  on(UiActions.setCooldownAttraction, (state, { enableCooldownAttraction }) => ({
+    ...state,
+    enableCooldownAttraction
+  })),
+  on(UiActions.setCooldownMinDistanceValue, (state, { value }) => ({ ...state, cooldownMinDistance: value })),
+  on(UiActions.setCooldownResetDistanceValue, (state, { value }) => ({ ...state, cooldownResetDistance: value })),
+  on(UiActions.setCooldownDurationValue, (state, { value }) => ({ ...state, cooldownDuration: value })),
   on(UiActions.resetAnimationSettings, state => ({
     ...state,
     numPoints: 100,
@@ -161,17 +155,12 @@ export const uiReducer = createReducer(
     repulsionStrength: 1.2,
     dampingFactor: 0.95,
     brownianStrength: 0.02,
-    clusterThreshold: 20,
-    explosionForce: 300,
-    clusterCheckInterval: 180,
-    minClusterSize: 8,
-    // Do not force magneticMode here; keep current choice
-    magneticMinStrength: 0.0001,
-    magneticMaxStrength: 0.003,
-    magneticInverseCoefficient: 1.0,
-    magneticFluctuationSpeed: 7.5,
     enablePolygonStabilizer: true,
     polygonTargetSpacing: 120,
-    polygonStrength: 0.0008
+    polygonStrength: 0.0008,
+    enableCooldownAttraction: false,
+    cooldownMinDistance: 20,
+    cooldownResetDistance: 80,
+    cooldownDuration: 3000
   }))
 );

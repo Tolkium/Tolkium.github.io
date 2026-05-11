@@ -83,12 +83,6 @@ export const setBrownianMotion = createAction(
   props<{ enableBrownianMotion: boolean }>()
 );
 
-export const toggleClusterBreaking = createAction('[UI] Toggle Cluster Breaking');
-export const setClusterBreaking = createAction(
-  '[UI] Set Cluster Breaking',
-  props<{ enableClusterBreaking: boolean }>()
-);
-
 // Animation configuration actions (numeric values)
 export const setNumPoints = createAction('[UI] Set Number of Points', props<{ value: number }>());
 export const setConnectionRadius = createAction('[UI] Set Connection Radius', props<{ value: number }>());
@@ -102,21 +96,17 @@ export const setRepulsionRadiusValue = createAction('[UI] Set Repulsion Radius',
 export const setRepulsionStrengthValue = createAction('[UI] Set Repulsion Strength', props<{ value: number }>());
 export const setDampingFactorValue = createAction('[UI] Set Damping Factor', props<{ value: number }>());
 export const setBrownianStrengthValue = createAction('[UI] Set Brownian Strength', props<{ value: number }>());
-export const setClusterThresholdValue = createAction('[UI] Set Cluster Threshold', props<{ value: number }>());
-export const setExplosionForceValue = createAction('[UI] Set Explosion Force', props<{ value: number }>());
-export const setClusterCheckIntervalValue = createAction('[UI] Set Cluster Check Interval', props<{ value: number }>());
-export const setMinClusterSizeValue = createAction('[UI] Set Min Cluster Size', props<{ value: number }>());
-
 // Reset all animation settings to defaults
 export const resetAnimationSettings = createAction('[UI] Reset Animation Settings');
 
-// Magnetic behavior extensions
-export const setMagneticMode = createAction('[UI] Set Magnetic Mode', props<{ mode: 'classic' | 'inverse' | 'fluctuating' }>());
-export const setMagneticMinStrengthValue = createAction('[UI] Set Magnetic Min Strength', props<{ value: number }>());
-export const setMagneticMaxStrengthValue = createAction('[UI] Set Magnetic Max Strength', props<{ value: number }>());
-export const setMagneticInverseCoefficientValue = createAction('[UI] Set Magnetic Inverse Coefficient', props<{ value: number }>());
-export const setMagneticFluctuationSpeedValue = createAction('[UI] Set Magnetic Fluctuation Speed', props<{ value: number }>()); 
 export const togglePolygonStabilizer = createAction('[UI] Toggle Polygon Stabilizer');
 export const setPolygonStabilizer = createAction('[UI] Set Polygon Stabilizer', props<{ enablePolygonStabilizer: boolean }>());
 export const setPolygonTargetSpacingValue = createAction('[UI] Set Polygon Target Spacing', props<{ value: number }>());
 export const setPolygonStrengthValue = createAction('[UI] Set Polygon Strength', props<{ value: number }>());
+
+// Magnetic cooldown actions
+export const toggleCooldownAttraction = createAction('[UI] Toggle Cooldown Attraction');
+export const setCooldownAttraction = createAction('[UI] Set Cooldown Attraction', props<{ enableCooldownAttraction: boolean }>());
+export const setCooldownMinDistanceValue = createAction('[UI] Set Cooldown Min Distance', props<{ value: number }>());
+export const setCooldownResetDistanceValue = createAction('[UI] Set Cooldown Reset Distance', props<{ value: number }>());
+export const setCooldownDurationValue = createAction('[UI] Set Cooldown Duration', props<{ value: number }>());

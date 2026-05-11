@@ -104,8 +104,6 @@ export class UiEffects {
           UiActions.setDamping,
           UiActions.toggleBrownianMotion,
           UiActions.setBrownianMotion,
-          UiActions.toggleClusterBreaking,
-          UiActions.setClusterBreaking,
           UiActions.setNumPoints,
           UiActions.setConnectionRadius,
           UiActions.setMagneticRadius,
@@ -118,19 +116,15 @@ export class UiEffects {
           UiActions.setRepulsionStrengthValue,
           UiActions.setDampingFactorValue,
           UiActions.setBrownianStrengthValue,
-          UiActions.setClusterThresholdValue,
-          UiActions.setExplosionForceValue,
-          UiActions.setClusterCheckIntervalValue,
-          UiActions.setMinClusterSizeValue,
-          UiActions.setMagneticMode,
-          UiActions.setMagneticMinStrengthValue,
-          UiActions.setMagneticMaxStrengthValue,
-          UiActions.setMagneticInverseCoefficientValue,
-          UiActions.setMagneticFluctuationSpeedValue,
           UiActions.togglePolygonStabilizer,
           UiActions.setPolygonStabilizer,
           UiActions.setPolygonTargetSpacingValue,
-          UiActions.setPolygonStrengthValue
+          UiActions.setPolygonStrengthValue,
+          UiActions.toggleCooldownAttraction,
+          UiActions.setCooldownAttraction,
+          UiActions.setCooldownMinDistanceValue,
+          UiActions.setCooldownResetDistanceValue,
+          UiActions.setCooldownDurationValue
         ),
         withLatestFrom(this.store.select(selectUiState)),
         tap(([, ui]) => {
@@ -148,7 +142,6 @@ export class UiEffects {
           this.setBoolean('enableRepulsionForce', ui.enableRepulsionForce);
           this.setBoolean('enableDamping', ui.enableDamping);
           this.setBoolean('enableBrownianMotion', ui.enableBrownianMotion);
-          this.setBoolean('enableClusterBreaking', ui.enableClusterBreaking);
 
           this.setNumber('numPoints', ui.numPoints);
           this.setNumber('connectionRadius', ui.connectionRadius);
@@ -162,19 +155,13 @@ export class UiEffects {
           this.setNumber('repulsionStrength', ui.repulsionStrength);
           this.setNumber('dampingFactor', ui.dampingFactor);
           this.setNumber('brownianStrength', ui.brownianStrength);
-          this.setNumber('clusterThreshold', ui.clusterThreshold);
-          this.setNumber('explosionForce', ui.explosionForce);
-          this.setNumber('clusterCheckInterval', ui.clusterCheckInterval);
-          this.setNumber('minClusterSize', ui.minClusterSize);
-
-          this.setString('magneticMode', ui.magneticMode);
-          this.setNumber('magneticMinStrength', ui.magneticMinStrength);
-          this.setNumber('magneticMaxStrength', ui.magneticMaxStrength);
-          this.setNumber('magneticInverseCoefficient', ui.magneticInverseCoefficient);
-          this.setNumber('magneticFluctuationSpeed', ui.magneticFluctuationSpeed);
           this.setBoolean('enablePolygonStabilizer', ui.enablePolygonStabilizer);
           this.setNumber('polygonTargetSpacing', ui.polygonTargetSpacing);
           this.setNumber('polygonStrength', ui.polygonStrength);
+          this.setBoolean('enableCooldownAttraction', ui.enableCooldownAttraction);
+          this.setNumber('cooldownMinDistance', ui.cooldownMinDistance);
+          this.setNumber('cooldownResetDistance', ui.cooldownResetDistance);
+          this.setNumber('cooldownDuration', ui.cooldownDuration);
 
           this.syncDocumentClasses(ui.isDarkMode, ui.hideScrollbar);
         })

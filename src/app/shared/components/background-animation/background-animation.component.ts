@@ -18,28 +18,22 @@ import { ANIMATION_CONSTANTS, Point, RGB } from '../../../models/animation.const
 import { QuadTree } from '../../../utils/quad-tree';
 import {
   selectBrownianStrength,
-  selectClusterCheckInterval,
-  selectClusterThreshold,
   selectConnectionRadius,
+  selectCooldownDuration,
+  selectCooldownMinDistance,
+  selectCooldownResetDistance,
   selectDampingFactor,
   selectEnableBackgroundAnimation,
   selectEnableBrownianMotion,
-  selectEnableClusterBreaking,
+  selectEnableCooldownAttraction,
   selectEnableDamping,
   selectEnableMagneticForce,
   selectEnablePolygonStabilizer,
   selectEnableRepulsionForce,
-  selectExplosionForce,
   selectLineWidth,
-  selectMagneticFluctuationSpeed,
-  selectMagneticInverseCoefficient,
-  selectMagneticMaxStrength,
-  selectMagneticMinStrength,
-  selectMagneticMode,
   selectMagneticRadius,
   selectMagneticStrength,
   selectMaxSpeed,
-  selectMinClusterSize,
   selectMinSpeed,
   selectNumPoints,
   selectPointsSize,
@@ -83,6 +77,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
   private readonly subscriptions = new Subscription();
   private readonly EPSILON = 1e-6;
   private readonly BOUNCE_COEFFICIENT = 0.95;
+  private readonly REFERENCE_DIMENSION = 2160;
 
   private ctx!: CanvasRenderingContext2D;
   private points: Point[] = [];
@@ -105,8 +100,15 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
   private enableRepulsionForce = true;
   private enableDamping = true;
   private enableBrownianMotion = true;
-  private enableClusterBreaking = true;
   private enablePolygonStabilizer = false;
+
+  // Cooldown attraction state
+  private enableCooldownAttraction = false;
+  private cooldownMinDistance = 20;
+  private cooldownResetDistance = 80;
+  private cooldownDuration = 3000;
+  private readonly cooldownMap = new Map<string, number>();
+  private cooldownCleanupCounter = 0;
 
   private readonly colorEffect = effect(() => {
     const c1 = this.animationColorService.color1();
@@ -137,18 +139,18 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
     REPULSION_STRENGTH: ANIMATION_CONSTANTS.REPULSION_STRENGTH,
     DAMPING_FACTOR: ANIMATION_CONSTANTS.DAMPING_FACTOR,
     BROWNIAN_STRENGTH: ANIMATION_CONSTANTS.BROWNIAN_STRENGTH,
-    CLUSTER_THRESHOLD: ANIMATION_CONSTANTS.CLUSTER_THRESHOLD,
-    EXPLOSION_FORCE: ANIMATION_CONSTANTS.EXPLOSION_FORCE,
-    CLUSTER_CHECK_INTERVAL: ANIMATION_CONSTANTS.CLUSTER_CHECK_INTERVAL,
-    MIN_CLUSTER_SIZE: ANIMATION_CONSTANTS.MIN_CLUSTER_SIZE,
-    MAGNETIC_MODE: 'classic' as 'classic' | 'inverse' | 'fluctuating',
-    MAGNETIC_MIN_STRENGTH: 0.0001,
-    MAGNETIC_MAX_STRENGTH: 0.003,
-    MAGNETIC_INVERSE_COEFFICIENT: 1.0,
-    MAGNETIC_FLUCTUATION_SPEED: 1.0,
     POLYGON_TARGET_SPACING: 120,
-    POLYGON_STRENGTH: 0.0008
+    POLYGON_STRENGTH: 0.0008,
+    COOLDOWN_MIN_DISTANCE: 20,
+    COOLDOWN_RESET_DISTANCE: 80,
+    COOLDOWN_DURATION: 3000
   };
+
+  private computeActualNumPoints(): number {
+    const density = this.config.NUM_POINTS;
+    const minDim = Math.min(this.viewportWidth, this.viewportHeight);
+    return Math.max(20, Math.round(density * minDim / this.REFERENCE_DIMENSION));
+  }
 
   public ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) {
@@ -216,18 +218,36 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
       this.store.select(selectEnableBrownianMotion).subscribe(enabled => (this.enableBrownianMotion = enabled))
     );
     this.subscriptions.add(
-      this.store.select(selectEnableClusterBreaking).subscribe(enabled => (this.enableClusterBreaking = enabled))
-    );
-    this.subscriptions.add(
       this.store.select(selectEnablePolygonStabilizer).subscribe(enabled => (this.enablePolygonStabilizer = enabled))
     );
 
     this.subscriptions.add(
-      this.store.select(selectNumPoints).subscribe(value => {
-        const oldCount = this.config.NUM_POINTS;
-        this.config.NUM_POINTS = value;
-        if (this.points.length > 0 && oldCount !== value) {
-          this.adjustParticleCount(value);
+      this.store.select(selectEnableCooldownAttraction).subscribe(enabled => {
+        this.enableCooldownAttraction = enabled;
+        if (!enabled) {
+          this.cooldownMap.clear();
+        }
+      })
+    );
+    this.bindNumericConfig(selectCooldownMinDistance, value => {
+      this.config.COOLDOWN_MIN_DISTANCE = value;
+      this.cooldownMinDistance = value;
+    });
+    this.bindNumericConfig(selectCooldownResetDistance, value => {
+      this.config.COOLDOWN_RESET_DISTANCE = value;
+      this.cooldownResetDistance = value;
+    });
+    this.bindNumericConfig(selectCooldownDuration, value => {
+      this.config.COOLDOWN_DURATION = value;
+      this.cooldownDuration = value;
+    });
+
+    this.subscriptions.add(
+      this.store.select(selectNumPoints).subscribe(density => {
+        const oldDensity = this.config.NUM_POINTS;
+        this.config.NUM_POINTS = density;
+        if (this.points.length > 0 && oldDensity !== density) {
+          this.adjustParticleCount(this.computeActualNumPoints());
           this.renderStaticFrameIfPaused();
         }
       })
@@ -236,19 +256,16 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
     this.bindNumericConfig(selectConnectionRadius, value => (this.config.CONNECTION_RADIUS = value));
     this.bindNumericConfig(selectMagneticRadius, value => (this.config.MAGNETIC_RADIUS = value));
     this.bindNumericConfig(selectMagneticStrength, value => (this.config.MAGNETIC_STRENGTH = value));
-    this.bindNumericConfig(selectMagneticMinStrength, value => (this.config.MAGNETIC_MIN_STRENGTH = value));
-    this.bindNumericConfig(selectMagneticMaxStrength, value => (this.config.MAGNETIC_MAX_STRENGTH = value));
-    this.bindNumericConfig(selectMagneticInverseCoefficient, value => (this.config.MAGNETIC_INVERSE_COEFFICIENT = value));
-    this.bindNumericConfig(selectMagneticFluctuationSpeed, value => (this.config.MAGNETIC_FLUCTUATION_SPEED = value));
+    this.bindNumericConfig(selectPointsSize, value => (this.config.POINTS_SIZE = value));
+    this.bindNumericConfig(selectLineWidth, value => (this.config.LINE_WIDTH = value));
+    this.bindNumericConfig(selectRepulsionRadius, value => (this.config.REPULSION_RADIUS = value));
+    this.bindNumericConfig(selectRepulsionStrength, value => (this.config.REPULSION_STRENGTH = value));
+    this.bindNumericConfig(selectDampingFactor, value => (this.config.DAMPING_FACTOR = value));
+    this.bindNumericConfig(selectBrownianStrength, value => (this.config.BROWNIAN_STRENGTH = value));
+    this.bindNumericConfig(selectMinSpeed, value => (this.config.MIN_SPEED = value));
+    this.bindNumericConfig(selectMaxSpeed, value => (this.config.MAX_SPEED = value));
     this.bindNumericConfig(selectPolygonTargetSpacing, value => (this.config.POLYGON_TARGET_SPACING = value));
     this.bindNumericConfig(selectPolygonStrength, value => (this.config.POLYGON_STRENGTH = value));
-
-    this.subscriptions.add(
-      this.store.select(selectMagneticMode).subscribe(mode => {
-        this.config.MAGNETIC_MODE = mode;
-        this.renderStaticFrameIfPaused();
-      })
-    );
   }
 
   private bindWindowEvents(): void {
@@ -350,6 +367,10 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
       this.initPoints();
     } else {
       this.clampPointsToViewport();
+      const newCount = this.computeActualNumPoints();
+      if (newCount !== this.points.length) {
+        this.adjustParticleCount(newCount);
+      }
     }
 
     if (!this.isAnimationEnabled) {
@@ -358,7 +379,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
   }
 
   private initPoints(): void {
-    this.points = Array.from({ length: this.config.NUM_POINTS }, (_, index) => this.createRandomPoint(index));
+    this.points = Array.from({ length: this.computeActualNumPoints() }, (_, index) => this.createRandomPoint(index));
     this.collectConnections(false);
   }
 
@@ -418,19 +439,6 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
       const deltaTime = Math.max(0.1, Math.min(3, deltaMs / 16.67));
       this.updatePoints(deltaTime);
       this.drawFrame();
-
-      if (
-        this.enableClusterBreaking &&
-        this.config.CLUSTER_CHECK_INTERVAL > 0 &&
-        this.frameCount % this.config.CLUSTER_CHECK_INTERVAL === 0
-      ) {
-        this.physicsService.breakUpClusters(
-          this.points,
-          this.config.CLUSTER_THRESHOLD,
-          this.config.EXPLOSION_FORCE,
-          this.config.MIN_CLUSTER_SIZE
-        );
-      }
 
       this.animationId = requestAnimationFrame(this.animate);
     } catch (error) {
@@ -504,13 +512,21 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
         this.connectionPairs.push({ point, otherPoint, distance });
 
         if (applyForces) {
-          this.applyPairForces(point, otherPoint, distance);
+          this.applyPairForces(point, otherPoint, i, otherIndex, distance);
         }
+      }
+    }
+
+    if (this.enableCooldownAttraction) {
+      this.cooldownCleanupCounter++;
+      if (this.cooldownCleanupCounter >= 60) {
+        this.cleanupCooldownMap();
+        this.cooldownCleanupCounter = 0;
       }
     }
   }
 
-  private applyPairForces(point: Point, otherPoint: Point, distance: number): void {
+  private applyPairForces(point: Point, otherPoint: Point, i: number, j: number, distance: number): void {
     if (this.enableRepulsionForce && distance < this.config.REPULSION_RADIUS) {
       this.physicsService.applyRepulsionForce(
         point,
@@ -520,37 +536,15 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
         this.config.REPULSION_STRENGTH
       );
     } else if (this.enableMagneticForce && distance < this.config.MAGNETIC_RADIUS) {
-      if (this.config.MAGNETIC_MODE === 'classic') {
+      if (this.enableCooldownAttraction) {
+        this.applyCooldownMagneticForce(point, otherPoint, i, j, distance);
+      } else {
         this.physicsService.applyMagneticForce(
           point,
           otherPoint,
           distance,
           this.config.MAGNETIC_RADIUS,
           this.config.MAGNETIC_STRENGTH
-        );
-      } else if (this.config.MAGNETIC_MODE === 'inverse') {
-        this.physicsService.applyMagneticForceInverse(
-          point,
-          otherPoint,
-          distance,
-          this.config.MAGNETIC_RADIUS,
-          this.config.MAGNETIC_MIN_STRENGTH,
-          this.config.MAGNETIC_MAX_STRENGTH,
-          this.config.MAGNETIC_INVERSE_COEFFICIENT
-        );
-      } else {
-        const dynamicStrength = this.physicsService.computeFluctuatingStrength(
-          this.config.MAGNETIC_MIN_STRENGTH,
-          this.config.MAGNETIC_MAX_STRENGTH,
-          this.config.MAGNETIC_FLUCTUATION_SPEED,
-          this.currentTimeMs
-        );
-        this.physicsService.applyMagneticForce(
-          point,
-          otherPoint,
-          distance,
-          this.config.MAGNETIC_RADIUS,
-          dynamicStrength
         );
       }
     }
@@ -563,6 +557,43 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
         this.config.POLYGON_TARGET_SPACING,
         this.config.POLYGON_STRENGTH
       );
+    }
+  }
+
+  private applyCooldownMagneticForce(point: Point, otherPoint: Point, i: number, j: number, distance: number): void {
+    const pairKey = `${Math.min(i, j)}-${Math.max(i, j)}`;
+    const now = performance.now();
+    const cooldownEnd = this.cooldownMap.get(pairKey);
+
+    if (distance < this.cooldownMinDistance) {
+      if (!cooldownEnd || now >= cooldownEnd) {
+        this.cooldownMap.set(pairKey, now + this.cooldownDuration);
+      }
+      return;
+    }
+
+    if (cooldownEnd !== undefined) {
+      if (now < cooldownEnd && distance < this.cooldownResetDistance) {
+        return;
+      }
+      this.cooldownMap.delete(pairKey);
+    }
+
+    this.physicsService.applyMagneticForce(
+      point,
+      otherPoint,
+      distance,
+      this.config.MAGNETIC_RADIUS,
+      this.config.MAGNETIC_STRENGTH
+    );
+  }
+
+  private cleanupCooldownMap(): void {
+    const now = performance.now();
+    for (const [key, endTime] of this.cooldownMap) {
+      if (now >= endTime) {
+        this.cooldownMap.delete(key);
+      }
     }
   }
 

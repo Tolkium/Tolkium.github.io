@@ -74,11 +74,6 @@ export const selectEnableBrownianMotion = createSelector(
   (state: UiState) => state.enableBrownianMotion
 );
 
-export const selectEnableClusterBreaking = createSelector(
-  selectUiState,
-  (state: UiState) => state.enableClusterBreaking
-);
-
 // Animation configuration selectors
 export const selectNumPoints = createSelector(selectUiState, (state: UiState) => state.numPoints);
 export const selectConnectionRadius = createSelector(selectUiState, (state: UiState) => state.connectionRadius);
@@ -92,17 +87,10 @@ export const selectRepulsionRadius = createSelector(selectUiState, (state: UiSta
 export const selectRepulsionStrength = createSelector(selectUiState, (state: UiState) => state.repulsionStrength);
 export const selectDampingFactor = createSelector(selectUiState, (state: UiState) => state.dampingFactor);
 export const selectBrownianStrength = createSelector(selectUiState, (state: UiState) => state.brownianStrength);
-export const selectClusterThreshold = createSelector(selectUiState, (state: UiState) => state.clusterThreshold);
-export const selectExplosionForce = createSelector(selectUiState, (state: UiState) => state.explosionForce);
-export const selectClusterCheckInterval = createSelector(selectUiState, (state: UiState) => state.clusterCheckInterval);
-export const selectMinClusterSize = createSelector(selectUiState, (state: UiState) => state.minClusterSize);
-
-// Magnetic behavior extensions
-export const selectMagneticMode = createSelector(selectUiState, (state: UiState) => state.magneticMode);
-export const selectMagneticMinStrength = createSelector(selectUiState, (state: UiState) => state.magneticMinStrength);
-export const selectMagneticMaxStrength = createSelector(selectUiState, (state: UiState) => state.magneticMaxStrength);
-export const selectMagneticInverseCoefficient = createSelector(selectUiState, (state: UiState) => state.magneticInverseCoefficient);
-export const selectMagneticFluctuationSpeed = createSelector(selectUiState, (state: UiState) => state.magneticFluctuationSpeed);
 export const selectEnablePolygonStabilizer = createSelector(selectUiState, (state: UiState) => state.enablePolygonStabilizer);
 export const selectPolygonTargetSpacing = createSelector(selectUiState, (state: UiState) => state.polygonTargetSpacing);
 export const selectPolygonStrength = createSelector(selectUiState, (state: UiState) => state.polygonStrength);
+export const selectEnableCooldownAttraction = createSelector(selectUiState, (state: UiState) => state.enableCooldownAttraction);
+export const selectCooldownMinDistance = createSelector(selectUiState, (state: UiState) => state.cooldownMinDistance);
+export const selectCooldownResetDistance = createSelector(selectUiState, (state: UiState) => state.cooldownResetDistance);
+export const selectCooldownDuration = createSelector(selectUiState, (state: UiState) => state.cooldownDuration);

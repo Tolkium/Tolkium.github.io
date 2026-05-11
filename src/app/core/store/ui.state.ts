@@ -14,7 +14,6 @@ export interface UiState {
   enableRepulsionForce: boolean;
   enableDamping: boolean;
   enableBrownianMotion: boolean;
-  enableClusterBreaking: boolean;
   // Animation configuration values
   numPoints: number;
   connectionRadius: number;
@@ -28,19 +27,15 @@ export interface UiState {
   repulsionStrength: number;
   dampingFactor: number;
   brownianStrength: number;
-  clusterThreshold: number;
-  explosionForce: number;
-  clusterCheckInterval: number;
-  minClusterSize: number;
-  // Magnetic behavior extensions
-  magneticMode: 'classic' | 'inverse' | 'fluctuating';
-  magneticMinStrength: number;
-  magneticMaxStrength: number;
-  magneticInverseCoefficient: number;
-  magneticFluctuationSpeed: number;
   enablePolygonStabilizer: boolean;
   polygonTargetSpacing: number;
   polygonStrength: number;
+
+  // Magnetic cooldown settings
+  enableCooldownAttraction: boolean;
+  cooldownMinDistance: number;
+  cooldownResetDistance: number;
+  cooldownDuration: number;
 }
 
 // Helper function to load numeric values from localStorage
@@ -85,38 +80,26 @@ export const initialUiState: UiState = {
   enableRepulsionForce: loadBooleanFromStorage('enableRepulsionForce', true),
   enableDamping: loadBooleanFromStorage('enableDamping', true),
   enableBrownianMotion: loadBooleanFromStorage('enableBrownianMotion', true),
-  enableClusterBreaking: loadBooleanFromStorage('enableClusterBreaking', true),
   // Animation configuration values - load from localStorage or use defaults
-  numPoints: loadNumberFromStorage('numPoints', 100),
+  numPoints: loadNumberFromStorage('numPoints', 110),
   connectionRadius: loadNumberFromStorage('connectionRadius', 200),
   magneticRadius: loadNumberFromStorage('magneticRadius', 100),
-  magneticStrength: loadNumberFromStorage('magneticStrength', 0.0005),
+  magneticStrength: loadNumberFromStorage('magneticStrength', 0.0001),
   minSpeed: loadNumberFromStorage('minSpeed', 0.25),
   maxSpeed: loadNumberFromStorage('maxSpeed', 0.6),
   pointsSize: loadNumberFromStorage('pointsSize', 5),
   lineWidth: loadNumberFromStorage('lineWidth', 5),
-  repulsionRadius: loadNumberFromStorage('repulsionRadius', 30),
-  repulsionStrength: loadNumberFromStorage('repulsionStrength', 1.2),
+  repulsionRadius: loadNumberFromStorage('repulsionRadius', 5),
+  repulsionStrength: loadNumberFromStorage('repulsionStrength', 5),
   dampingFactor: loadNumberFromStorage('dampingFactor', 0.95),
   brownianStrength: loadNumberFromStorage('brownianStrength', 0.02),
-  clusterThreshold: loadNumberFromStorage('clusterThreshold', 20),
-  explosionForce: loadNumberFromStorage('explosionForce', 300),
-  clusterCheckInterval: loadNumberFromStorage('clusterCheckInterval', 180),
-  minClusterSize: loadNumberFromStorage('minClusterSize', 8),
-  // Magnetic behavior extensions defaults
-  magneticMode: (() => {
-    try {
-      const saved = localStorage.getItem('magneticMode');
-      return (saved === 'inverse' || saved === 'fluctuating') ? saved : 'classic';
-    } catch {
-      return 'classic';
-    }
-  })(),
-  magneticMinStrength: loadNumberFromStorage('magneticMinStrength', 0.0001),
-  magneticMaxStrength: loadNumberFromStorage('magneticMaxStrength', 0.003),
-  magneticInverseCoefficient: loadNumberFromStorage('magneticInverseCoefficient', 1.0),
-  magneticFluctuationSpeed: loadNumberFromStorage('magneticFluctuationSpeed', 7.5), // Period in seconds (5-10 range)
-  enablePolygonStabilizer: loadBooleanFromStorage('enablePolygonStabilizer', true),
+  enablePolygonStabilizer: loadBooleanFromStorage('enablePolygonStabilizer', false),
   polygonTargetSpacing: loadNumberFromStorage('polygonTargetSpacing', 120),
-  polygonStrength: loadNumberFromStorage('polygonStrength', 0.0008)
+  polygonStrength: loadNumberFromStorage('polygonStrength', 0.0008),
+
+  // Magnetic cooldown - default: off, 20px min distance, 80px reset distance, 3000ms duration
+  enableCooldownAttraction: loadBooleanFromStorage('enableCooldownAttraction', false),
+  cooldownMinDistance: loadNumberFromStorage('cooldownMinDistance', 20),
+  cooldownResetDistance: loadNumberFromStorage('cooldownResetDistance', 80),
+  cooldownDuration: loadNumberFromStorage('cooldownDuration', 3000)
 };

@@ -11,18 +11,6 @@ import { Point } from '../../models/animation.constants';
 export class ParticlePhysicsService {
 
   /**
-   * Compute a fluctuating strength between min and max using a smooth sinusoidal function.
-   * periodSeconds controls the oscillation period (5-10 seconds for one full cycle).
-   */
-  public computeFluctuatingStrength(minStrength: number, maxStrength: number, periodSeconds: number, timeMs: number): number {
-    const clampedPeriod = Math.max(1.0, Math.min(30.0, periodSeconds)); // Clamp to reasonable range
-    const angularFreq = (2 * Math.PI) / clampedPeriod; // Convert period to angular frequency
-    const t = (timeMs / 1000) * angularFreq; // Time in radians
-    const wave = (Math.sin(t) + 1) / 2; // [0,1] smooth oscillation
-    return minStrength + wave * (maxStrength - minStrength);
-  }
-
-  /**
    * Applies a spring-like force that tries to keep particles around a target spacing.
    * Helpful for maintaining polygonal structures without collapsing into clusters.
    */
@@ -51,37 +39,6 @@ export class ParticlePhysicsService {
     point.vy += dirY * force;
     otherPoint.vx -= dirX * force;
     otherPoint.vy -= dirY * force;
-  }
-
-  /**
-   * Magnetic force variant where force grows as distance increases (within radius),
-   * capped between minStrength and maxStrength and controlled by a coefficient.
-   * coefficient > 1 biases force to grow more with distance; < 1 more linear.
-   */
-  public applyMagneticForceInverse(
-    point: Point,
-    otherPoint: Point,
-    distance: number,
-    magneticRadius: number,
-    minStrength: number,
-    maxStrength: number,
-    coefficient: number
-  ): void {
-    if (distance <= 0 || distance >= magneticRadius) {
-      return;
-    }
-    const normalized = Math.pow(distance / magneticRadius, Math.max(0.01, coefficient));
-    const strength = Math.min(maxStrength, Math.max(minStrength, normalized * (maxStrength - minStrength) + minStrength));
-
-    const dx = otherPoint.x - point.x;
-    const dy = otherPoint.y - point.y;
-    const dirX = dx / distance;
-    const dirY = dy / distance;
-
-    point.vx += dirX * strength;
-    point.vy += dirY * strength;
-    otherPoint.vx -= dirX * strength;
-    otherPoint.vy -= dirY * strength;
   }
 
   /**
@@ -183,71 +140,6 @@ export class ParticlePhysicsService {
     // Add random force in range [-strength/2, +strength/2]
     point.vx += (Math.random() - 0.5) * strength;
     point.vy += (Math.random() - 0.5) * strength;
-  }
-
-  /**
-   * Detects and breaks up particle clusters that are too dense.
-   * Applies explosive outward forces to disperse stuck particles.
-   * 
-   * @param points - Array of all particles
-   * @param clusterThreshold - Maximum distance to consider particles as part of same cluster
-   * @param explosionForce - Strength of the explosive force applied
-   * @param minClusterSize - Minimum number of nearby particles to trigger explosion
-   * @returns Number of particles that were in clusters and received explosive force
-   */
-  public breakUpClusters(
-    points: Point[],
-    clusterThreshold: number,
-    explosionForce: number,
-    minClusterSize: number = 4
-  ): number {
-    let clusteredCount = 0;
-
-    // Optimization: Cache point count to avoid repeated array access
-    const pointCount = points.length;
-
-    for (let i = 0; i < pointCount; i++) {
-      const point = points[i];
-      let nearbyCount = 0;
-
-      // Count nearby particles
-      for (let j = 0; j < pointCount; j++) {
-        if (i === j) continue;
-
-        const other = points[j];
-        const dx = other.x - point.x;
-        const dy = other.y - point.y;
-        const distance = Math.hypot(dx, dy);
-
-        if (distance < clusterThreshold) {
-          nearbyCount++;
-        }
-      }
-
-      // If particle is in a dense cluster
-      if (nearbyCount >= minClusterSize) {
-        // Apply random outward explosion force
-        // Cap the force per frame to make explosion gradual and visible (not instant teleportation)
-        const maxForcePerFrame = 15; // Maximum velocity change per frame for smooth explosion
-        const angle = Math.random() * Math.PI * 2;
-        const forceX = Math.cos(angle) * explosionForce;
-        const forceY = Math.sin(angle) * explosionForce;
-        
-        // Apply force gradually over multiple frames by capping the magnitude
-        const forceMagnitude = Math.hypot(forceX, forceY);
-        if (forceMagnitude > maxForcePerFrame) {
-          const scale = maxForcePerFrame / forceMagnitude;
-          point.vx += forceX * scale;
-          point.vy += forceY * scale;
-        } else {
-          point.vx += forceX;
-          point.vy += forceY;
-        }
-        clusteredCount++;
-      }
-    }
-
-    return clusteredCount;
   }
 
   /**

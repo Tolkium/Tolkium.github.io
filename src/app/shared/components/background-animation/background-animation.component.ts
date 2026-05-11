@@ -7,6 +7,7 @@ import {
   OnInit,
   PLATFORM_ID,
   ViewChild,
+  effect,
   inject
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
@@ -47,6 +48,7 @@ import {
   selectRepulsionRadius,
   selectRepulsionStrength
 } from '../../../core/store/ui.selectors';
+import { AnimationColorService } from '../../../core/services/animation-color.service';
 import { ParticlePhysicsService } from '../../../core/services/particle-physics.service';
 
 interface ConnectionPair {
@@ -73,6 +75,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
   private readonly errorHandler = inject(ErrorHandler);
   private readonly store = inject(Store);
   private readonly physicsService = inject(ParticlePhysicsService);
+  private readonly animationColorService = inject(AnimationColorService);
 
   @ViewChild('canvas', { static: true })
   private readonly canvasRef!: ElementRef<HTMLCanvasElement>;
@@ -105,6 +108,17 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
   private enableClusterBreaking = true;
   private enablePolygonStabilizer = false;
 
+  private readonly colorEffect = effect(() => {
+    const c1 = this.animationColorService.color1();
+    const c2 = this.animationColorService.color2();
+    this.config.COLORS.ORANGE = c1;
+    this.config.COLORS.PURPLE = c2;
+    if (this.ctx && this.points.length > 0) {
+      this.recolorPoints();
+      this.renderStaticFrameIfPaused();
+    }
+  });
+
   private config = {
     showBorder: false,
     glowPoints: true,
@@ -117,7 +131,7 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
     MAX_SPEED: ANIMATION_CONSTANTS.MAX_SPEED,
     POINTS_SIZE: ANIMATION_CONSTANTS.POINTS_SIZE,
     LINE_WIDTH: ANIMATION_CONSTANTS.LINE_WIDTH,
-    COLORS: ANIMATION_CONSTANTS.COLORS,
+    COLORS: { ...ANIMATION_CONSTANTS.COLORS },
     GLOW: ANIMATION_CONSTANTS.GLOW,
     REPULSION_RADIUS: ANIMATION_CONSTANTS.REPULSION_RADIUS,
     REPULSION_STRENGTH: ANIMATION_CONSTANTS.REPULSION_STRENGTH,
@@ -228,18 +242,6 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
     this.bindNumericConfig(selectMagneticFluctuationSpeed, value => (this.config.MAGNETIC_FLUCTUATION_SPEED = value));
     this.bindNumericConfig(selectPolygonTargetSpacing, value => (this.config.POLYGON_TARGET_SPACING = value));
     this.bindNumericConfig(selectPolygonStrength, value => (this.config.POLYGON_STRENGTH = value));
-    this.bindNumericConfig(selectMinSpeed, value => (this.config.MIN_SPEED = value));
-    this.bindNumericConfig(selectMaxSpeed, value => (this.config.MAX_SPEED = value));
-    this.bindNumericConfig(selectPointsSize, value => (this.config.POINTS_SIZE = value));
-    this.bindNumericConfig(selectLineWidth, value => (this.config.LINE_WIDTH = value));
-    this.bindNumericConfig(selectRepulsionRadius, value => (this.config.REPULSION_RADIUS = value));
-    this.bindNumericConfig(selectRepulsionStrength, value => (this.config.REPULSION_STRENGTH = value));
-    this.bindNumericConfig(selectDampingFactor, value => (this.config.DAMPING_FACTOR = value));
-    this.bindNumericConfig(selectBrownianStrength, value => (this.config.BROWNIAN_STRENGTH = value));
-    this.bindNumericConfig(selectClusterThreshold, value => (this.config.CLUSTER_THRESHOLD = value));
-    this.bindNumericConfig(selectExplosionForce, value => (this.config.EXPLOSION_FORCE = value));
-    this.bindNumericConfig(selectClusterCheckInterval, value => (this.config.CLUSTER_CHECK_INTERVAL = value));
-    this.bindNumericConfig(selectMinClusterSize, value => (this.config.MIN_CLUSTER_SIZE = value));
 
     this.subscriptions.add(
       this.store.select(selectMagneticMode).subscribe(mode => {
@@ -373,6 +375,12 @@ export class BackgroundAnimationComponent implements OnInit, OnDestroy {
       color: index % 2 === 0 ? this.config.COLORS.ORANGE : this.config.COLORS.PURPLE,
       connections: 0
     };
+  }
+
+  private recolorPoints(): void {
+    for (let i = 0; i < this.points.length; i++) {
+      this.points[i].color = i % 2 === 0 ? this.config.COLORS.ORANGE : this.config.COLORS.PURPLE;
+    }
   }
 
   private adjustParticleCount(newCount: number): void {

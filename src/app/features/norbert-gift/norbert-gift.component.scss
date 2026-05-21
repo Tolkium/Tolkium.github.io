@@ -53,7 +53,7 @@
 }
 
 ::ng-deep .dark .dashboard-card {
-  background: #18181b !important;
+  background: rgba(24, 24, 27, 0.9) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   box-shadow: none !important;
@@ -61,7 +61,7 @@
 }
 
 ::ng-deep .dark .dashboard-card-small {
-  background: #18181b !important;
+  background: rgba(24, 24, 27, 0.88) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   box-shadow: none !important;
@@ -97,6 +97,24 @@
 
 .gift-accordion-content {
   animation: accordionSlideIn 0.3s ease-out;
+}
+
+.gift-product-image-frame {
+  background-color: #f3f3f3;
+  background-image: linear-gradient(135deg, #f8f8f8 0%, #e4e4e4 100%);
+  background-position: center;
+  background-size: 100% 100%;
+}
+
+.gift-product-image-frame.background-blend .gift-product-image {
+  position: relative;
+  z-index: 1;
+  mix-blend-mode: multiply;
+  filter: contrast(1.08) saturate(1.05);
+}
+
+.gift-product-image-frame.cover-only {
+  background-image: none;
 }
 
 @keyframes accordionSlideIn {
@@ -143,10 +161,13 @@
   min-height: 1.2em;
   display: inline-block;
   margin-top: 0.25rem;
+  max-width: 100%;
 }
 
 .rotating-text {
   display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   will-change: transform, opacity;
   animation: none;
 }
@@ -168,13 +189,58 @@
 
 @media (max-width: 768px) {
   .dashboard-card {
-    padding: 16px;
+    padding: 14px;
+    border-radius: 14px;
   }
   .dashboard-card-small {
+    min-width: 0;
     padding: 12px;
   }
   .donation-chart-container {
     height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  :host {
+    overflow-x: hidden;
+  }
+
+  .dashboard-card .font-metal,
+  .dashboard-card-small .font-metal,
+  .gift-accordion-header .font-metal,
+  .modal-card .font-metal {
+    font-family: 'Inter', sans-serif !important;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+
+  .gift-accordion-header h3 {
+    font-size: 0.8125rem;
+    line-height: 1.2;
+  }
+
+  .dashboard-card {
+    padding: 12px;
+  }
+
+  .dashboard-card-small {
+    padding: 10px;
+  }
+
+  .gift-accordion-item.expanded {
+    border-left-width: 2px;
+  }
+
+  .donation-chart-container {
+    gap: 0.25rem;
+    height: 104px;
+  }
+
+  .modal-card {
+    max-height: calc(100vh - 1.5rem);
+    overflow-y: auto;
+    padding: 18px;
   }
 }
 

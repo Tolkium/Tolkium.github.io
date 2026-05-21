@@ -52,7 +52,7 @@ export const GIFTS: WishlistItem[] = [
     description: 'Klasická gitara 4/4 s výrezom a piezo snímačom, ideálna pre začiatočníkov. Set obsahuje puzdro, stojan, ladičku a podnožku.',
     longDescription: 'Klasická gitara štandardnej veľkosti 4/4 s výrezom a piezo snímačom určená predovšetkým pre začiatočníkov. Vrchná doska je vyrobená z lipy, luby a zadná doska z rovnakej dreviny. Javorový krk s menzúrou 650mm, ebonizovaný hmatník s 19 mosadznými pražcami. Piezo snímač s predzosilňovačom a EQ. V balení: puzdro, stojan, klipová ladička, podnožka.',
     price: 145,
-    imageUrl: 'https://picsum.photos/seed/guitar-valencia/600/400',
+    imageUrl: 'https://www.ehudobniny.sk/image/cache/wp/gj/product/513/51331/main-1b0d12a3-680x475h.webp',
     productUrl: 'https://www.muziker.sk/valencia-vc104ce-set-4-4-black-klasicka-gitara-s-elektronikou',
     specs: [
       { label: 'Veľkosť', value: '4/4' },
@@ -86,7 +86,7 @@ export const GIFTS: WishlistItem[] = [
     description: '40W smart amp s Bluetooth, desiatkami efektov a aplikáciou. Kombinuje analógový zvuk s modernými digitálnymi technológiami.',
     longDescription: 'Revolučný inteligentný gitarový zosilňovač Positive Grid Spark 40 kombinuje tradičný analógový zvuk s modernými digitálnymi technológiami. 40W výkon, 30+ modelov zosilňovačov a efektov, Bluetooth streaming, Smart Looper, USB audio rozhranie. Ovládanie cez aplikáciu Spark pre iOS/Android. Užívaj si slobodu tvoriť, učiť sa a experimentovať.',
     price: 219,
-    imageUrl: 'https://picsum.photos/seed/spark-amp/600/400',
+    imageUrl: 'https://www.positivegrid.com/cdn/shop/products/spark-shopify-hero.png?v=1664261701&width=1200',
     productUrl: 'https://www.muziker.sk/positive-grid-spark-40',
     specs: [
       { label: 'Výkon', value: '40W' },
@@ -118,7 +118,7 @@ export const GIFTS: WishlistItem[] = [
     description: 'Všetko čo gitarista potrebuje: stojan, ladička, struny, trsátka, popruh a kábel. Dokonalý doplnok k novej gitare.',
     longDescription: 'Kompletný balíček nevyhnutného príslušenstva pre každého gitaristu. Skladací stojan A-štýl, presná klipová chromatická ladička, sada kvalitných nylonových strún, 10 trsátok rôznych hrúbok, nastaviteľný popruh a 3m nástrojový kábel s 6.3mm jack konektormi.',
     price: 75,
-    imageUrl: 'https://picsum.photos/seed/guitar-pack/600/400',
+    imageUrl: 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=1200&q=80',
     productUrl: 'https://www.muziker.sk/',
     specs: [
       { label: 'Stojan', value: 'Skladací A-štýl' },

@@ -94,7 +94,7 @@ export const TRANSLATIONS: Record<Language, NorbertGiftTranslations> = {
     giftProgress: 'Gift Progress',
   },
   sk: {
-    pageTitle: "🎸 Norbertov zoznam prianí",
+    pageTitle: "🎸 Norbertov Wishlist",
     pageSubtitle: 'Pár vecí, ktoré by otec rád dostal',
     overallProgress: 'Celkový postup zoznamu',
     totalRaised: 'Celkovo vyzbierané',

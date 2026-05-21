@@ -68,6 +68,15 @@ html.dark body.norbert-gift-active {
   background: #000;
 }
 
+html.dark body.norbert-gift-active app-side-menu .menu-container {
+  background-color: #18181b;
+  box-shadow: none;
+}
+
+html.dark body.norbert-gift-active app-side-menu .menu-container.mobile-open {
+  background-color: #18181b;
+}
+
 /* Firefox */
 html {
   scrollbar-width: thin;

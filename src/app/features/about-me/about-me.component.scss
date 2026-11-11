@@ -307,9 +307,11 @@ $breakpoint-lg: 1024px;
 .code-card.experience-card {
   // Light theme
   --tl-main: #5b7a99; // career path line
-  --tl-side: #9a7080; // study-period branch line
-  --tl-main-text: #3f5b77; // badge text, same hue as --tl-main, darker for AA contrast
+  --tl-side: #9a7080; // work-during-studies branch line
+  --tl-school: #8a9099; // school branch line (neutral gray)
+  --tl-main-text: #3f5b77; // badge text, same hue as the line, darker for AA contrast
   --tl-side-text: #7a4c5d;
+  --tl-school-text: #535a64;
   --tl-accent: #3d8079; // hover/interactive only
   --tl-muted: #94a3b8; // initial commit node
   --tl-surface: #ffffff; // card + node fill
@@ -321,13 +323,14 @@ $breakpoint-lg: 1024px;
   --tl-tag-bg: rgba(15, 23, 42, 0.05);
   --tl-hover-bg: color-mix(in srgb, var(--tl-accent) 6%, transparent);
 
-  // Geometry
-  --tl-graph-w: 44px;
+  // Geometry (lane x = center of the line)
+  --tl-graph-w: 68px;
   --tl-main-x: 14px;
-  --tl-side-x: 34px;
+  --tl-school-x: 36px;
+  --tl-side-x: 58px;
   --tl-node-y: 22px; // vertical center of the title line
-  --tl-node: 12px;
-  --tl-stroke: 2px;
+  --tl-node: 14px;
+  --tl-stroke: 3px;
 
   width: 100%;
   display: flex;
@@ -341,6 +344,8 @@ $breakpoint-lg: 1024px;
   .dark & {
     --tl-main-text: #93acc4;
     --tl-side-text: #c8a2b0;
+    --tl-school: #7c838d;
+    --tl-school-text: #b4bac2;
     --tl-accent: #4f9a94;
     --tl-muted: #64748b;
     --tl-surface: #1a2537; // matches the other (translucent) cards on the dark page
@@ -356,9 +361,10 @@ $breakpoint-lg: 1024px;
   }
 
   @media (max-width: $breakpoint-md - 1px) {
-    --tl-graph-w: 36px;
-    --tl-main-x: 11px;
-    --tl-side-x: 27px;
+    --tl-graph-w: 46px;
+    --tl-main-x: 10px;
+    --tl-school-x: 24px;
+    --tl-side-x: 38px;
   }
 
   .code-card-header {
@@ -417,59 +423,79 @@ $breakpoint-lg: 1024px;
   margin-left: 0.25rem;
 }
 
+// Lane position + color; --tl-dx = horizontal distance from main (curve size)
+.tl-seg,
+.tl-curve,
+.tl-node {
+  --x: var(--tl-main-x);
+  --c: var(--tl-main);
+  --tl-dx: calc(var(--x) - var(--tl-main-x));
+}
+
+.tl-seg--school,
+.tl-curve--school,
+.tl-node--school {
+  --x: var(--tl-school-x);
+  --c: var(--tl-school);
+}
+
+.tl-seg--side,
+.tl-curve--side,
+.tl-node--side {
+  --x: var(--tl-side-x);
+  --c: var(--tl-side);
+}
+
 .tl-seg {
   position: absolute;
+  left: calc(var(--x) - var(--tl-stroke) / 2);
   width: var(--tl-stroke);
-  background-color: var(--tl-main);
-
-  &--main { left: calc(var(--tl-main-x) - var(--tl-stroke) / 2); }
-  &--side {
-    left: calc(var(--tl-side-x) - var(--tl-stroke) / 2);
-    background-color: var(--tl-side);
-  }
+  border-radius: var(--tl-stroke);
+  background-color: var(--c);
 
   &--above { top: 0; height: var(--tl-node-y); }
   &--below { top: var(--tl-node-y); bottom: 0; }
 
-  // Leave room for the curves
-  &--to-fork { height: calc(var(--tl-node-y) - (var(--tl-side-x) - var(--tl-main-x))); }
-  &--from-merge { top: calc(var(--tl-node-y) + (var(--tl-side-x) - var(--tl-main-x))); }
+  // Leave room for the merge / fork curves
+  &--from-merge { top: calc(var(--tl-node-y) + var(--tl-dx)); }
+  &--to-fork { height: calc(var(--tl-node-y) - var(--tl-dx)); }
+
+  // Round dots, 3px every 8px
+  &--dotted {
+    background: radial-gradient(circle, var(--c) calc(var(--tl-stroke) / 2), transparent calc(var(--tl-stroke) / 2 + 0.5px))
+      center top / var(--tl-stroke) 8px repeat-y;
+  }
 }
 
 .tl-curve {
   position: absolute;
   left: var(--tl-main-x);
-  width: calc(var(--tl-side-x) - var(--tl-main-x));
-  height: calc(var(--tl-side-x) - var(--tl-main-x));
+  width: var(--tl-dx);
+  height: var(--tl-dx);
   overflow: visible;
   fill: none;
-  stroke: var(--tl-side);
+  stroke: var(--c);
   stroke-width: var(--tl-stroke);
 
   &--merge { top: var(--tl-node-y); }
-  &--fork { top: calc(var(--tl-node-y) - (var(--tl-side-x) - var(--tl-main-x))); }
+  &--fork { top: calc(var(--tl-node-y) - var(--tl-dx)); }
 }
 
 .tl-node {
   position: absolute;
   z-index: 1;
   top: calc(var(--tl-node-y) - var(--tl-node) / 2);
-  left: calc(var(--tl-main-x) - var(--tl-node) / 2);
+  left: calc(var(--x) - var(--tl-node) / 2);
   width: var(--tl-node);
   height: var(--tl-node);
   overflow: visible;
   fill: var(--tl-surface);
-  stroke: var(--tl-main);
+  stroke: var(--c);
   stroke-width: var(--tl-stroke);
   transition: fill 120ms ease;
 
   .tl-row:hover & {
     fill: color-mix(in srgb, var(--tl-accent) 6%, var(--tl-surface));
-  }
-
-  &--side {
-    left: calc(var(--tl-side-x) - var(--tl-node) / 2);
-    stroke: var(--tl-side);
   }
 
   // Dashed outline = not a regular commit (break / initial). pathLength=24 -> 6 even dashes
@@ -479,7 +505,7 @@ $breakpoint-lg: 1024px;
   }
 
   &--initial {
-    stroke: var(--tl-muted);
+    --c: var(--tl-muted);
   }
 }
 
@@ -507,7 +533,7 @@ $breakpoint-lg: 1024px;
 
 .tl-title {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start;
   min-width: 0;
   gap: 0.5rem;
   margin: 0;
@@ -520,6 +546,7 @@ $breakpoint-lg: 1024px;
 
 .tl-logo {
   flex-shrink: 0;
+  margin-top: 2px; // centered on the first title line
   width: 16px;
   height: 16px;
   border-radius: 4px;
@@ -544,6 +571,7 @@ $breakpoint-lg: 1024px;
 }
 
 .tl-badge {
+  --c: var(--tl-main);
   flex-shrink: 0;
   margin-left: auto;
   margin-top: 0.0625rem;
@@ -553,13 +581,17 @@ $breakpoint-lg: 1024px;
   line-height: 1.125rem;
   border-radius: 4px;
   color: var(--tl-main-text);
-  background-color: color-mix(in srgb, var(--tl-main) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--tl-main) 25%, transparent);
+  background-color: color-mix(in srgb, var(--c) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c) 25%, transparent);
 
   &--side {
+    --c: var(--tl-side);
     color: var(--tl-side-text);
-    background-color: color-mix(in srgb, var(--tl-side) 10%, transparent);
-    border-color: color-mix(in srgb, var(--tl-side) 25%, transparent);
+  }
+
+  &--school {
+    --c: var(--tl-school);
+    color: var(--tl-school-text);
   }
 }
 
@@ -594,9 +626,14 @@ $breakpoint-lg: 1024px;
   background-color: var(--tl-tag-bg);
 }
 
-.tl-row--initial .tl-body {
-  padding-top: 0.875rem;
-  padding-bottom: 0.75rem;
+// Initial commit: node sits lower so all branches can fork off it
+.tl-row--initial {
+  --tl-node-y: calc(var(--tl-side-x) - var(--tl-main-x) + 10px);
+
+  .tl-body {
+    padding-top: calc(var(--tl-node-y) - 0.5rem);
+    padding-bottom: 0.75rem;
+  }
 }
 
 .tl-initial {

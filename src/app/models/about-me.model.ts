@@ -2,13 +2,10 @@
  * Models for About Me component
  */
 
-// Lane of the experience git graph: `main` = career path, `side` = work during studies
-export type TimelineLane = 'main' | 'side';
-
-// How a commit connects the side lane to the main lane
-// - `merge`: side branch merges into this main-lane commit (enters from below)
-// - `fork`:  side branch forks off right after this main-lane commit (leaves upward)
-export type TimelineConnector = 'merge' | 'fork';
+// Lanes of the experience git graph (left -> right).
+// Every lane starts at "Initial commit"; branch lanes end where they merge into `main`.
+export type TimelineLane = 'main' | 'school' | 'side';
+export type BranchLane = Exclude<TimelineLane, 'main'>;
 
 export interface Experience {
   readonly company: string;
@@ -17,19 +14,31 @@ export interface Experience {
   readonly description: string;
   readonly logoUrl?: string; // Omitted -> neutral monochrome icon
   readonly icon?: string; // ng-icon name used when there is no logo
-  readonly tech: readonly string[];
-  readonly lane: TimelineLane;
-  readonly connector?: TimelineConnector;
+  readonly tech?: readonly string[];
+  readonly lane: TimelineLane; // lane the commit node sits on
+  readonly mergeFrom?: BranchLane; // this main-lane commit merges (and ends) that branch
+  readonly tone?: TimelineLane; // badge color, defaults to `lane`
   readonly isPause?: boolean; // Dashed node (career break)
 }
 
-// Per-row segments of the graph, derived from the ordered experience list
+export interface TimelineSegment {
+  readonly lane: TimelineLane;
+  readonly part: 'above' | 'below'; // above / below the row's node
+  readonly fromMerge?: boolean; // starts below the merge curve
+  readonly toFork?: boolean; // ends above the fork curve (initial commit)
+  readonly dotted?: boolean;
+}
+
+// Graph pieces for one row, derived from the ordered experience list
 export interface TimelineRow {
   readonly experience: Experience;
-  readonly mainAbove: boolean;
-  readonly mainBelow: boolean;
-  readonly sideAbove: boolean;
-  readonly sideBelow: boolean;
+  readonly segments: readonly TimelineSegment[];
+  readonly merges: readonly BranchLane[];
+}
+
+export interface TimelineGraph {
+  readonly rows: readonly TimelineRow[];
+  readonly initial: { readonly segments: readonly TimelineSegment[]; readonly forks: readonly BranchLane[] };
 }
 
 export interface CodeLine {

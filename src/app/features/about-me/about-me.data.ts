@@ -93,7 +93,8 @@ export const EDUCATION = {
 } as const;
 
 // Work experience, newest first. Order matters: the git graph is derived from it.
-// main lane = career path; side lane = work during studies (forks after Siemens, merges into Capco).
+// main = career path, school = studies, side = work during studies.
+// All lanes start at "Initial commit"; school merges into main at STU, side merges into main at Capco.
 export const EXPERIENCES: readonly Experience[] = [
   {
     company: 'Career break',
@@ -135,7 +136,7 @@ export const EXPERIENCES: readonly Experience[] = [
     logoUrl: 'assets/images/capco-logo.ico',
     tech: ['Angular', 'TypeScript', 'RxJS', 'LLM'],
     lane: 'main',
-    connector: 'merge',
+    mergeFrom: 'side',
   },
   {
     company: 'AmNFT',
@@ -157,6 +158,17 @@ export const EXPERIENCES: readonly Experience[] = [
     lane: 'side',
   },
   {
+    company: 'STU Bratislava',
+    badge: 'Education',
+    period: '2018 → 2022',
+    description:
+      'Applied Informatics – Slovak University of Technology in Bratislava, Faculty of Electrical Engineering and Information Technology (FEI).',
+    icon: 'heroAcademicCap',
+    lane: 'main',
+    mergeFrom: 'school',
+    tone: 'school',
+  },
+  {
     company: 'Hmstrsoc.io',
     badge: 'Frontend',
     period: 'Sep 2021 → Dec 2021',
@@ -174,6 +186,5 @@ export const EXPERIENCES: readonly Experience[] = [
     logoUrl: 'assets/images/simens-logo.png',
     tech: ['Angular', 'C#', 'Azure DevOps'],
     lane: 'main',
-    connector: 'fork',
   },
 ] as const;

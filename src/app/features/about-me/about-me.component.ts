@@ -1,8 +1,8 @@
 import { Component, ChangeDetectionStrategy, computed } from '@angular/core';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
-import { heroCpuChip, heroPauseCircle } from '@ng-icons/heroicons/outline';
+import { heroAcademicCap, heroCpuChip, heroPauseCircle } from '@ng-icons/heroicons/outline';
 import { TECHNICAL_SKILLS, SOFT_SKILLS } from '../../models/skills.model';
-import type { Experience, CodeLine, StatCard, TimelineRow } from '../../models/about-me.model';
+import type { BranchLane, Experience, CodeLine, StatCard, TimelineGraph, TimelineSegment } from '../../models/about-me.model';
 import { PROFILE_INFO, STAT_CARDS, CODE_LINES, EDUCATION, EXPERIENCES } from './about-me.data';
 
 @Component({
@@ -11,7 +11,7 @@ import { PROFILE_INFO, STAT_CARDS, CODE_LINES, EDUCATION, EXPERIENCES } from './
   templateUrl: './about-me.component.html',
   styleUrls: ['./about-me.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  viewProviders: [provideIcons({ heroCpuChip, heroPauseCircle })],
+  viewProviders: [provideIcons({ heroAcademicCap, heroCpuChip, heroPauseCircle })],
 })
 export class AboutMeComponent {
   // Immutable data
@@ -50,21 +50,35 @@ export class AboutMeComponent {
 }
 
 /**
- * Derives which graph segments each row draws from the ordered (newest-first) list.
- * The side lane is open between a `merge` commit (top) and a `fork` commit (bottom).
+ * Derives the graph from the ordered (newest-first) list.
+ * `main` runs from HEAD down to "Initial commit"; its last stretch is dotted.
+ * Every branch lane forks off "Initial commit" and runs up to the row that merges it.
  */
-export function buildTimeline(experiences: readonly Experience[]): readonly TimelineRow[] {
-  let sideOpen = false;
-  return experiences.map((experience, index) => {
-    const sideAbove = sideOpen && experience.connector !== 'merge';
-    if (experience.connector === 'merge') sideOpen = true;
-    if (experience.connector === 'fork') sideOpen = false;
-    return {
-      experience,
-      mainAbove: index > 0,
-      mainBelow: true, // continues down to the "Initial commit" row
-      sideAbove,
-      sideBelow: sideOpen,
-    };
+export function buildTimeline(experiences: readonly Experience[]): TimelineGraph {
+  const branches: readonly BranchLane[] = ['school', 'side'];
+  const mergeRow = new Map(branches.map((lane) => [lane, experiences.findIndex((e) => e.mergeFrom === lane)]));
+  const last = experiences.length - 1;
+
+  const rows = experiences.map((experience, i) => {
+    const segments: TimelineSegment[] = [];
+    if (i > 0) segments.push({ lane: 'main', part: 'above' });
+    segments.push({ lane: 'main', part: 'below', dotted: i === last });
+    for (const lane of branches) {
+      const m = mergeRow.get(lane)!;
+      if (i > m) segments.push({ lane, part: 'above' }, { lane, part: 'below' });
+      else if (i === m) segments.push({ lane, part: 'below', fromMerge: true });
+    }
+    return { experience, segments, merges: branches.filter((lane) => mergeRow.get(lane) === i) };
   });
+
+  return {
+    rows,
+    initial: {
+      segments: [
+        { lane: 'main', part: 'above', dotted: true },
+        ...branches.map((lane): TimelineSegment => ({ lane, part: 'above', toFork: true })),
+      ],
+      forks: branches,
+    },
+  };
 }

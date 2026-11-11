@@ -21,24 +21,42 @@ export interface Experience {
   readonly isPause?: boolean; // Dashed node (career break)
 }
 
-export interface TimelineSegment {
+// One row of the graph, drawn as a single SVG in CSS-pixel units.
+// y values are numbers (px) or '100%' (row bottom).
+export interface GraphLine {
   readonly lane: TimelineLane;
-  readonly part: 'above' | 'below'; // above / below the row's node
-  readonly fromMerge?: boolean; // starts below the merge curve
-  readonly toFork?: boolean; // ends above the fork curve (initial commit)
+  readonly x: number;
+  readonly y1: number | string;
+  readonly y2: number | string;
   readonly dotted?: boolean;
 }
 
-// Graph pieces for one row, derived from the ordered experience list
+export interface GraphCurve {
+  readonly lane: TimelineLane;
+  readonly d: string;
+}
+
+export interface GraphNode {
+  readonly lane: TimelineLane;
+  readonly x: number;
+  readonly y: number;
+  readonly kind?: 'pause' | 'initial';
+}
+
+export interface RowGraph {
+  readonly lines: readonly GraphLine[];
+  readonly curves: readonly GraphCurve[];
+  readonly node: GraphNode;
+}
+
 export interface TimelineRow {
   readonly experience: Experience;
-  readonly segments: readonly TimelineSegment[];
-  readonly merges: readonly BranchLane[];
+  readonly graph: RowGraph;
 }
 
 export interface TimelineGraph {
   readonly rows: readonly TimelineRow[];
-  readonly initial: { readonly segments: readonly TimelineSegment[]; readonly forks: readonly BranchLane[] };
+  readonly initial: RowGraph;
 }
 
 export interface CodeLine {

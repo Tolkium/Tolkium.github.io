@@ -1,13 +1,14 @@
 import { Component, ChangeDetectionStrategy, computed } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { heroAcademicCap, heroCpuChip, heroPauseCircle } from '@ng-icons/heroicons/outline';
 import { TECHNICAL_SKILLS, SOFT_SKILLS } from '../../models/skills.model';
-import type { BranchLane, Experience, CodeLine, StatCard, TimelineGraph, TimelineSegment } from '../../models/about-me.model';
+import type { BranchLane, Experience, CodeLine, GraphCurve, GraphLine, StatCard, TimelineGraph, TimelineLane } from '../../models/about-me.model';
 import { PROFILE_INFO, STAT_CARDS, CODE_LINES, EDUCATION, EXPERIENCES } from './about-me.data';
 
 @Component({
   selector: 'app-about-me',
-  imports: [NgIconComponent],
+  imports: [NgIconComponent, NgTemplateOutlet],
   templateUrl: './about-me.component.html',
   styleUrls: ['./about-me.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -49,36 +50,72 @@ export class AboutMeComponent {
 
 }
 
+// Graph geometry in CSS px. Lane centers sit on .5 so 3px strokes are pixel-aligned.
+export const GRAPH = {
+  laneX: { main: 10.5, school: 24.5, side: 38.5 } satisfies Record<TimelineLane, number>,
+  nodeY: 22, // vertical center of the title line
+  initialNodeY: 38, // lower, so every branch can fork off "Initial commit"
+} as const;
+
 /**
  * Derives the graph from the ordered (newest-first) list.
  * `main` runs from HEAD down to "Initial commit"; its last stretch is dotted.
  * Every branch lane forks off "Initial commit" and runs up to the row that merges it.
+ * Each row is one SVG, so lines, curves and nodes share one coordinate system.
  */
 export function buildTimeline(experiences: readonly Experience[]): TimelineGraph {
+  const { laneX, nodeY, initialNodeY } = GRAPH;
+  const mainX = laneX.main;
   const branches: readonly BranchLane[] = ['school', 'side'];
   const mergeRow = new Map(branches.map((lane) => [lane, experiences.findIndex((e) => e.mergeFrom === lane)]));
   const last = experiences.length - 1;
+  const bottom = '100%';
 
   const rows = experiences.map((experience, i) => {
-    const segments: TimelineSegment[] = [];
-    if (i > 0) segments.push({ lane: 'main', part: 'above' });
-    segments.push({ lane: 'main', part: 'below', dotted: i === last });
-    for (const lane of branches) {
-      const m = mergeRow.get(lane)!;
-      if (i > m) segments.push({ lane, part: 'above' }, { lane, part: 'below' });
-      else if (i === m) segments.push({ lane, part: 'below', fromMerge: true });
+    const lines: GraphLine[] = [];
+    const curves: GraphCurve[] = [];
+
+    if (i === last) {
+      lines.push({ lane: 'main', x: mainX, y1: 0, y2: nodeY });
+      lines.push({ lane: 'main', x: mainX, y1: nodeY, y2: bottom, dotted: true });
+    } else {
+      lines.push({ lane: 'main', x: mainX, y1: i === 0 ? nodeY : 0, y2: bottom });
     }
-    return { experience, segments, merges: branches.filter((lane) => mergeRow.get(lane) === i) };
+
+    for (const lane of branches) {
+      const x = laneX[lane];
+      const m = mergeRow.get(lane)!;
+      if (i > m) {
+        lines.push({ lane, x, y1: 0, y2: bottom });
+      } else if (i === m) {
+        const dx = x - mainX;
+        lines.push({ lane, x, y1: nodeY + dx, y2: bottom });
+        curves.push({ lane, d: `M${x} ${nodeY + dx} Q${x} ${nodeY} ${mainX} ${nodeY}` });
+      }
+    }
+
+    return {
+      experience,
+      graph: {
+        lines,
+        curves,
+        node: { lane: experience.lane, x: laneX[experience.lane], y: nodeY, kind: experience.isPause ? 'pause' : undefined },
+      },
+    } as const;
   });
 
   return {
     rows,
     initial: {
-      segments: [
-        { lane: 'main', part: 'above', dotted: true },
-        ...branches.map((lane): TimelineSegment => ({ lane, part: 'above', toFork: true })),
+      lines: [
+        { lane: 'main', x: mainX, y1: 0, y2: initialNodeY, dotted: true },
+        ...branches.map((lane): GraphLine => ({ lane, x: laneX[lane], y1: 0, y2: initialNodeY - (laneX[lane] - mainX) })),
       ],
-      forks: branches,
+      curves: branches.map((lane): GraphCurve => {
+        const x = laneX[lane];
+        return { lane, d: `M${mainX} ${initialNodeY} Q${x} ${initialNodeY} ${x} ${initialNodeY - (x - mainX)}` };
+      }),
+      node: { lane: 'main', x: mainX, y: initialNodeY, kind: 'initial' },
     },
   };
 }

@@ -323,13 +323,10 @@ $breakpoint-lg: 1024px;
   --tl-tag-bg: rgba(15, 23, 42, 0.05);
   --tl-hover-bg: color-mix(in srgb, var(--tl-accent) 6%, transparent);
 
-  // Geometry (lane x = center of the line)
-  --tl-graph-w: 68px;
-  --tl-main-x: 14px;
-  --tl-school-x: 36px;
-  --tl-side-x: 58px;
-  --tl-node-y: 22px; // vertical center of the title line
-  --tl-node: 14px;
+  // Geometry. Lane x positions / node y live in GRAPH (about-me.component.ts);
+  // --tl-node-y must match GRAPH.nodeY so text lines up with the nodes.
+  --tl-graph-w: 48px;
+  --tl-node-y: 22px;
   --tl-stroke: 3px;
 
   width: 100%;
@@ -358,13 +355,6 @@ $breakpoint-lg: 1024px;
 
     background-color: var(--tl-surface);
     border-color: var(--tl-border);
-  }
-
-  @media (max-width: $breakpoint-md - 1px) {
-    --tl-graph-w: 46px;
-    --tl-main-x: 10px;
-    --tl-school-x: 24px;
-    --tl-side-x: 38px;
   }
 
   .code-card-header {
@@ -417,78 +407,36 @@ $breakpoint-lg: 1024px;
 }
 
 // ---------- graph column ----------
+// One SVG per row: lines, curves and node share a coordinate system,
+// so joins stay seamless at any zoom / sub-pixel position.
+// Absolutely positioned so the SVG fills the row without affecting its height.
 .tl-graph {
-  position: relative;
-  flex: 0 0 var(--tl-graph-w);
-  margin-left: 0.25rem;
-}
-
-// Lane position + color; --tl-dx = horizontal distance from main (curve size)
-.tl-seg,
-.tl-curve,
-.tl-node {
-  --x: var(--tl-main-x);
-  --c: var(--tl-main);
-  --tl-dx: calc(var(--x) - var(--tl-main-x));
-}
-
-.tl-seg--school,
-.tl-curve--school,
-.tl-node--school {
-  --x: var(--tl-school-x);
-  --c: var(--tl-school);
-}
-
-.tl-seg--side,
-.tl-curve--side,
-.tl-node--side {
-  --x: var(--tl-side-x);
-  --c: var(--tl-side);
-}
-
-.tl-seg {
   position: absolute;
-  left: calc(var(--x) - var(--tl-stroke) / 2);
-  width: var(--tl-stroke);
-  border-radius: var(--tl-stroke);
-  background-color: var(--c);
-
-  &--above { top: 0; height: var(--tl-node-y); }
-  &--below { top: var(--tl-node-y); bottom: 0; }
-
-  // Leave room for the merge / fork curves
-  &--from-merge { top: calc(var(--tl-node-y) + var(--tl-dx)); }
-  &--to-fork { height: calc(var(--tl-node-y) - var(--tl-dx)); }
-
-  // Round dots, 3px every 8px
-  &--dotted {
-    background: radial-gradient(circle, var(--c) calc(var(--tl-stroke) / 2), transparent calc(var(--tl-stroke) / 2 + 0.5px))
-      center top / var(--tl-stroke) 8px repeat-y;
-  }
-}
-
-.tl-curve {
-  position: absolute;
-  left: var(--tl-main-x);
-  width: var(--tl-dx);
-  height: var(--tl-dx);
+  top: 0;
+  left: 0.25rem;
+  width: var(--tl-graph-w);
+  height: 100%;
   overflow: visible;
+}
+
+.tl-lane--main { --c: var(--tl-main); }
+.tl-lane--school { --c: var(--tl-school); }
+.tl-lane--side { --c: var(--tl-side); }
+
+.tl-line {
   fill: none;
   stroke: var(--c);
   stroke-width: var(--tl-stroke);
+  stroke-linecap: square; // ends overlap neighbouring rows / curves by 1.5px
 
-  &--merge { top: var(--tl-node-y); }
-  &--fork { top: calc(var(--tl-node-y) - var(--tl-dx)); }
+  // Round dots, 3px every 8px
+  &--dotted {
+    stroke-linecap: round;
+    stroke-dasharray: 0 8;
+  }
 }
 
 .tl-node {
-  position: absolute;
-  z-index: 1;
-  top: calc(var(--tl-node-y) - var(--tl-node) / 2);
-  left: calc(var(--x) - var(--tl-node) / 2);
-  width: var(--tl-node);
-  height: var(--tl-node);
-  overflow: visible;
   fill: var(--tl-surface);
   stroke: var(--c);
   stroke-width: var(--tl-stroke);
@@ -513,13 +461,14 @@ $breakpoint-lg: 1024px;
 .tl-body {
   flex: 1;
   min-width: 0;
-  padding: 0.75rem 1rem 0.875rem 0.25rem;
+  padding: 0.75rem 1rem 0.875rem calc(var(--tl-graph-w) + 0.5rem);
 }
 
 .tl-head {
   display: flex;
+  flex-wrap: wrap; // badge drops below a long title instead of squeezing it
   align-items: flex-start;
-  gap: 0.5rem;
+  gap: 0.25rem 0.5rem;
   min-height: 1.25rem;
 }
 
@@ -628,7 +577,7 @@ $breakpoint-lg: 1024px;
 
 // Initial commit: node sits lower so all branches can fork off it
 .tl-row--initial {
-  --tl-node-y: calc(var(--tl-side-x) - var(--tl-main-x) + 10px);
+  --tl-node-y: 38px; // = GRAPH.initialNodeY
 
   .tl-body {
     padding-top: calc(var(--tl-node-y) - 0.5rem);

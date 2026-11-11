@@ -147,16 +147,7 @@
               @for (row of timeline.rows; track row.experience.company; let first = $first) {
                 @let exp = row.experience;
                 <li class="tl-row">
-                  <div class="tl-graph" aria-hidden="true">
-                    @for (seg of row.segments; track $index) {
-                      <span [class]="'tl-seg tl-seg--' + seg.lane + ' tl-seg--' + seg.part"
-                            [class.tl-seg--from-merge]="seg.fromMerge" [class.tl-seg--dotted]="seg.dotted"></span>
-                    }
-                    @for (lane of row.merges; track lane) {
-                      <svg [class]="'tl-curve tl-curve--merge tl-curve--' + lane" viewBox="0 0 20 20" preserveAspectRatio="none"><path d="M20 20 Q20 0 0 0" vector-effect="non-scaling-stroke" /></svg>
-                    }
-                    <svg [class]="'tl-node tl-node--' + exp.lane" [class.tl-node--pause]="exp.isPause" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" pathLength="24" /></svg>
-                  </div>
+                  <ng-container *ngTemplateOutlet="graphTpl; context: { $implicit: row.graph }" />
 
                   <div class="tl-body">
                     <div class="tl-head">
@@ -189,16 +180,7 @@
               }
 
               <li class="tl-row tl-row--initial">
-                <div class="tl-graph" aria-hidden="true">
-                  @for (seg of timeline.initial.segments; track $index) {
-                    <span [class]="'tl-seg tl-seg--' + seg.lane + ' tl-seg--' + seg.part"
-                          [class.tl-seg--to-fork]="seg.toFork" [class.tl-seg--dotted]="seg.dotted"></span>
-                  }
-                  @for (lane of timeline.initial.forks; track lane) {
-                    <svg [class]="'tl-curve tl-curve--fork tl-curve--' + lane" viewBox="0 0 20 20" preserveAspectRatio="none"><path d="M0 20 Q20 20 20 0" vector-effect="non-scaling-stroke" /></svg>
-                  }
-                  <svg class="tl-node tl-node--main tl-node--initial" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" pathLength="24" /></svg>
-                </div>
+                <ng-container *ngTemplateOutlet="graphTpl; context: { $implicit: timeline.initial }" />
                 <div class="tl-body">
                   <span class="tl-initial">Initial commit</span>
                 </div>
@@ -239,3 +221,18 @@
     </footer>
   </div>
 </div>
+
+<ng-template #graphTpl let-g>
+  <svg class="tl-graph" aria-hidden="true">
+    @for (l of g.lines; track $index) {
+      <line [attr.x1]="l.x" [attr.x2]="l.x" [attr.y1]="l.y1" [attr.y2]="l.y2"
+            [class]="'tl-line tl-lane--' + l.lane" [class.tl-line--dotted]="l.dotted" />
+    }
+    @for (c of g.curves; track $index) {
+      <path [attr.d]="c.d" [class]="'tl-line tl-lane--' + c.lane" />
+    }
+    <circle [attr.cx]="g.node.x" [attr.cy]="g.node.y" r="5.5" pathLength="24"
+            [class]="'tl-node tl-lane--' + g.node.lane" [class.tl-node--pause]="g.node.kind === 'pause'"
+            [class.tl-node--initial]="g.node.kind === 'initial'" />
+  </svg>
+</ng-template>

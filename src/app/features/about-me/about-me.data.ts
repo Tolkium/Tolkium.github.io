@@ -2,7 +2,7 @@
  * Data for About Me component
  */
 
-import type { Experience, CodeLine, StatCard, ProfileInfo, BranchColors } from '../../models/about-me.model';
+import type { Experience, CodeLine, StatCard, ProfileInfo } from '../../models/about-me.model';
 
 // Profile information
 export const PROFILE_INFO: ProfileInfo = {
@@ -21,7 +21,7 @@ export const STAT_CARDS: readonly StatCard[] = [
     color: '#f29f67',
   },
   {
-    value: '7',
+    value: '6',
     label: 'Companies',
     color: '#8833cc',
   },
@@ -85,121 +85,95 @@ export const CODE_LINES: readonly CodeLine[] = [
 
 // Education information
 export const EDUCATION = {
-  institution: 'Slovak University of Technology',
-  degree: 'Information Technology',
-  period: '2016 → 2022',
+  institution: 'Slovak University of Technology in Bratislava (STU)',
+  faculty: 'Faculty of Electrical Engineering and Information Technology (FEI)',
+  program: 'Applied Informatics',
+  period: '2018 – 2022',
   icon: '🏛️',
 } as const;
 
-// Branch colors for GitLens-style visualization
-export const BRANCH_COLORS: BranchColors = {
-  main: {
-    light: '#7dd3fc', // sky-300
-    dark: '#7dd3fc',
-    bgLight: '#e0f2fe', // sky-100
-    bgDark: '#0c4a6e', // sky-900
-  },
-  feature: {
-    light: '#a5b4fc', // indigo-300
-    dark: '#fdba74', // orange-300
-    bgLight: '#e0e7ff', // indigo-100
-    bgDark: '#7c2d12', // orange-900
-  },
-  merge: {
-    light: '#5eead4', // teal-300
-    dark: '#f9a8d4', // pink-300
-    bgLight: '#ccfbf1', // teal-100
-    bgDark: '#831843', // pink-900
-  },
-} as const;
-
-// Work experience with branch visualization data
+// Work experience, newest first. Order matters: the git graph is derived from it.
+// main lane = career path; side lane = work during studies (forks after Siemens, merges into Capco).
 export const EXPERIENCES: readonly Experience[] = [
   {
-    company: 'T7',
-    role: 'Fullstack',
-    period: 'Apr 2024 → Aug 2024',
-    description: 'Built analytics dashboard for Etsy seller optimization. Full-stack development with modern frameworks.',
-    icon: '📊',
-    logoUrl: 'assets/images/t7-logo.png',
-    color: '#f29f67',
-    tech: ['Angular', 'Node.js', 'PostgreSQL'] as const,
-    branch: 'main',
-    lineStyle: 'dashed',
+    company: 'Career break',
+    badge: 'Break',
+    period: 'Jul 2025 → Oct 2026',
+    description:
+      'Continued development during the break: QRHant (Angular 22 PWA), Parakeet speech-to-text plugin, Manga Reader TTS.',
+    icon: 'heroPauseCircle',
+    tech: ['Angular', 'C#', 'Local AI'],
+    lane: 'main',
+    isPause: true,
   },
   {
-    company: 'Exomal',
-    role: 'Solidity Dev',
-    period: 'Mar 2024 → Apr 2024',
-    description: 'ERC20 token development and smart contract security auditing.',
-    icon: '⛓️',
-    logoUrl: 'assets/images/exomal-logo.png',
-    color: '#8833cc',
-    tech: ['Solidity', 'Hardhat', 'Web3.js'] as const,
-    branch: 'feature',
-    lineStyle: 'dashed',
-    isBranchStart: true,
+    company: 'Freelance – Web & IoT',
+    badge: 'Freelance',
+    period: 'Aug 2024 → Jun 2025',
+    description:
+      'Independent projects for multiple clients – web control interfaces and firmware for custom IoT devices.',
+    icon: 'heroCpuChip',
+    tech: ['JavaScript', 'ESP32', 'Raspberry Pi'],
+    lane: 'main',
+  },
+  {
+    company: 'T7',
+    badge: 'Fullstack',
+    period: 'Feb 2024 → Jul 2024',
+    description:
+      'Analytics dashboard for Etsy sellers – React frontend, independently designed Node.js/PostgreSQL backend.',
+    logoUrl: 'assets/images/t7-logo.png',
+    tech: ['React', 'TypeScript', 'Node.js', 'PostgreSQL'],
+    lane: 'main',
   },
   {
     company: 'Capco',
-    role: 'Frontend',
-    period: 'Nov 2022 → Jun 2023',
-    description: 'Enterprise banking software development with Angular. Integrated AI-powered solutions.',
-    icon: '🏦',
+    badge: 'Frontend',
+    period: 'Nov 2022 → Aug 2023',
+    description:
+      'Internal banking applications in Angular; internal AI research project on LLMs; co-organized a company hackathon.',
     logoUrl: 'assets/images/capco-logo.ico',
-    color: '#3b82f6',
-    tech: ['Angular', 'TypeScript', 'RxJS', 'AI/ML'] as const,
-    branch: 'main',
-    lineStyle: 'solid',
+    tech: ['Angular', 'TypeScript', 'RxJS', 'LLM'],
+    lane: 'main',
+    connector: 'merge',
   },
   {
     company: 'AmNFT',
-    role: 'Web3 Dev',
-    period: 'Jul 2022 → Sep 2022',
-    description: 'NFT marketplace smart contracts and beautiful frontend interfaces.',
-    icon: '🎨',
+    badge: 'Contract',
+    period: 'Sep 2022 → Oct 2022',
+    description: 'NFT marketplace frontend in React and smart contracts in Solidity.',
     logoUrl: 'assets/images/amnft-logo.png',
-    color: '#14b8a6',
-    tech: ['Solidity', 'React', 'IPFS'] as const,
-    branch: 'merge',
-    lineStyle: 'solid',
-    isMerge: true,
+    tech: ['React', 'Solidity'],
+    lane: 'side',
   },
   {
     company: 'alfaBASE',
-    role: 'Frontend',
+    badge: 'Frontend',
     period: 'Jun 2022 → Aug 2022',
-    description: 'Government IT projects using Angular. Focus on accessibility and security.',
-    icon: '🏛️',
+    description:
+      'Angular frontends for public-sector projects with a focus on accessibility and security; reusable UI component library.',
     logoUrl: 'assets/images/alfabase-logo.png',
-    color: '#6366f1',
-    tech: ['Angular', 'TypeScript', 'SCSS'] as const,
-    branch: 'feature',
-    lineStyle: 'solid',
+    tech: ['Angular', 'TypeScript', 'SCSS'],
+    lane: 'side',
   },
   {
     company: 'Hmstrsoc.io',
-    role: 'Fullstack',
+    badge: 'Frontend',
     period: 'Sep 2021 → Dec 2021',
-    description: 'NFT collection platform with Angular frontend and Solidity smart contracts.',
-    icon: '🐹',
+    description: 'NFT collection website in Angular and Solidity smart contracts.',
     logoUrl: 'assets/images/hmstrsoc-logo.ico',
-    color: '#6366f1',
-    tech: ['Angular', 'Solidity', 'Firebase'] as const,
-    branch: 'merge',
-    lineStyle: 'solid',
-    isBranchEnd: true,
+    tech: ['Angular', 'Solidity', 'Firebase'],
+    lane: 'side',
   },
   {
     company: 'Siemens Healthineers',
-    role: 'Intern',
+    badge: 'Intern',
     period: 'Jul 2019 → Aug 2019',
-    description: 'Azure migration automation tools. First taste of enterprise development.',
-    icon: '⚕️',
+    description:
+      'Web application automating system migration to Azure; CI/CD in Azure DevOps, unit tests.',
     logoUrl: 'assets/images/simens-logo.png',
-    color: '#14b8a6',
-    tech: ['Azure', 'Python', 'PowerShell'] as const,
-    branch: 'main',
-    lineStyle: 'solid',
+    tech: ['Angular', 'C#', 'Azure DevOps'],
+    lane: 'main',
+    connector: 'fork',
   },
 ] as const;

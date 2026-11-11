@@ -1,28 +1,35 @@
-# TolkiumGithubIo
+# tolkium.net
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 20.3.5.
+Personal portfolio of Marek Šípoš – live at [tolkium.net](https://tolkium.net).
 
-## Development server
+Built with Angular 20 (standalone components, signals), NgRx, Tailwind CSS and SCSS.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Development
 
-## Code scaffolding
+```bash
+npm ci
+npm start          # dev server on http://localhost:4200
+npm run build      # production build -> dist/
+npm run lint
+npm test
+```
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Project structure
 
-## Build
+```
+src/app/
+  core/       services (search, animation, physics) and NgRx UI store
+  features/   routed pages (about-me, projects, gallery, snippet-vault, ...)
+  layout/     side menu, search, dark-mode toggle
+  models/     shared TypeScript types
+src/assets/   images and logos
+```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+The experience timeline on the About page is generated from `EXPERIENCES` in
+`src/app/features/about-me/about-me.data.ts`; its colors are CSS custom properties
+(`--tl-*`) at the top of the timeline section in `about-me.component.scss`.
 
-## Running unit tests
+## Deployment
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
-
+Every push to `main` is built and published to GitHub Pages by
+`.github/workflows/deploy.yml`. The custom domain is set in `src/CNAME`.

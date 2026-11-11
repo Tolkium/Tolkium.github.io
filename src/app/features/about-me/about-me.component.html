@@ -124,7 +124,8 @@
               </div>
               <div class="education-details">
                 <h3 class="education-institution">{{ education.institution }}</h3>
-                <p class="education-degree">{{ education.degree }}</p>
+                <p class="education-degree">{{ education.faculty }}</p>
+                <p class="education-degree">{{ education.program }}</p>
                 <p class="education-period">{{ education.period }}</p>
               </div>
             </div>
@@ -132,348 +133,80 @@
         </section>
       </div>
 
-      <!-- Right Column: Experience Git Tree -->
+      <!-- Right Column: Experience Git Graph -->
       <div class="right-column-wrapper">
-        <section class="code-card experience-card experience-card-height">
+        <section class="code-card experience-card experience-card-height" aria-labelledby="experience-heading">
           <div class="code-card-header code-card-header-fixed">
-            <span class="code-header-text"><span class="code-header-icon">⎇</span> git log --graph --oneline</span>
-            <div class="git-branch-indicator">
-              <span class="git-branch-name">main</span>
-              <span class="git-branch-pulse"></span>
-            </div>
+            <h2 id="experience-heading" class="code-header-text tl-heading">
+              <span class="code-header-icon" aria-hidden="true">⎇</span> git log --graph --oneline
+            </h2>
+            <span class="git-branch-name">main</span>
           </div>
-          <div class="code-card-content git-tree-container">
-            <!-- GitLens-style Multi-Branch Graph -->
-            <table class="git-tree-table" role="list" aria-label="Work experience timeline">
-              <thead>
-                <tr>
-                  <th class="git-col-mobile"></th>
-                  <th class="git-col-main"></th>
-                  <th class="git-col-feature"></th>
-                  <th class="git-col-content"></th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Row 1: T7 - Main branch start (dashed) -->
-                <tr class="git-row #git-row-first">
-                  <!-- Mobile: single branch -->
-                  <td class="git-cell git-cell-mobile border-main border-dashed">
-                    <div class="circle-component circle-upper-left border-dashed" [style.border-color]="experiences[0].color"></div>
-                  </td>
-                  <!-- Desktop: Main branch -->
-                  <td class="branch-connector-right git-cell git-cell-desktop border-main border-dashed">
-                    <div class="circle-component circle-upper-left border-dashed" [style.border-color]="experiences[0].color"></div>
-                  </td>
-                  <!-- Desktop: Feature branch (empty) -->
-                  <td class="git-cell git-cell-desktop #border-top-spacer-main"></td>
-                  <!-- Content -->
-                  <td class="git-content-cell">
-                    <div class="experience-header">
-                      <div class="experience-header-left">
-                        <h3 class="experience-company git-text">
-                          @if (experiences[0].logoUrl) {
-                            <img [src]="experiences[0].logoUrl" [alt]="experiences[0].company + ' logo'" class="company-logo">
-                          } @else {
-                            <span class="company-icon">{{ experiences[0].icon }}</span>
-                          }
-                          {{ experiences[0].company }}
-                          <time class="git-period experience-period">{{ experiences[0].period }}</time>
-                        </h3>
-                      </div>
-                      <span class="experience-role" [style.color]="experiences[0].color">
-                        {{ experiences[0].role }}
-                      </span>
-                    </div>
-                    <p class="experience-description">
-                      {{ experiences[0].description }}
-                    </p>
-                    @if (experiences[0].tech?.length) {
-                      <div class="experience-tech-list" role="list" aria-label="Technologies used at {{ experiences[0].company }}">
-                        @for (tech of experiences[0].tech!; track trackByTech($index, tech)) {
-                          <span class="tech-tag" role="listitem">{{ tech }}</span>
-                        }
-                      </div>
+          <div class="code-card-content tl">
+            <ol class="tl-list" aria-label="Work experience timeline">
+              @for (row of timeline; track row.experience.company; let first = $first) {
+                @let exp = row.experience;
+                <li class="tl-row" [class.tl-row--side]="exp.lane === 'side'">
+                  <div class="tl-graph" aria-hidden="true">
+                    @if (row.mainAbove) {
+                      <span class="tl-seg tl-seg--main tl-seg--above"></span>
                     }
-                  </td>
-                </tr>
-
-                <!-- Row 2: Exomal - Feature branch start (dashed) -->
-                <tr class="git-row">
-                  <!-- Mobile: single branch -->
-                  <td class="git-cell git-cell-mobile border-feature">
-                    <div class="circle-component circle-upper-left border-dashed " [style.border-color]="experiences[1].color"></div>
-                  </td>
-                  <!-- Desktop: Main branch continues with branch connector -->
-                  <td class="git-cell git-cell-desktop border-main border-dashed #branch-connector-right"></td>
-                  <!-- Desktop: Feature branch starts with connector from main -->
-                  <td class="git-cell git-cell-desktop border-feature #border-top-spacer-feature branch-connector-corner">
-                    <div class="circle-component circle-upper-left border-dashed" [style.border-color]="experiences[1].color"></div>
-                  </td>
-                  <!-- Content -->
-                  <td class="git-content-cell">
-                    <div class="experience-header">
-                      <div class="experience-header-left">
-                        <h3 class="experience-company git-text">
-                          @if (experiences[1].logoUrl) {
-                            <img [src]="experiences[1].logoUrl" [alt]="experiences[1].company + ' logo'" class="company-logo">
-                          } @else {
-                            <span class="company-icon">{{ experiences[1].icon }}</span>
-                          }
-                          {{ experiences[1].company }}
-                          <time class="git-period experience-period">{{ experiences[1].period }}</time>
-                        </h3>
-                      </div>
-                      <span class="experience-role" [style.color]="experiences[1].color">
-                        {{ experiences[1].role }}
-                      </span>
-                    </div>
-                    <p class="experience-description">
-                      {{ experiences[1].description }}
-                    </p>
-                    @if (experiences[1].tech?.length) {
-                      <div class="experience-tech-list" role="list" aria-label="Technologies used at {{ experiences[1].company }}">
-                        @for (tech of experiences[1].tech!; track trackByTech($index, tech)) {
-                          <span class="tech-tag" role="listitem">{{ tech }}</span>
-                        }
-                      </div>
+                    @if (row.mainBelow) {
+                      <span class="tl-seg tl-seg--main tl-seg--below"></span>
                     }
-                  </td>
-                </tr>
-
-                <!-- Row 3: Capco - Main branch (solid) -->
-                <tr class="git-row git-row-tall">
-                  <!-- Mobile: single branch -->
-                  <td class="git-cell git-cell-mobile border-main">
-                    <div class="circle-component circle-upper-left" [style.border-color]="experiences[2].color"></div>
-                  </td>
-                  <!-- Desktop: Main branch -->
-                  <td class="git-cell git-cell-desktop border-main #border-top-spacer-main">
-                    <div class="circle-component circle-upper-left" [style.border-color]="experiences[2].color"></div>
-                  </td>
-                  <!-- Desktop: Feature branch continues -->
-                  <td class="git-cell git-cell-desktop border-feature #border-top-spacer-main"></td>
-                  <!-- Content -->
-                  <td class="git-content-cell">
-                    <div class="experience-header">
-                      <div class="experience-header-left">
-                        <h3 class="experience-company git-text">
-                          @if (experiences[2].logoUrl) {
-                            <img [src]="experiences[2].logoUrl" [alt]="experiences[2].company + ' logo'" class="company-logo">
-                          } @else {
-                            <span class="company-icon">{{ experiences[2].icon }}</span>
-                          }
-                          {{ experiences[2].company }}
-                          <time class="git-period experience-period">{{ experiences[2].period }}</time>
-                        </h3>
-                      </div>
-                      <span class="experience-role" [style.color]="experiences[2].color">
-                        {{ experiences[2].role }}
-                      </span>
-                    </div>
-                    <p class="experience-description">
-                      {{ experiences[2].description }}
-                    </p>
-                    @if (experiences[2].tech?.length) {
-                      <div class="experience-tech-list" role="list" aria-label="Technologies used at {{ experiences[2].company }}">
-                        @for (tech of experiences[2].tech!; track trackByTech($index, tech)) {
-                          <span class="tech-tag" role="listitem">{{ tech }}</span>
-                        }
-                      </div>
+                    @if (row.sideAbove) {
+                      <span class="tl-seg tl-seg--side tl-seg--above" [class.tl-seg--to-fork]="exp.connector === 'fork'"></span>
                     }
-                  </td>
-                </tr>
-
-                <!-- Row 4: AmNFT - Merge point -->
-                <tr class="git-row git-row-merge">
-                  <!-- Mobile: single branch -->
-                  <td class="git-cell git-cell-mobile border-merge">
-                    <div class="circle-component circle-upper-left circle-merge-offset" [style.border-color]="experiences[3].color"></div>
-                  </td>
-                  <!-- Desktop: Main branch with merge line -->
-                  <td class="git-cell git-cell-desktop border-main border-merge-top">
-                    <div class="circle-component circle-upper-left circle-merge-offset" [style.border-color]="experiences[2].color"></div>
-                  </td>
-                  <!-- Desktop: Feature branch + merge corner -->
-                  <td class="git-cell git-cell-desktop border-feature border-merge-corner-tr border-merge-right"></td>
-                  <!-- Content -->
-                  <td class="git-content-cell">
-                    <div class="experience-header">
-                      <div class="experience-header-left">
-                        <h3 class="experience-company git-text">
-                          @if (experiences[3].logoUrl) {
-                            <img [src]="experiences[3].logoUrl" [alt]="experiences[3].company + ' logo'" class="company-logo">
-                          } @else {
-                            <span class="company-icon">{{ experiences[3].icon }}</span>
-                          }
-                          {{ experiences[3].company }}
-                          <time class="git-period experience-period">{{ experiences[3].period }}</time>
-                        </h3>
-                      </div>
-                      <span class="experience-role" [style.color]="experiences[3].color">
-                        {{ experiences[3].role }}
-                      </span>
-                    </div>
-                    <p class="experience-description">
-                      {{ experiences[3].description }}
-                    </p>
-                    @if (experiences[3].tech?.length) {
-                      <div class="experience-tech-list" role="list" aria-label="Technologies used at {{ experiences[3].company }}">
-                        @for (tech of experiences[3].tech!; track trackByTech($index, tech)) {
-                          <span class="tech-tag" role="listitem">{{ tech }}</span>
-                        }
-                      </div>
+                    @if (row.sideBelow) {
+                      <span class="tl-seg tl-seg--side tl-seg--below" [class.tl-seg--from-merge]="exp.connector === 'merge'"></span>
                     }
-                  </td>
-                </tr>
-
-                <!-- Row 5: alfaBASE - Feature branch -->
-                <tr class="git-row">
-                  <!-- Mobile: single branch -->
-                  <td class="git-cell git-cell-mobile border-merge">
-                    <div class="circle-component circle-upper-left" [style.border-color]="experiences[4].color"></div>
-                  </td>
-                  <!-- Desktop: Main branch -->
-                  <td class="git-cell git-cell-desktop border-main"></td>
-                  <!-- Desktop: Feature branch with merge right border -->
-                  <td class="git-cell git-cell-desktop border-feature border-merge-right">
-                    <div class="circle-component circle-upper-right" [style.border-color]="experiences[4].color"></div>
-                  </td>
-                  <!-- Content -->
-                  <td class="git-content-cell">
-                    <div class="experience-header">
-                      <div class="experience-header-left">
-                        <h3 class="experience-company git-text">
-                          @if (experiences[4].logoUrl) {
-                            <img [src]="experiences[4].logoUrl" [alt]="experiences[4].company + ' logo'" class="company-logo">
-                          } @else {
-                            <span class="company-icon">{{ experiences[4].icon }}</span>
-                          }
-                          {{ experiences[4].company }}
-                          <time class="git-period experience-period">{{ experiences[4].period }}</time>
-                        </h3>
-                      </div>
-                      <span class="experience-role" [style.color]="experiences[4].color">
-                        {{ experiences[4].role }}
-                      </span>
-                    </div>
-                    <p class="experience-description">
-                      {{ experiences[4].description }}
-                    </p>
-                    @if (experiences[4].tech?.length) {
-                      <div class="experience-tech-list" role="list" aria-label="Technologies used at {{ experiences[4].company }}">
-                        @for (tech of experiences[4].tech!; track trackByTech($index, tech)) {
-                          <span class="tech-tag" role="listitem">{{ tech }}</span>
-                        }
-                      </div>
+                    @if (exp.connector === 'merge') {
+                      <svg class="tl-curve tl-curve--merge" viewBox="0 0 20 20"><path d="M20 20 Q20 0 0 0" vector-effect="non-scaling-stroke" /></svg>
                     }
-                  </td>
-                </tr>
-
-                <!-- Row 6: Hmstrsoc.io - Branch end -->
-                <tr class="git-row git-row-tall">
-                  <!-- Mobile: single branch -->
-                  <td class="git-cell git-cell-mobile border-merge">
-                    <div class="circle-component circle-upper-left" [style.border-color]="experiences[5].color"></div>
-                  </td>
-                  <!-- Desktop: Main branch with bottom merge -->
-                  <td class="git-cell git-cell-desktop border-main border-merge-bottom"></td>
-                  <!-- Desktop: Feature branch ends with corner -->
-                  <td class="git-cell git-cell-desktop border-feature border-merge-corner-br border-merge-bottom border-merge-right">
-                    <div class="circle-component circle-upper-right" [style.border-color]="experiences[5].color"></div>
-                  </td>
-                  <!-- Content -->
-                  <td class="git-content-cell">
-                    <div class="experience-header">
-                      <div class="experience-header-left">
-                        <h3 class="experience-company git-text">
-                          @if (experiences[5].logoUrl) {
-                            <img [src]="experiences[5].logoUrl" [alt]="experiences[5].company + ' logo'" class="company-logo">
-                          } @else {
-                            <span class="company-icon">{{ experiences[5].icon }}</span>
-                          }
-                          {{ experiences[5].company }}
-                          <time class="git-period experience-period">{{ experiences[5].period }}</time>
-                        </h3>
-                      </div>
-                      <span class="experience-role" [style.color]="experiences[5].color">
-                        {{ experiences[5].role }}
-                      </span>
-                    </div>
-                    <p class="experience-description">
-                      {{ experiences[5].description }}
-                    </p>
-                    @if (experiences[5].tech?.length) {
-                      <div class="experience-tech-list" role="list" aria-label="Technologies used at {{ experiences[5].company }}">
-                        @for (tech of experiences[5].tech!; track trackByTech($index, tech)) {
-                          <span class="tech-tag" role="listitem">{{ tech }}</span>
-                        }
-                      </div>
+                    @if (exp.connector === 'fork') {
+                      <svg class="tl-curve tl-curve--fork" viewBox="0 0 20 20"><path d="M0 20 Q20 20 20 0" vector-effect="non-scaling-stroke" /></svg>
                     }
-                  </td>
-                </tr>
+                    <svg class="tl-node" [class.tl-node--side]="exp.lane === 'side'" [class.tl-node--pause]="exp.isPause" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" pathLength="24" /></svg>
+                  </div>
 
-                <!-- Row 7: Siemens - Main branch -->
-                <tr class="git-row git-row-merge">
-                  <!-- Mobile: single branch -->
-                  <td class="git-cell git-cell-mobile border-main">
-                    <div class="circle-component circle-upper-left circle-merge-offset" [style.border-color]="experiences[6].color"></div>
-                  </td>
-                  <!-- Desktop: Main branch -->
-                  <td class="git-cell git-cell-desktop border-main">
-                    <div class="circle-component circle-upper-left circle-merge-offset" [style.border-color]="experiences[6].color"></div>
-                  </td>
-                  <!-- Desktop: Feature branch ended -->
-                  <td class="git-cell git-cell-desktop border-feature"></td>
-                  <!-- Content -->
-                  <td class="git-content-cell">
-                    <div class="experience-header">
-                      <div class="experience-header-left">
-                        <h3 class="experience-company git-text">
-                          @if (experiences[6].logoUrl) {
-                            <img [src]="experiences[6].logoUrl" [alt]="experiences[6].company + ' logo'" class="company-logo">
-                          } @else {
-                            <span class="company-icon">{{ experiences[6].icon }}</span>
-                          }
-                          {{ experiences[6].company }}
-                          <time class="git-period experience-period">{{ experiences[6].period }}</time>
-                        </h3>
-                      </div>
-                      <span class="experience-role" [style.color]="experiences[6].color">
-                        {{ experiences[6].role }}
-                      </span>
-                    </div>
-                    <p class="experience-description">
-                      {{ experiences[6].description }}
-                    </p>
-                    @if (experiences[6].tech?.length) {
-                      <div class="experience-tech-list" role="list" aria-label="Technologies used at {{ experiences[6].company }}">
-                        @for (tech of experiences[6].tech!; track trackByTech($index, tech)) {
-                          <span class="tech-tag" role="listitem">{{ tech }}</span>
+                  <div class="tl-body">
+                    <div class="tl-head">
+                      <h3 class="tl-title">
+                        @if (exp.logoUrl) {
+                          <img [src]="exp.logoUrl" alt="" class="tl-logo" width="16" height="16" loading="lazy">
+                        } @else if (exp.icon) {
+                          <ng-icon [name]="exp.icon" size="16" class="tl-logo tl-logo--icon" aria-hidden="true"></ng-icon>
                         }
-                      </div>
-                    }
-                  </td>
-                </tr>
+                        <span>{{ exp.company }}</span>
+                      </h3>
+                      <span class="tl-badge" [class.tl-badge--side]="exp.lane === 'side'">{{ exp.badge }}</span>
+                    </div>
+                    <div class="tl-meta">
+                      <time class="tl-date">{{ exp.period }}</time>
+                      @if (first) {
+                        <span class="tl-ref">(HEAD → main)</span>
+                      }
+                    </div>
+                    <p class="tl-desc">{{ exp.description }}</p>
+                    <ul class="tl-tags" [attr.aria-label]="'Technologies used at ' + exp.company">
+                      @for (tech of exp.tech; track tech) {
+                        <li class="tl-tag">{{ tech }}</li>
+                      }
+                    </ul>
+                  </div>
+                </li>
+              }
 
-                <!-- Initial commit -->
-                <tr class="git-row git-row-initial">
-                  <!-- Mobile: single branch -->
-                  <td class="git-cell git-cell-mobile border-main-short">
-                    <div class="circle-component circle-upper-left circle-initial-offset border-initial border-dashed"></div>
-                  </td>
-                  <!-- Desktop: Main branch ends -->
-                  <td class="git-cell git-cell-desktop border-top-spacer-main border-main-short">
-                    <div class="circle-component circle-upper-left circle-initial-offset border-initial border-dashed"></div>
-                  </td>
-                  <!-- Desktop: Empty -->
-                  <td class="git-cell git-cell-desktop #border-top-spacer-main"></td>
-                  <!-- Content -->
-                  <td class="git-content-cell">
-                    <p class="git-text git-text-initial">🎯 Initial commit</p>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+              <li class="tl-row tl-row--initial">
+                <div class="tl-graph" aria-hidden="true">
+                  <span class="tl-seg tl-seg--main tl-seg--above"></span>
+                  <svg class="tl-node tl-node--initial" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" pathLength="24" /></svg>
+                </div>
+                <div class="tl-body">
+                  <span class="tl-initial">Initial commit</span>
+                </div>
+              </li>
+            </ol>
           </div>
         </section>
       </div>

@@ -300,556 +300,310 @@ $breakpoint-lg: 1024px;
   }
 }
 
-// Git Branch
-.git-branch-indicator {
+// ============================================
+// Experience timeline (git log --graph)
+// All colors live in the custom properties below.
+// ============================================
+.code-card.experience-card {
+  // Light theme
+  --tl-main: #5b7a99; // career path line
+  --tl-side: #9a7080; // study-period branch line
+  --tl-main-text: #3f5b77; // badge text, same hue as --tl-main, darker for AA contrast
+  --tl-side-text: #7a4c5d;
+  --tl-accent: #3d8079; // hover/interactive only
+  --tl-muted: #94a3b8; // initial commit node
+  --tl-surface: #ffffff; // card + node fill
+  --tl-border: rgba(15, 23, 42, 0.08);
+  --tl-title: rgba(15, 23, 42, 0.9);
+  --tl-body: rgba(15, 23, 42, 0.72);
+  --tl-dim: rgba(15, 23, 42, 0.6);
+  --tl-tag-fg: rgba(15, 23, 42, 0.7);
+  --tl-tag-bg: rgba(15, 23, 42, 0.05);
+  --tl-hover-bg: color-mix(in srgb, var(--tl-accent) 6%, transparent);
+
+  // Geometry
+  --tl-graph-w: 44px;
+  --tl-main-x: 14px;
+  --tl-side-x: 34px;
+  --tl-node-y: 22px; // vertical center of the title line
+  --tl-node: 12px;
+  --tl-stroke: 2px;
+
+  width: 100%;
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  flex-direction: column;
+  background-color: var(--tl-surface); // opaque: no background effect behind the timeline
+  backdrop-filter: none;
+  box-shadow: none;
+  border-color: var(--tl-border);
+
+  :host-context(.dark) &,
+  .dark & {
+    --tl-main-text: #93acc4;
+    --tl-side-text: #c8a2b0;
+    --tl-accent: #4f9a94;
+    --tl-muted: #64748b;
+    --tl-surface: #1a2537; // matches the other (translucent) cards on the dark page
+    --tl-border: rgba(255, 255, 255, 0.07);
+    --tl-title: rgba(255, 255, 255, 0.88);
+    --tl-body: rgba(255, 255, 255, 0.7);
+    --tl-dim: rgba(255, 255, 255, 0.55);
+    --tl-tag-fg: rgba(255, 255, 255, 0.7);
+    --tl-tag-bg: rgba(255, 255, 255, 0.06);
+
+    background-color: var(--tl-surface);
+    border-color: var(--tl-border);
+  }
+
+  @media (max-width: $breakpoint-md - 1px) {
+    --tl-graph-w: 36px;
+    --tl-main-x: 11px;
+    --tl-side-x: 27px;
+  }
+
+  .code-card-header {
+    border-bottom-color: var(--tl-border);
+  }
+
+  .code-header-icon {
+    color: var(--tl-main);
+  }
+}
+
+.code-card-header-fixed {
+  flex-shrink: 0;
+}
+
+.tl-heading {
+  margin: 0;
+  font-weight: 400;
 }
 
 .git-branch-name {
   font-size: 0.75rem;
   line-height: 1rem;
-  color: rgba(100, 116, 139, 1);
+  color: var(--tl-dim);
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }
 
-.git-branch-pulse {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 9999px;
-  background-color: rgba(34, 197, 94, 1);
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.tl {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--tl-border) transparent;
 }
 
-// ============================================
-// GitLens-style Multi-Branch Graph
-// ============================================
-
-// Branch color variables
-$branch-main-light: #7dd3fc; // sky-300
-$branch-main-dark: #7dd3fc;
-$branch-main-bg-light: #e0f2fe; // sky-100
-$branch-main-bg-dark: #0c4a6e; // sky-900
-
-$branch-feature-light: #a5b4fc; // indigo-300
-$branch-feature-dark: #fdba74; // orange-300
-$branch-feature-bg-light: #e0e7ff; // indigo-100
-$branch-feature-bg-dark: #7c2d12; // orange-900
-
-$branch-merge-light: #5eead4; // teal-300
-$branch-merge-dark: #f9a8d4; // pink-300
-$branch-merge-bg-light: #ccfbf1; // teal-100
-$branch-merge-bg-dark: #831843; // pink-900
-
-// Git Tree Table - GitLens style
-.git-tree-table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: separate;
-  border-spacing: 0;
-  margin-left: 0.5rem;
-  height: 100%;
-  display: table;
-
-  tbody {
-    display: table-row-group;
-    height: 100%;
-  }
-}
-
-// Column definitions
-.git-col-mobile {
-  width: 4px;
-  display: table-cell;
-
-  @media (min-width: $breakpoint-md) {
-    display: none;
-  }
-}
-
-.git-col-main {
-  width: 1.5625rem; // 25px
-  display: none;
-
-  @media (min-width: $breakpoint-md) {
-    display: table-cell;
-  }
-}
-
-.git-col-feature {
-  width: 1.75rem;
-  display: none;
-
-  @media (min-width: $breakpoint-md) {
-    display: table-cell;
-  }
-}
-
-.git-col-content {
-  width: auto;
-}
-
-// Row styles
-.git-row {
-  position: relative;
-  height: auto; // Auto height for mobile to accommodate content
-  min-height: 3.5rem; // Minimum height for mobile
-
-  @media (min-width: $breakpoint-md) {
-    height: 2.5rem; // Reduced from 3rem
-    min-height: 0;
-  }
-
-  &.git-row-first {
-    min-height: 3.5rem; // Minimum height for mobile
-
-    @media (min-width: $breakpoint-md) {
-      height: 2.5rem; // Reduced from 3rem
-      min-height: 0;
-    }
-  }
-
-  &.git-row-tall {
-    min-height: 4rem; // Taller minimum for mobile
-
-    @media (min-width: $breakpoint-md) {
-      height: 3rem; // Reduced from 3.5rem
-      min-height: 0;
-    }
-  }
-
-  &.git-row-merge {
-    min-height: 3rem; // Minimum height for mobile
-
-    @media (min-width: $breakpoint-md) {
-      height: 2rem; // Reduced from 2.25rem
-      min-height: 0;
-    }
-  }
-
-  &.git-row-initial {
-    min-height: 3rem; // Minimum height for mobile
-
-    @media (min-width: $breakpoint-md) {
-      height: 2.5rem; // Reduced from 3rem
-      min-height: 0;
-    }
-
-    // Apply opacity only to content, not borders
-    .git-content-cell {
-      opacity: 0.6;
-    }
-  }
-}
-
-// Cell styles
-.git-cell {
-  position: relative;
-  padding: 0;
-}
-
-.git-cell-mobile {
-  display: table-cell;
-
-  @media (min-width: $breakpoint-md) {
-    display: none;
-  }
-}
-
-.git-cell-desktop {
-  display: none;
-
-  @media (min-width: $breakpoint-md) {
-    display: table-cell;
-  }
-}
-
-// Content cell
-.git-content-cell {
-  vertical-align: top;
-  padding-left: 1rem; // Reduced padding for mobile
-  padding-top: 0.5rem; // Increased top padding for mobile
-  padding-bottom: 0.75rem; // Increased bottom padding for mobile spacing
-  padding-right: 0.5rem; // Add right padding for mobile
-
-  @media (min-width: $breakpoint-md) {
-    padding-left: 1.5rem; // ps-6
-    padding-top: 0.25rem; // Add small top padding for better alignment
-    padding-bottom: 0.25rem; // Add small bottom padding
-    padding-right: 0;
-  }
-}
-
-.git-text {
-  position: relative;
-  top: -0.5rem; // Align with circle position (moved up slightly)
+.tl-list {
+  list-style: none;
   margin: 0;
-  color: rgba(30, 41, 59, 1);
-  font-family: 'Outfit', sans-serif;
-  font-weight: 500;
-  font-size: 0.8125rem; // Reduced from 0.875rem
-  line-height: 1.25rem; // Reduced from 1.5rem
-
-  :host-context(.dark) &,
-  .dark & {
-    color: rgba(203, 213, 225, 1);
-  }
+  padding: 0.375rem 0;
 }
 
-.git-text-initial {
-  font-style: italic;
-  color: rgba(100, 116, 139, 1);
-}
-
-.git-period {
+.tl-row {
   position: relative;
-  top: 0;
-  font-size: 0.6875rem; // Reduced from 0.75rem
-  color: rgba(100, 116, 139, 1);
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-  margin: 0;
-  white-space: nowrap;
+  display: flex;
+  transition: background-color 120ms ease;
 
-  :host-context(.dark) &,
-  .dark & {
-    color: rgba(71, 85, 105, 1);
-  }
-
-  // When inside experience-company, make it inline
-  .experience-company & {
-    display: inline;
-    margin-left: 0.5rem;
+  &:hover {
+    background-color: var(--tl-hover-bg);
   }
 }
 
-.git-row-tall .git-text {
-  top: -0.5rem; // Consistent with base alignment
+// ---------- graph column ----------
+.tl-graph {
+  position: relative;
+  flex: 0 0 var(--tl-graph-w);
+  margin-left: 0.25rem;
 }
 
-.git-row-tall .git-period {
-  top: 0; // Same alignment for tall rows
-}
-
-// First row has top spacer, adjust text position
-.git-row-first .git-text {
-  top: 0.75rem; // Move down a little from previous position
-}
-
-.git-row-first .git-period {
-  top: 0;
-}
-
-// Merge rows are shorter, adjust text position more
-.git-row-merge .git-text {
-  top: -0.75rem; // Move up more for shorter merge rows
-}
-
-.git-row-merge .git-period {
-  top: 0; // Keep period aligned
-}
-
-// Initial commit row - move text down moderately
-.git-row-initial .git-text {
-  top: 0.5rem; // Move down moderately
-}
-
-.git-row-initial .git-period {
-  top: 0;
-}
-
-// ============================================
-// Circle Component - GitLens style
-// ============================================
-
-.circle-component {
+.tl-seg {
   position: absolute;
-  z-index: 40;
-  height: 1.5rem;
-  width: 1.5rem;
-  border-radius: 9999px;
-  border-width: 3px;
-  border-style: solid;
-  background-color: #f4f5f7;
+  width: var(--tl-stroke);
+  background-color: var(--tl-main);
+
+  &--main { left: calc(var(--tl-main-x) - var(--tl-stroke) / 2); }
+  &--side {
+    left: calc(var(--tl-side-x) - var(--tl-stroke) / 2);
+    background-color: var(--tl-side);
+  }
+
+  &--above { top: 0; height: var(--tl-node-y); }
+  &--below { top: var(--tl-node-y); bottom: 0; }
+
+  // Leave room for the curves
+  &--to-fork { height: calc(var(--tl-node-y) - (var(--tl-side-x) - var(--tl-main-x))); }
+  &--from-merge { top: calc(var(--tl-node-y) + (var(--tl-side-x) - var(--tl-main-x))); }
+}
+
+.tl-curve {
+  position: absolute;
+  left: var(--tl-main-x);
+  width: calc(var(--tl-side-x) - var(--tl-main-x));
+  height: calc(var(--tl-side-x) - var(--tl-main-x));
+  overflow: visible;
+  fill: none;
+  stroke: var(--tl-side);
+  stroke-width: var(--tl-stroke);
+
+  &--merge { top: var(--tl-node-y); }
+  &--fork { top: calc(var(--tl-node-y) - (var(--tl-side-x) - var(--tl-main-x))); }
+}
+
+.tl-node {
+  position: absolute;
+  z-index: 1;
+  top: calc(var(--tl-node-y) - var(--tl-node) / 2);
+  left: calc(var(--tl-main-x) - var(--tl-node) / 2);
+  width: var(--tl-node);
+  height: var(--tl-node);
+  overflow: visible;
+  fill: var(--tl-surface);
+  stroke: var(--tl-main);
+  stroke-width: var(--tl-stroke);
+  transition: fill 120ms ease;
+
+  .tl-row:hover & {
+    fill: color-mix(in srgb, var(--tl-accent) 6%, var(--tl-surface));
+  }
+
+  &--side {
+    left: calc(var(--tl-side-x) - var(--tl-node) / 2);
+    stroke: var(--tl-side);
+  }
+
+  // Dashed outline = not a regular commit (break / initial). pathLength=24 -> 6 even dashes
+  &--pause,
+  &--initial {
+    stroke-dasharray: 2 2;
+  }
+
+  &--initial {
+    stroke: var(--tl-muted);
+  }
+}
+
+// ---------- content ----------
+.tl-body {
+  flex: 1;
+  min-width: 0;
+  padding: 0.75rem 1rem 0.875rem 0.25rem;
+}
+
+.tl-head {
   display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  min-height: 1.25rem;
+}
+
+.tl-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.5rem;
+  margin-top: 0.125rem;
+}
+
+.tl-title {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  font-size: 0.625rem;
-
-  :host-context(.dark) &,
-  .dark & {
-    background-color: #1a2537; // slate-950
-  }
-}
-
-.circle-upper-left {
-  top: -0.5rem;
-  left: -2px;
-  transform: translate(-50%, -1px);
-}
-
-.circle-upper-right {
-  top: -0.25rem;
-  right: -2px;
-  transform: translate(50%, -1px);
-}
-
-.circle-merge-offset {
-  top: -0.25rem;
-  left: -3px;
-  transform: translate(-50%, -9px);
-}
-
-.circle-initial-offset {
-  // top: -1rem;
-  left: 2px;
-  transform: translate(-50%, -1px);
-}
-
-.git-row-first .circle-component {
-  top: 1rem; // Account for border-top spacer
-}
-
-// Hide indicator bar for initial commit
-.border-initial::after {
-  display: none;
-}
-
-// ============================================
-// Border-based Branch Lines
-// ============================================
-
-// Main branch borders
-.border-main {
-  border-left: 4px solid $branch-main-light;
-
-  :host-context(.dark) &,
-  .dark & {
-    border-left-color: $branch-main-dark;
-  }
-}
-
-// Feature branch borders
-.border-feature {
-  border-left: 4px solid $branch-feature-light;
-
-  :host-context(.dark) &,
-  .dark & {
-    border-left-color: $branch-feature-dark;
-  }
-}
-
-// Merge branch borders
-.border-merge {
-  border-left: 4px solid $branch-merge-light;
-
-  :host-context(.dark) &,
-  .dark & {
-    border-left-color: $branch-merge-dark;
-  }
-}
-
-// Dashed border style
-.border-dashed {
-  border-style: dashed;
-}
-
-// Initial commit dashed border
-.border-initial {
-  border-color: rgba(203, 213, 225, 1); // slate-300
-
-  :host-context(.dark) &,
-  .dark & {
-    border-color: rgb(203, 225, 225);
-  }
-}
-
-// Vertical line connecting to initial commit circle
-// Line extends from previous row (negative top) down to circle
-.border-main-short {
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: -1rem; // Start from previous row
-    left: 0; // Align with left edge (where border-left normally is)
-    width: 0;
-    height: calc(1rem + 0.75rem); // Through spacer + to circle
-    border-left: 4px solid $branch-main-light;
-
-    :host-context(.dark) &,
-    .dark & {
-      border-left-color: $branch-main-dark;
-    }
-  }
-}
-
-// Top spacer borders (creates visual gap at start of branch)
-.border-top-spacer-main {
-  border-top: 1rem solid transparent;
-
-}
-
-// Removed unused class: border-top-spacer-feature
-
-// Merge line borders (horizontal connections)
-.border-merge-top {
-  border-top: 4px solid $branch-merge-light;
-
-  :host-context(.dark) &,
-  .dark & {
-    border-top-color: $branch-merge-dark;
-  }
-}
-
-.border-merge-bottom {
-  border-bottom: 4px solid $branch-merge-light;
-
-  :host-context(.dark) &,
-  .dark & {
-    border-bottom-color: $branch-merge-dark;
-  }
-}
-
-.border-merge-right {
-  border-right: 4px solid $branch-merge-light;
-
-  :host-context(.dark) &,
-  .dark & {
-    border-right-color: $branch-merge-dark;
-  }
-}
-
-// Removed unused class: border-merge-right-dashed
-
-// Rounded corners for merge points - creates the corner where merge line meets feature branch
-.border-merge-corner-tr {
-  position: relative;
-  border-top: 4px solid $branch-merge-light !important;
-  border-top-right-radius: 0.5rem;
-
-  :host-context(.dark) &,
-  .dark & {
-    border-top-color: $branch-merge-dark !important;
-  }
-}
-
-// Removed unused class: border-merge-corner-tr-dashed
-
-
-.border-merge-corner-br {
-  position: relative;
-  border-bottom: 4px solid $branch-merge-light !important;
-  border-bottom-right-radius: 0.5rem;
-
-  :host-context(.dark) &,
-  .dark & {
-    border-bottom-color: $branch-merge-dark !important;
-  }
-}
-
-// Branch connector elbow - L-shape going UP then RIGHT to connect to feature branch
-// Line goes: from bottom UP -> curves RIGHT with rounded corner -> connects to feature branch
-.branch-connector-right {
-  position: relative;
-
-  // L-shaped elbow: vertical line going UP + horizontal line going RIGHT
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: -4px;
-    width: calc(50% + 1px); // From right edge to center of main branch line
-    height: 7rem; // Height of the elbow (matches top-spacer)
-    border-top: 4px dashed $branch-feature-light;
-    border-right: 4px dashed $branch-feature-light;
-    border-top-right-radius: 0.5rem;
-    pointer-events: none;
-
-    :host-context(.dark) &,
-    .dark & {
-      border-top-color: $branch-feature-dark;
-      border-right-color: $branch-feature-dark;
-    }
-  }
-}
-
-// Corner cell where feature branch starts - no additional line needed
-.branch-connector-corner {
-  // The elbow from branch-connector-right already connects to this cell
-  // No additional styling needed here
-  // Placeholder to avoid empty ruleset
-  position: relative;
-}
-
-.git-content {
-  flex: 1 1 0%;
-  padding-right: 0.5rem;
-}
-
-.experience-company {
-  color: rgba(30, 41, 59, 1);
-  font-weight: 600;
-  font-family: 'Outfit', sans-serif;
-  font-size: 1.125rem;
-  line-height: 1.75rem;
+  min-width: 0;
+  gap: 0.5rem;
   margin: 0;
-
-  :host-context(.dark) &,
-  .dark & {
-    color: rgba(255, 255, 255, 1);
-  }
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: var(--tl-title);
 }
 
-.experience-role {
-  font-size: 0.75rem;
-  line-height: 1rem;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-  padding: 0.125rem 0.5rem;
-  border-radius: 9999px;
+.tl-logo {
   flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  object-fit: cover;
+
+  &--icon {
+    color: var(--tl-dim);
+  }
 }
 
-.experience-period {
+.tl-ref,
+.tl-badge,
+.tl-date,
+.tl-initial {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+.tl-ref {
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  color: var(--tl-dim);
+}
+
+.tl-badge {
+  flex-shrink: 0;
+  margin-left: auto;
+  margin-top: 0.0625rem;
+  white-space: nowrap;
+  padding: 0 0.375rem;
+  font-size: 0.6875rem;
+  line-height: 1.125rem;
+  border-radius: 4px;
+  color: var(--tl-main-text);
+  background-color: color-mix(in srgb, var(--tl-main) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tl-main) 25%, transparent);
+
+  &--side {
+    color: var(--tl-side-text);
+    background-color: color-mix(in srgb, var(--tl-side) 10%, transparent);
+    border-color: color-mix(in srgb, var(--tl-side) 25%, transparent);
+  }
+}
+
+.tl-date {
   font-size: 0.75rem;
   line-height: 1rem;
-  color: rgba(148, 163, 184, 1);
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-  margin-bottom: 0.5rem;
-  display: block;
-
-  :host-context(.dark) &,
-  .dark & {
-    color: rgba(100, 116, 139, 1);
-  }
+  color: var(--tl-dim);
 }
 
-.experience-description {
-  font-size: 0.8125rem; // Reduced from 0.875rem
-  line-height: 1.375; // Reduced from 1.625
-  color: rgba(71, 85, 105, 1);
-  font-family: 'Inter', sans-serif;
-  margin: 0;
-  margin-bottom: 0.25rem; // Add small bottom margin
-
-  :host-context(.dark) &,
-  .dark & {
-    color: rgba(148, 163, 184, 1);
-  }
+.tl-desc {
+  margin: 0.375rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--tl-body);
 }
 
-// Removed unused classes: experience-tech-tags, git-commit-initial-opacity, initial-commit, initial-commit-text
-
-// Experience Card
-.experience-card {
-  width: 100%;
+.tl-tags {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
 }
 
-.code-card-header-fixed {
-  flex-shrink: 0;
+.tl-tag {
+  padding: 0 0.4375rem;
+  font-size: 0.6875rem;
+  line-height: 1.125rem;
+  border-radius: 9999px;
+  color: var(--tl-tag-fg);
+  background-color: var(--tl-tag-bg);
+}
+
+.tl-row--initial .tl-body {
+  padding-top: 0.875rem;
+  padding-bottom: 0.75rem;
+}
+
+.tl-initial {
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--tl-dim);
 }
 
 // CTA Footer
@@ -1294,45 +1048,6 @@ $branch-merge-bg-dark: #831843; // pink-900
   }
 }
 
-// Git tree container scrollbar
-.git-tree-container {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(136, 51, 204, 0.3) transparent;
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 0.5rem; // Add padding for mobile
-
-  @media (min-width: $breakpoint-md) {
-    padding: 0; // Remove padding for desktop
-  }
-
-  @media (min-width: $breakpoint-lg) {
-    max-height: 100%;
-  }
-
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(136, 51, 204, 0.3);
-    border-radius: 3px;
-
-    &:hover {
-      background: rgba(136, 51, 204, 0.5);
-    }
-  }
-}
-
-// Removed unused git-commit hover effects (git-commit, git-commit-active, git-content, git-node not used in HTML)
-
 // Code content container
 .code-content {
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
@@ -1430,22 +1145,6 @@ $branch-merge-bg-dark: #831843; // pink-900
     .dark & {
       color: rgba(203, 213, 225, 1);
     }
-  }
-}
-
-// Tech tag for experience items
-.tech-tag {
-  font-size: 0.625rem;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-  padding: 0.0625rem 0.375rem; // Reduced padding
-  border-radius: 0.25rem;
-  background-color: rgba(226, 232, 240, 0.8);
-  color: rgba(71, 85, 105, 1);
-
-  :host-context(.dark) &,
-  .dark & {
-    background-color: rgba(51, 65, 85, 0.5);
-    color: rgba(203, 213, 225, 1);
   }
 }
 
@@ -1642,118 +1341,6 @@ $branch-merge-bg-dark: #831843; // pink-900
 
 .education-period {
   margin-top: 0.25rem;
-}
-
-// Git branch
-.git-branch-indicator {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-// Experience
-.experience-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0; // No margin to keep spacing tight
-
-  @media (min-width: $breakpoint-md) {
-    margin-bottom: 0; // Remove margin to reduce gap
-  }
-}
-
-.experience-header-left {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex: 1;
-}
-
-.experience-company {
-  margin: 0;
-  line-height: 1.25rem; // Reduced line-height for tighter spacing on mobile
-  display: flex;
-  align-items: baseline; // Align to baseline so period aligns with bottom of title
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-bottom: 0; // Remove bottom margin to reduce spacing
-  width: 100%; // Ensure full width so wrapped items align properly
-
-  @media (min-width: $breakpoint-md) {
-    line-height: 1.125rem; // Tighter line-height to reduce space below
-    display: inline-flex; // Use inline-flex for desktop to keep inline behavior
-    width: auto;
-  }
-}
-
-.company-logo {
-  width: 1rem;
-  height: 1rem;
-  object-fit: cover;
-  border-radius: 50%;
-  display: inline-block;
-  vertical-align: baseline;
-  margin-right: 0.25rem;
-}
-
-.company-icon {
-  display: inline-block;
-  margin-right: 0.25rem;
-}
-
-.experience-role {
-  padding: 0.0625rem 0.375rem; // Reduced padding
-  font-size: 0.6875rem; // Reduced from 0.75rem
-  line-height: 0.875rem; // Reduced from 1rem
-  border-radius: 9999px;
-  background-color: rgba(148, 163, 184, 0.15);
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-}
-
-.experience-period {
-  display: inline; // Inline to appear beside title
-  margin: 0;
-
-  // When inside experience-company, spacing is handled by gap property
-  // No margin-left needed to prevent indentation when wrapping
-  .experience-company & {
-    margin-left: 0;
-  }
-}
-
-.experience-description {
-  margin: 0;
-  font-size: 0.8125rem; // Reduced from 0.875rem
-  line-height: 1.5; // Increased line-height for mobile readability
-  margin-top: 0; // No top margin to keep spacing tight
-  margin-bottom: 0.5rem; // Increased bottom margin for mobile spacing
-
-  @media (min-width: $breakpoint-md) {
-    line-height: 1.375; // Reduced from 1.5
-    margin-bottom: 0.25rem; // Add small bottom margin
-  }
-}
-
-.experience-tech-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem; // Reduced from 0.375rem
-  margin-top: 0.75rem; // Increased spacing for mobile
-  margin-bottom: 0.5rem; // Add bottom margin to prevent collision
-
-  @media (min-width: $breakpoint-md) {
-    margin-top: 0.375rem; // Reduced from 0.75rem
-    margin-bottom: 0;
-  }
-}
-
-// Initial commit
-.initial-commit {
-  display: flex;
-  align-items: center;
-  padding-top: 0.5rem;
 }
 
 // CTA

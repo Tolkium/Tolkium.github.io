@@ -2,42 +2,34 @@
  * Models for About Me component
  */
 
-// Branch position enum for multi-branch graph
-export type BranchPosition = 'main' | 'feature' | 'merge';
+// Lane of the experience git graph: `main` = career path, `side` = work during studies
+export type TimelineLane = 'main' | 'side';
 
-// Branch line style
-export type BranchLineStyle = 'solid' | 'dashed' | 'none';
+// How a commit connects the side lane to the main lane
+// - `merge`: side branch merges into this main-lane commit (enters from below)
+// - `fork`:  side branch forks off right after this main-lane commit (leaves upward)
+export type TimelineConnector = 'merge' | 'fork';
 
-// Experience with branch information for GitLens-style graph
 export interface Experience {
   readonly company: string;
-  readonly role: string;
+  readonly badge: string;
   readonly period: string;
   readonly description: string;
-  readonly icon: string; // Emoji fallback
-  readonly logoUrl?: string; // Optional logo image URL
-  readonly color: string;
-  readonly tech?: readonly string[];
-  // Branch visualization properties
-  readonly branch?: BranchPosition;
-  readonly lineStyle?: BranchLineStyle;
-  readonly isMerge?: boolean;
-  readonly isBranchStart?: boolean;
-  readonly isBranchEnd?: boolean;
+  readonly logoUrl?: string; // Omitted -> neutral monochrome icon
+  readonly icon?: string; // ng-icon name used when there is no logo
+  readonly tech: readonly string[];
+  readonly lane: TimelineLane;
+  readonly connector?: TimelineConnector;
+  readonly isPause?: boolean; // Dashed node (career break)
 }
 
-// Branch color configuration
-export interface BranchColors {
-  readonly main: BranchColorPair;
-  readonly feature: BranchColorPair;
-  readonly merge: BranchColorPair;
-}
-
-export interface BranchColorPair {
-  readonly light: string;
-  readonly dark: string;
-  readonly bgLight: string;
-  readonly bgDark: string;
+// Per-row segments of the graph, derived from the ordered experience list
+export interface TimelineRow {
+  readonly experience: Experience;
+  readonly mainAbove: boolean;
+  readonly mainBelow: boolean;
+  readonly sideAbove: boolean;
+  readonly sideBelow: boolean;
 }
 
 export interface CodeLine {

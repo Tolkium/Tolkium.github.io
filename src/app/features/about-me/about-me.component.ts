@@ -53,7 +53,7 @@ export class AboutMeComponent {
 // Graph geometry in CSS px. Lane centers sit on .5 so 3px strokes are pixel-aligned.
 export const GRAPH = {
   laneX: { main: 10.5, school: 24.5, side: 38.5 } satisfies Record<TimelineLane, number>,
-  nodeY: 22, // vertical center of the title line
+  nodeY: 20, // vertical center of the title line
   initialNodeY: 38, // lower, so every branch can fork off "Initial commit"
 } as const;
 

@@ -306,13 +306,13 @@ $breakpoint-lg: 1024px;
 // ============================================
 .code-card.experience-card {
   // Light theme
-  --tl-main: #5b7a99; // career path line
-  --tl-side: #9a7080; // work-during-studies branch line
-  --tl-school: #8a9099; // school branch line (neutral gray)
-  --tl-main-text: #3f5b77; // badge text, same hue as the line, darker for AA contrast
-  --tl-side-text: #7a4c5d;
-  --tl-school-text: #535a64;
-  --tl-accent: #3d8079; // hover/interactive only
+  --tl-main: #4f8fd9; // career path line
+  --tl-side: #d4688f; // work-during-studies branch line
+  --tl-school: #a07ad6; // school branch line
+  --tl-main-text: #23609f; // badge text, same hue as the line, darker for AA contrast
+  --tl-side-text: #a2365f;
+  --tl-school-text: #6a45a0;
+  --tl-accent: #1f8a80; // hover/interactive only
   --tl-muted: #94a3b8; // initial commit node
   --tl-surface: #ffffff; // card + node fill
   --tl-border: rgba(15, 23, 42, 0.08);
@@ -326,7 +326,7 @@ $breakpoint-lg: 1024px;
   // Geometry. Lane x positions / node y live in GRAPH (about-me.component.ts);
   // --tl-node-y must match GRAPH.nodeY so text lines up with the nodes.
   --tl-graph-w: 48px;
-  --tl-node-y: 22px;
+  --tl-node-y: 20px;
   --tl-stroke: 3px;
 
   width: 100%;
@@ -339,11 +339,11 @@ $breakpoint-lg: 1024px;
 
   :host-context(.dark) &,
   .dark & {
-    --tl-main-text: #93acc4;
-    --tl-side-text: #c8a2b0;
-    --tl-school: #7c838d;
-    --tl-school-text: #b4bac2;
-    --tl-accent: #4f9a94;
+    --tl-main-text: #9cc5f5;
+    --tl-side-text: #f2a7c2;
+    --tl-school: #a986e0;
+    --tl-school-text: #d2bdf3;
+    --tl-accent: #3fb8ad;
     --tl-muted: #64748b;
     --tl-surface: #1a2537; // matches the other (translucent) cards on the dark page
     --tl-border: rgba(255, 255, 255, 0.07);
@@ -382,12 +382,9 @@ $breakpoint-lg: 1024px;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }
 
-.tl {
+.code-card-content.tl {
   flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--tl-border) transparent;
+  padding: 0.5rem 0.25rem; // rows carry their own padding
 }
 
 .tl-list {
@@ -461,7 +458,7 @@ $breakpoint-lg: 1024px;
 .tl-body {
   flex: 1;
   min-width: 0;
-  padding: 0.75rem 1rem 0.875rem calc(var(--tl-graph-w) + 0.5rem);
+  padding: 0.625rem 1rem 0.75rem calc(var(--tl-graph-w) + 0.5rem); // top + half title line = --tl-node-y
 }
 
 .tl-head {
@@ -472,12 +469,19 @@ $breakpoint-lg: 1024px;
   min-height: 1.25rem;
 }
 
+// Date sits on the title line on wider screens, on its own line on mobile
 .tl-meta {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   column-gap: 0.5rem;
-  margin-top: 0.125rem;
+  line-height: 1.25rem;
+
+  @media (max-width: $breakpoint-md - 1px) {
+    order: 3;
+    flex-basis: 100%;
+    line-height: 1rem;
+  }
 }
 
 .tl-title {
@@ -530,8 +534,8 @@ $breakpoint-lg: 1024px;
   line-height: 1.125rem;
   border-radius: 4px;
   color: var(--tl-main-text);
-  background-color: color-mix(in srgb, var(--c) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--c) 25%, transparent);
+  background-color: color-mix(in srgb, var(--c) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
 
   &--side {
     --c: var(--tl-side);
@@ -551,7 +555,7 @@ $breakpoint-lg: 1024px;
 }
 
 .tl-desc {
-  margin: 0.375rem 0 0;
+  margin: 0.25rem 0 0;
   font-size: 0.8125rem;
   line-height: 1.5;
   color: var(--tl-body);
@@ -561,7 +565,7 @@ $breakpoint-lg: 1024px;
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
-  margin: 0.5rem 0 0;
+  margin: 0.375rem 0 0;
   padding: 0;
   list-style: none;
 }
@@ -904,14 +908,10 @@ $breakpoint-lg: 1024px;
   }
 }
 
+// Timeline card grows to show every entry (no inner scrolling)
 .experience-card-height {
   @media (min-width: $breakpoint-lg) {
-    flex: 1 1 0;
-    min-height: 0;
-    max-height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    flex: 1 0 auto;
   }
 }
 
@@ -1283,6 +1283,11 @@ $breakpoint-lg: 1024px;
 
   @media (min-width: $breakpoint-lg) {
     grid-column: span 5 / span 5;
+
+    // Last card stretches so both columns end on the same line
+    > :last-child {
+      flex: 1 0 auto;
+    }
   }
 }
 

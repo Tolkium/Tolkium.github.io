@@ -88,7 +88,7 @@ export const EDUCATION = {
   institution: 'Slovak University of Technology in Bratislava (STU)',
   faculty: 'Faculty of Electrical Engineering and Information Technology (FEI)',
   program: 'Applied Informatics',
-  period: '2018 – 2022',
+  period: '2016 – 2022',
   icon: '🏛️',
 } as const;
 
@@ -160,7 +160,7 @@ export const EXPERIENCES: readonly Experience[] = [
   {
     company: 'STU Bratislava',
     badge: 'Education',
-    period: '2018 → 2022',
+    period: '2016 → 2022',
     description:
       'Applied Informatics – Slovak University of Technology in Bratislava, Faculty of Electrical Engineering and Information Technology (FEI).',
     icon: 'heroAcademicCap',

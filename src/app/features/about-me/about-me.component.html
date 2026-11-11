@@ -159,13 +159,13 @@
                         }
                         <span>{{ exp.company }}</span>
                       </h3>
+                      <div class="tl-meta">
+                        <time class="tl-date">{{ exp.period }}</time>
+                        @if (first) {
+                          <span class="tl-ref">(HEAD → main)</span>
+                        }
+                      </div>
                       <span [class]="'tl-badge tl-badge--' + (exp.tone ?? exp.lane)">{{ exp.badge }}</span>
-                    </div>
-                    <div class="tl-meta">
-                      <time class="tl-date">{{ exp.period }}</time>
-                      @if (first) {
-                        <span class="tl-ref">(HEAD → main)</span>
-                      }
                     </div>
                     <p class="tl-desc">{{ exp.description }}</p>
                     @if (exp.tech?.length) {

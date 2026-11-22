@@ -1,6 +1,7 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  DestroyRef,
   signal,
   computed,
   inject,
@@ -57,6 +58,7 @@ function buildDesignsQuery(designs: DesignEntry[]): string {
 export class DesignViewerComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly designs = signal<DesignEntry[]>([]);
   readonly currentIndex = signal(0);
@@ -96,7 +98,8 @@ export class DesignViewerComponent {
         this.currentIndex.set(0);
       }
     });
-    setInterval(() => this.currentTime.set(this.formatTime(new Date())), 1000);
+    const clockInterval = setInterval(() => this.currentTime.set(this.formatTime(new Date())), 1000);
+    this.destroyRef.onDestroy(() => clearInterval(clockInterval));
   }
 
   private formatTime(d: Date): string {

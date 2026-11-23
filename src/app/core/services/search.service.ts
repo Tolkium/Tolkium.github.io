@@ -1,5 +1,6 @@
 import { Injectable, signal, computed, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { FeatureFlagService } from '../features/feature-flag.service';
 import type {
   SearchableItem,
   SearchResultTree,
@@ -24,6 +25,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class SearchService {
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly featureFlags = inject(FeatureFlagService);
   private readonly searchEngine = new SearchEngine();
   private readonly resultProcessor = new SearchResultProcessor();
   
@@ -85,28 +87,36 @@ export class SearchService {
    * Updates todos in the index incrementally
    */
   public updateTodos(): void {
-    this.updateIndexSection('todo-', () => this.todosIndexer.index());
+    this.updateIndexSection('todo-', () =>
+      this.featureFlags.isEnabled('todo') ? this.todosIndexer.index() : []
+    );
   }
 
   /**
    * Updates gallery items in the index incrementally
    */
   public updateGallery(): void {
-    this.updateIndexSection('gallery-', () => this.galleryIndexer.index());
+    this.updateIndexSection('gallery-', () =>
+      this.featureFlags.isEnabled('gallery') ? this.galleryIndexer.index() : []
+    );
   }
 
   /**
    * Updates calendar events in the index incrementally
    */
   public updateCalendar(): void {
-    this.updateIndexSection('calendar-', () => this.calendarIndexer.index());
+    this.updateIndexSection('calendar-', () =>
+      this.featureFlags.isEnabled('calendar') ? this.calendarIndexer.index() : []
+    );
   }
 
   /**
    * Updates projects in the index incrementally
    */
   public updateProjects(): void {
-    this.updateIndexSection('project-', () => this.projectsIndexer.index());
+    this.updateIndexSection('project-', () =>
+      this.featureFlags.isEnabled('projects') ? this.projectsIndexer.index() : []
+    );
   }
 
   /**
@@ -166,13 +176,23 @@ export class SearchService {
     // Static content
     items.push(...this.menuIndexer.index());
     items.push(...this.routesIndexer.index());
-    items.push(...this.projectsIndexer.index());
-    items.push(...this.skillsIndexer.index());
+    if (this.featureFlags.isEnabled('projects')) {
+      items.push(...this.projectsIndexer.index());
+    }
+    if (this.featureFlags.isEnabled('about')) {
+      items.push(...this.skillsIndexer.index());
+    }
 
     // Dynamic content (localStorage-based)
-    items.push(...this.todosIndexer.index());
-    items.push(...this.galleryIndexer.index());
-    items.push(...this.calendarIndexer.index());
+    if (this.featureFlags.isEnabled('todo')) {
+      items.push(...this.todosIndexer.index());
+    }
+    if (this.featureFlags.isEnabled('gallery')) {
+      items.push(...this.galleryIndexer.index());
+    }
+    if (this.featureFlags.isEnabled('calendar')) {
+      items.push(...this.calendarIndexer.index());
+    }
 
     return items;
   }

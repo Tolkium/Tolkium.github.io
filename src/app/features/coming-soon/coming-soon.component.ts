@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { FeatureFlagService } from '../../core/features/feature-flag.service';
 
 interface ComingSoonData {
   featureName?: string;
@@ -17,6 +18,9 @@ interface ComingSoonData {
 })
 export class ComingSoonComponent {
   private readonly route = inject(ActivatedRoute);
+  private readonly featureFlags = inject(FeatureFlagService);
+
+  readonly showProjectsLink = this.featureFlags.isRoutable('projects');
 
   private get data(): ComingSoonData {
     return this.route.snapshot.data as ComingSoonData;

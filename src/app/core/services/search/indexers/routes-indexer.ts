@@ -1,5 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { routes } from '../../../../app.routes';
+import { FeatureFlagService } from '../../../features/feature-flag.service';
+import { isFeatureKey } from '../../../features/features';
 import type { IContentIndexer } from './content-indexer.interface';
 import type { SearchableItem } from '../search.models';
 import { extractKeywords, formatRouteName } from '../search.utils';
@@ -9,11 +11,21 @@ import { extractKeywords, formatRouteName } from '../search.utils';
  */
 @Injectable({ providedIn: 'root' })
 export class RoutesIndexer implements IContentIndexer {
-  index(): SearchableItem[] {
+  private readonly featureFlags = inject(FeatureFlagService);
+
+  public index(): SearchableItem[] {
     const items: SearchableItem[] = [];
 
     routes.forEach((route) => {
       if (route.path && route.path !== '' && route.path !== '**') {
+        if (route.data?.['isLockedFallback']) {
+          return;
+        }
+        const feature = route.data?.['feature'];
+        if (isFeatureKey(feature) && !this.featureFlags.isEnabled(feature)) {
+          return;
+        }
+
         const routeName = formatRouteName(route.path);
         const keywords = [
           routeName.toLowerCase(),

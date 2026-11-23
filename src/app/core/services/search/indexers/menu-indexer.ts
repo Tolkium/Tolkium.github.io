@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MENU_SECTIONS } from '../../../../models/menu-data';
 import type { MenuSection, MenuItem } from '../../../../models/menu-section';
+import { FeatureFlagService } from '../../../features/feature-flag.service';
 import type { IContentIndexer } from './content-indexer.interface';
 import type { SearchableItem } from '../search.models';
 import { extractKeywords } from '../search.utils';
@@ -10,10 +11,12 @@ import { extractKeywords } from '../search.utils';
  */
 @Injectable({ providedIn: 'root' })
 export class MenuIndexer implements IContentIndexer {
-  index(): SearchableItem[] {
+  private readonly featureFlags = inject(FeatureFlagService);
+
+  public index(): SearchableItem[] {
     const items: SearchableItem[] = [];
 
-    MENU_SECTIONS.forEach((section: MenuSection) => {
+    this.featureFlags.filterMenuSections(MENU_SECTIONS).forEach((section: MenuSection) => {
       section.items.forEach((item: MenuItem) => {
         const keywords = [
           item.label.toLowerCase(),

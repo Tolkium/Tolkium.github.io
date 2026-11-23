@@ -6,7 +6,7 @@ import { SideMenuItemComponent } from '../../layout/side-menu-item/side-menu-ite
 import { DarkModeToggleComponent } from '../dark-mode-toggle/dark-mode-toggle.component';
 import { SearchComponent } from '../../shared/components/search/search.component';
 import { MENU_SECTIONS } from '../../models/menu-data';
-import { MenuItem } from '../../models/menu-section';
+import { FeatureFlagService } from '../../core/features/feature-flag.service';
 import * as UiActions from '../../core/store/ui.actions';
 import * as UiSelectors from '../../core/store/ui.selectors';
 import { Subscription } from 'rxjs';
@@ -21,6 +21,7 @@ import { Subscription } from 'rxjs';
 })
 export class SideMenuComponent {
   private readonly store = inject(Store);
+  private readonly featureFlags = inject(FeatureFlagService);
   
   readonly isCollapsed$ = this.store.select(UiSelectors.selectIsMenuCollapsed).pipe(
     map(isCollapsed => isCollapsed ?? true),
@@ -37,19 +38,7 @@ export class SideMenuComponent {
     shareReplay(1)
   );
 
-  menuSections = MENU_SECTIONS;
-
-  darkModeToggleItem: MenuItem = {
-    label: 'Dark Mode',
-    iconName: 'heroMoon',
-    route: ''
-  };
-
-  darkModeToggleLightItem: MenuItem = {
-    label: 'Light Mode',
-    iconName: 'heroSun',
-    route: ''
-  };
+  readonly menuSections = this.featureFlags.filterMenuSections(MENU_SECTIONS);
 
   @HostListener('window:resize')
   public onResize(): void {

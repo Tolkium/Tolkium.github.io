@@ -6,6 +6,8 @@ import { provideEffects } from '@ngrx/effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { uiReducer } from './core/store/ui.reducer';
 import { UiEffects } from './core/store/ui.effects';
+import { provideFeatureFlags } from './core/features/features';
+import { environment } from '../environments/environment';
 import { provideIcons } from '@ng-icons/core';
 import {
   heroCog6Tooth,
@@ -60,6 +62,7 @@ import { heroCheckCircleSolid, heroMapPinSolid } from '@ng-icons/heroicons/solid
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideFeatureFlags(environment.featureFlags),
     provideRouter(routes),
     provideStore({ ui: uiReducer }),
     provideEffects([UiEffects]),

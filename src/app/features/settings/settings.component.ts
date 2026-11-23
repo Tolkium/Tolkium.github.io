@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { shareReplay } from 'rxjs/operators';
+import { FeatureFlagService } from '../../core/features/feature-flag.service';
 import { 
   selectHideScrollbar, 
   selectEnableSparkleEffect, 
@@ -106,6 +107,7 @@ import {
           <div>
             <h2 class="text-base font-semibold text-slate-700 dark:text-slate-300 mb-2 font-outfit">Performance Settings</h2>
             <div class="space-y-2">
+              @if (showProjectCardSettings) {
               <!-- 3D Tilt Effect -->
               <div class="relative group">
                 <div class="flex items-center justify-between bg-white/60 dark:bg-slate-800/60 rounded-lg p-3 shadow-sm">
@@ -189,6 +191,7 @@ import {
                   </div>
                 </div>
               </div>
+              }
 
               <!-- Performance Monitor -->
               <div class="relative group">
@@ -706,6 +709,9 @@ import {
 })
 export class SettingsComponent {
   private readonly store = inject(Store);
+  private readonly featureFlags = inject(FeatureFlagService);
+
+  readonly showProjectCardSettings = this.featureFlags.isRoutable('projects');
   
   readonly hideScrollbar$ = this.store.select(selectHideScrollbar).pipe(shareReplay(1));
   readonly enableSparkleEffect$ = this.store.select(selectEnableSparkleEffect).pipe(shareReplay(1));

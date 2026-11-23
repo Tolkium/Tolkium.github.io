@@ -1,6 +1,5 @@
 import { MenuSection } from './menu-section';
 
-// Temporarily saved menu sections (icons as inline SVG). To be wired after Angular upgrade.
 export const MENU_SECTIONS: MenuSection[] = [
   {
     title: 'NAVIGATION',
@@ -8,42 +7,50 @@ export const MENU_SECTIONS: MenuSection[] = [
       {
         iconName: 'heroHome',
         label: 'Home',
-        route: '/about'
+        route: '/about',
+        feature: 'about'
       },
       {
         iconName: 'heroGift',
         label: 'Christmas Gift',
-        route: '/christmas-gift'
+        route: '/christmas-gift',
+        feature: 'christmasGift'
       },
       {
         iconName: 'heroSparkles',
         label: "Norbert's Wishlist",
-        route: '/norbert-gift'
+        route: '/norbert-gift',
+        feature: 'norbertGift'
       },
       {
         iconName: 'heroFolder',
         label: 'Projects',
-        route: '/projects'
+        route: '/projects',
+        feature: 'projects'
       },
       {
         iconName: 'heroPhoto',
         label: 'Gallery',
-        route: '/gallery'
+        route: '/gallery',
+        feature: 'gallery'
       },
       {
         iconName: 'heroSquares2x2',
         label: 'TODO list',
-        route: '/todo'
+        route: '/todo',
+        feature: 'todo'
       },
       {
         iconName: 'heroCalendarDays',
         label: 'Personal calendar',
-        route: '/calendar'
+        route: '/calendar',
+        feature: 'calendar'
       },
       {
         iconName: 'heroCubeTransparent',
         label: 'Docker Dashboard',
-        route: '/DockerDashboard'
+        route: '/DockerDashboard',
+        feature: 'dockerDashboard'
       }
     ]
   },
@@ -53,49 +60,57 @@ export const MENU_SECTIONS: MenuSection[] = [
       {
         iconName: 'heroCommandLine',
         label: 'Regex Tester',
-        route: '/Regex'
+        route: '/Regex',
+        feature: 'regex'
       },
       {
         iconName: 'heroSwatch',
         label: 'Color Palette Generator',
-        route: '/ColorPaletteGenerator'
+        route: '/ColorPaletteGenerator',
+        feature: 'colorPalette'
       },
       {
         iconName: 'heroCodeBracketSquare',
         label: 'GitHub Repo Explorer',
-        route: '/GitHubRepoExplorer'
+        route: '/GitHubRepoExplorer',
+        feature: 'githubExplorer'
       },
       {
         iconName: 'heroCube',
         label: 'Package Version Checker',
-        route: '/PackageVersionChecker'
+        route: '/PackageVersionChecker',
+        feature: 'packageChecker'
       },
       {
         iconName: 'heroSquaresPlus',
         label: 'Skill Matrix',
-        route: '/SkillMatrix'
+        route: '/SkillMatrix',
+        feature: 'skillMatrix'
       },
       {
         iconName: 'heroArchiveBox',
         label: 'Snippet Vault',
-        route: '/snippet-vault'
+        route: '/snippet-vault',
+        feature: 'snippetVault'
       },
       {
         iconName: 'heroDevicePhoneMobile',
         label: 'Design Viewer',
-        route: '/design-viewer'
+        route: '/design-viewer',
+        feature: 'designViewer'
       },
       {
         iconName: 'heroDevicePhoneMobile',
         label: 'Local Storage Viewer',
-        route: '/SkillMatrix'
+        route: '/LocalStorageViewer',
+        feature: 'localStorageViewer'
       },
       {
         iconName: 'heroServerStack',
-        label: 'Server Analitics',
-        route: '/DockerDashboard'
-      },
-      
+        label: 'Server Analytics',
+        route: '/ServerAnalytics',
+        feature: 'serverAnalytics'
+      }
     ]
   },
   {
@@ -104,18 +119,21 @@ export const MENU_SECTIONS: MenuSection[] = [
       {
         iconName: 'heroArrowDownTray',
         label: 'Download CV as PDF',
-        route: '/roles'
+        route: '/roles',
+        feature: 'cvDownload'
       },
       {
         iconName: 'heroUsers',
         label: 'User Management',
-        route: '/User'
+        route: '/User',
+        feature: 'userManagement'
       },
       {
         iconName: 'heroCog8Tooth',
         label: 'Settings',
-        route: '/settings'
+        route: '/settings',
+        feature: 'settings'
       }
     ]
-  } 
+  }
 ];

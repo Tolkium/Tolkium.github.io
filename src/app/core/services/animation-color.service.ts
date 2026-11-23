@@ -1,15 +1,20 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { FeatureFlagService } from '../features/feature-flag.service';
 
 @Injectable({ providedIn: 'root' })
 export class AnimationColorService {
+  private readonly featureFlags = inject(FeatureFlagService);
+
   readonly color1 = signal('#f29f67');
   readonly color2 = signal('#8833cc');
 
-  private readonly pathColors = new Map<string, { c1: string; c2: string }>([
-    ['/norbert-gift', { c1: '#ffffff', c2: '#cc0000' }],
-  ]);
+  private readonly pathColors = new Map<string, { c1: string; c2: string }>(
+    this.featureFlags.isRoutable('norbertGift')
+      ? [['/norbert-gift', { c1: '#ffffff', c2: '#cc0000' }]]
+      : []
+  );
 
   constructor() {
     this.matchFromUrl(location.pathname);

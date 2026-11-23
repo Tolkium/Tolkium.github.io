@@ -1,0 +1,85 @@
+<div class="restricted-page-wrapper">
+  <div class="restricted-container">
+    <!-- Terminal-style Header (matches Home terminal-header) -->
+    <header class="terminal-header terminal-header-spacing">
+      <div class="terminal-bar">
+        <div class="terminal-window-controls">
+          <span class="terminal-dot terminal-dot-red"></span>
+          <span class="terminal-dot terminal-dot-yellow"></span>
+          <span class="terminal-dot terminal-dot-green"></span>
+        </div>
+        <span class="terminal-title">marek&#64;portfolio:~/{{ routePath }}</span>
+      </div>
+
+      <div class="terminal-content">
+        <div class="header-layout">
+          <div class="header-main">
+            <div class="lock-icon-badge" aria-hidden="true">
+              <ng-icon name="heroLockClosed" size="28"></ng-icon>
+            </div>
+            <div class="header-text">
+              <h1 class="feature-title">
+                <span class="feature-title-prefix" aria-hidden="true">&gt;</span>
+                <span>{{ featureName }}</span>
+              </h1>
+              <p class="feature-subtitle">
+                This module is private and requires authorization to access.
+              </p>
+            </div>
+          </div>
+
+          <span class="status-pill">403 · RESTRICTED</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Status Details Card (matches Home code-card) -->
+    <section class="code-card" aria-label="Access status">
+      <div class="code-card-header">
+        <span class="code-header-text">
+          <span class="code-header-command">$</span> auth --verify /{{ routePath }}
+        </span>
+        <div class="code-header-dots" aria-hidden="true">
+          <span class="code-dot"></span>
+          <span class="code-dot"></span>
+          <span class="code-dot"></span>
+        </div>
+      </div>
+      <div class="code-card-content">
+        <div class="code-content" role="code" aria-label="Authorization status output">
+          <div class="code-line">
+            <span class="code-line-number" aria-hidden="true">1</span>
+            <span class="code-text--comment">// Access control check</span>
+          </div>
+          <div class="code-line">
+            <span class="code-line-number" aria-hidden="true">2</span>
+            <span>
+              <span class="code-text--property">status:</span>
+              <span class="code-text--denied"> 403 Forbidden</span>
+              <span class="code-text--default"> — active session lacks permission for this module</span>
+            </span>
+          </div>
+          <div class="code-line">
+            <span class="code-line-number" aria-hidden="true">3</span>
+            <span>
+              <span class="code-text--property">note:</span>
+              <span class="code-text--default"> Private workspace module. Reach out if you need a preview or access.</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <a routerLink="/about" class="cta-button">Back to Home</a>
+          <a
+            [href]="linkedInUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="action-btn-secondary"
+          >
+            Request Access
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

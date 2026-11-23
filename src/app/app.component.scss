@@ -44,13 +44,26 @@
 }
 
 .main-content {
+  --content-max-width: 80rem;
   height: 100vh;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 1rem;
+  padding: 1rem 1rem 1rem calc(3rem + 1rem);
   width: 100%;
-  transition: all 0.3s ease-in-out;
-  margin-left: 3rem;
+  margin-left: 0;
+  transition: padding 0.3s ease-in-out, opacity 0.3s ease-in-out;
+
+  &:has(app-settings) {
+    --content-max-width: 56rem;
+  }
+
+  &:has(app-coming-soon) {
+    --content-max-width: 70rem;
+  }
+
+  &:has(app-design-viewer) {
+    --content-max-width: 1800px;
+  }
 
   // Hide scrollbar when global toggle is active (Firefox/IE/WebKit)
   html.scrollbar-hidden & {
@@ -73,10 +86,14 @@
     }
   }
 
-  // When menu is expanded, push content on all desktop screens
+  // Desktop expanded menu:
+  // - Wide screens: balanced horizontal padding keeps centered content at the exact same position (0px shift)
+  // - Tighter desktop: nudges content right just enough to clear the 16rem menu without shrinking
+  // - Narrow desktop: shrinks content cleanly to fit calc(100vw - 16rem)
   &.menu-expanded {
     @media (min-width: 768px) {
-      margin-left: 16rem;
+      padding-left: calc(16rem + 1rem);
+      padding-right: clamp(1rem, calc(100vw - var(--content-max-width) - 17rem), 14rem);
     }
   }
 }

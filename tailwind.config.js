@@ -7,8 +7,10 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'outfit': ['Outfit', 'sans-serif'],
+        'display': ['Geist', 'Outfit', 'sans-serif'],
+        'outfit': ['Geist', 'Outfit', 'sans-serif'],
         'inter': ['Inter', 'sans-serif'],
+        'mono': ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
         'metal': ['Metal Mania', 'cursive'],
       }
     },

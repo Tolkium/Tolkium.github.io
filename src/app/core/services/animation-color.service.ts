@@ -7,8 +7,8 @@ import { FeatureFlagService } from '../features/feature-flag.service';
 export class AnimationColorService {
   private readonly featureFlags = inject(FeatureFlagService);
 
-  readonly color1 = signal('#f29f67');
-  readonly color2 = signal('#8833cc');
+  readonly color1 = signal('#f5a164');
+  readonly color2 = signal('#9d4edd');
 
   private readonly pathColors = new Map<string, { c1: string; c2: string }>(
     this.featureFlags.isRoutable('norbertGift')
@@ -39,7 +39,7 @@ export class AnimationColorService {
         return;
       }
     }
-    this.color1.set('#f29f67');
-    this.color2.set('#8833cc');
+    this.color1.set('#f5a164');
+    this.color2.set('#9d4edd');
   }
 }

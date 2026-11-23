@@ -9,7 +9,7 @@ export const PROFILE_INFO: ProfileInfo = {
   name: 'Marek Šípoš',
   title: 'Frontend Web Developer',
   location: 'Bratislava, Slovakia',
-  avatarUrl: 'assets/images/avatar1.png',
+  avatarUrl: 'https://avatars.githubusercontent.com/u/20688510?v=4&s=256',
   linkedInUrl: 'https://www.linkedin.com/in/marek-sipos/',
 } as const;
 
@@ -18,17 +18,17 @@ export const STAT_CARDS: readonly StatCard[] = [
   {
     value: '5+',
     label: 'Years Exp',
-    color: '#f29f67',
+    color: 'var(--accent-orange)',
   },
   {
-    value: '6',
-    label: 'Companies',
-    color: '#8833cc',
+    value: '5',
+    label: 'Industries',
+    color: 'var(--accent-purple)',
   },
   {
-    value: '∞',
-    label: 'Curiosity',
-    color: '#10b981',
+    value: '20+',
+    label: 'Technologies',
+    color: 'var(--accent-mint)',
   },
 ] as const;
 

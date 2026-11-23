@@ -6,7 +6,9 @@
 @tailwind utilities;
 
 body {
-  @apply bg-gray-300 dark:bg-slate-900 m-0 p-0;
+  background-color: var(--surface-canvas);
+  margin: 0;
+  padding: 0;
   transition: background-color 0.2s ease-in-out;
 }
 
@@ -18,21 +20,43 @@ html, body {
 }
 
 :root {
+  /* Typography */
+  --font-display: 'Geist', 'Outfit', sans-serif;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
   /* Primary Colors */
-  --color-primary: #f29f67;
-  --color-primary-hover: rgba(242, 159, 103, 0.05);
+  --color-primary: #f5a164;
+  --color-primary-hover: rgba(245, 161, 100, 0.08);
 
   /* Dark Mode Colors */
-  --color-dark-primary: #8833cc;
-  --color-dark-primary-hover: rgba(136, 51, 204, 0.1);
+  --color-dark-primary: #7c3aed;
+  --color-dark-primary-hover: rgba(124, 58, 237, 0.1);
+
+  /* Crystal Frost Surface Tokens (Light) */
+  --surface-canvas: #eef1f6;
+  --surface-glass: rgba(255, 255, 255, 0.50);
+  --surface-glass-header: rgba(241, 245, 249, 0.48);
+  --surface-glass-border: rgba(15, 23, 42, 0.11);
+  --surface-glass-header-border: rgba(15, 23, 42, 0.08);
+  --surface-glass-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 12px 28px -10px rgba(15, 23, 42, 0.12);
+  --surface-inset: rgba(241, 245, 249, 0.48);
+  --surface-inset-border: rgba(15, 23, 42, 0.09);
+  --surface-popover: rgba(255, 255, 255, 0.92);
+  --glass-blur: blur(12px) saturate(140%);
+
+  /* Accent Tokens (Light — WCAG AA contrast on light glass) */
+  --accent-orange: #b45309;
+  --accent-purple: #7c3aed;
+  --accent-mint: #047857;
 
   /* Background Colors */
   --color-bg-light: rgba(243, 244, 246, 0.7);
-  --color-bg-dark: rgba(30, 41, 59, 0.5);
+  --color-bg-dark: rgba(15, 16, 24, 0.70);
 
   /* Text Colors */
-  --color-text-light: #334155;
-  --color-text-dark: #cbd5e1;
+  --color-text-light: #1e293b;
+  --color-text-dark: #e2e8f0;
 
   /* Hover Colors - for light mode */
   --hover-text-color: var(--color-dark-primary);
@@ -40,14 +64,29 @@ html, body {
 
   /* Scrollbar (light) */
   --scrollbar-bg: transparent;
-  --scrollbar-thumb: rgba(30, 41, 59, 0.25); /* slate-800 at ~25% */
+  --scrollbar-thumb: rgba(30, 41, 59, 0.25);
   --scrollbar-thumb-hover: rgba(30, 41, 59, 0.4);
 }
 
-/* Dark mode overrides */
+/* Dark mode overrides — Crystal Frost (70% glass) */
 .dark {
-  --color-bg-light: rgba(30, 41, 59, 0.5);
-  --color-text-light: #cbd5e1;
+  --surface-canvas: #06070c;
+  --surface-glass: rgba(15, 16, 24, 0.70);
+  --surface-glass-header: rgba(255, 255, 255, 0.04);
+  --surface-glass-border: rgba(255, 255, 255, 0.14);
+  --surface-glass-header-border: rgba(255, 255, 255, 0.09);
+  --surface-glass-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 18px 46px -14px rgba(0, 0, 0, 0.75);
+  --surface-inset: rgba(6, 7, 12, 0.50);
+  --surface-inset-border: rgba(255, 255, 255, 0.12);
+  --surface-popover: rgba(15, 16, 24, 0.92);
+  --glass-blur: blur(24px) saturate(180%);
+
+  --accent-orange: #f5a164;
+  --accent-purple: #c084fc;
+  --accent-mint: #6ee7b7;
+
+  --color-bg-light: rgba(15, 16, 24, 0.70);
+  --color-text-light: #e2e8f0;
   --hover-text-color: var(--color-primary);
   --hover-bg-color: var(--color-primary-hover);
   --color-dark-primary: var(--color-primary);
@@ -55,12 +94,13 @@ html, body {
 
   /* Scrollbar (dark) */
   --scrollbar-bg: transparent;
-  --scrollbar-thumb: rgba(203, 213, 225, 0.25); /* slate-300 at ~25% */
-  --scrollbar-thumb-hover: rgba(203, 213, 225, 0.4);
+  --scrollbar-thumb: rgba(203, 213, 225, 0.22);
+  --scrollbar-thumb-hover: rgba(203, 213, 225, 0.38);
 }
 
 /* Norbert Gift page: neutral/black dark backgrounds instead of slate-blue */
 html.dark body.norbert-gift-active {
+  --surface-canvas: #000;
   --color-bg-dark: #18181b;
   --color-text-dark: #d4d4d8;
   --hover-text-color: #cc0000;

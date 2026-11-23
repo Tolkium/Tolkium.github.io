@@ -78,13 +78,13 @@ import {
   template: `
   <div class="relative z-10">
     <div class="container mx-auto px-2 py-2 md:py-0 md:px-0 max-w-4xl">
-        <div class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-lg shadow-md backdrop-blur-sm">
-          <h1 class="text-2xl font-bold text-[#f29f67]/90 dark:text-[#8833cc]/70 mb-6 font-outfit">Settings</h1>
+        <div class="settings-card p-6 rounded-xl">
+          <h1 class="text-2xl font-bold text-[#b45309] dark:text-[#f5a164] mb-6 font-display">Settings</h1>
 
           <!-- UI Settings -->
           <div class="mb-6">
             <h2 class="text-base font-semibold text-slate-700 dark:text-slate-300 mb-2 font-outfit">UI Settings</h2>
-            <div class="flex items-center justify-between bg-white/60 dark:bg-slate-800/60 rounded-lg p-3 shadow-sm">
+            <div class="flex items-center justify-between settings-inset rounded-lg p-3 shadow-sm">
               <div>
                 <div class="text-sm font-medium text-slate-700 dark:text-slate-300 font-inter">Hide page scrollbar</div>
                 <div class="text-xs text-slate-600 dark:text-slate-400 font-inter">Persists in your browser</div>
@@ -110,7 +110,7 @@ import {
               @if (showProjectCardSettings) {
               <!-- 3D Tilt Effect -->
               <div class="relative group">
-                <div class="flex items-center justify-between bg-white/60 dark:bg-slate-800/60 rounded-lg p-3 shadow-sm">
+                <div class="flex items-center justify-between settings-inset rounded-lg p-3 shadow-sm">
                   <div class="flex-1 pr-3">
                     <div class="text-sm font-medium text-slate-700 dark:text-slate-300 font-inter">Card 3D tilt effect</div>
                     <div class="text-xs text-slate-600 dark:text-slate-400 font-inter">3D rotation follows cursor</div>
@@ -129,7 +129,7 @@ import {
                 </div>
                 
                 <div class="absolute left-0 right-0 -bottom-2 translate-y-full opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50">
-                  <div class="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xs p-2 rounded-lg shadow-lg mt-2 border border-slate-300 dark:border-slate-600">
+                  <div class="settings-tooltip text-slate-900 dark:text-white text-xs p-2 rounded-lg shadow-lg mt-2">
                     <p class="font-semibold mb-1">Why disable?</p>
                     <p class="text-slate-700 dark:text-slate-300">Reduces CPU usage on weaker GPUs or when displaying many cards.</p>
                   </div>
@@ -138,7 +138,7 @@ import {
 
               <!-- Holographic Effect -->
               <div class="relative group">
-                <div class="flex items-center justify-between bg-white/60 dark:bg-slate-800/60 rounded-lg p-3 shadow-sm">
+                <div class="flex items-center justify-between settings-inset rounded-lg p-3 shadow-sm">
                   <div class="flex-1 pr-3">
                     <div class="text-sm font-medium text-slate-700 dark:text-slate-300 font-inter">Card holographic gradient</div>
                     <div class="text-xs text-slate-600 dark:text-slate-400 font-inter">Rainbow gradient shifts with cursor</div>
@@ -157,7 +157,7 @@ import {
                 </div>
                 
                 <div class="absolute left-0 right-0 -bottom-2 translate-y-full opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50">
-                  <div class="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xs p-2 rounded-lg shadow-lg mt-2 border border-slate-300 dark:border-slate-600">
+                  <div class="settings-tooltip text-slate-900 dark:text-white text-xs p-2 rounded-lg shadow-lg mt-2">
                     <p class="font-semibold mb-1">Why disable?</p>
                     <p class="text-slate-700 dark:text-slate-300">Improves performance on older devices or when battery life is a concern.</p>
                   </div>
@@ -166,7 +166,7 @@ import {
 
               <!-- Sparkle Effect -->
               <div class="relative group">
-                <div class="flex items-center justify-between bg-white/60 dark:bg-slate-800/60 rounded-lg p-3 shadow-sm">
+                <div class="flex items-center justify-between settings-inset rounded-lg p-3 shadow-sm">
                   <div class="flex-1 pr-3">
                     <div class="text-sm font-medium text-slate-700 dark:text-slate-300 font-inter">Card sparkle effect</div>
                     <div class="text-xs text-slate-600 dark:text-slate-400 font-inter">Animated sparkles follow cursor</div>
@@ -185,7 +185,7 @@ import {
                 </div>
                 
                 <div class="absolute left-0 right-0 -bottom-2 translate-y-full opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50">
-                  <div class="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xs p-2 rounded-lg shadow-lg mt-2 border border-slate-300 dark:border-slate-600">
+                  <div class="settings-tooltip text-slate-900 dark:text-white text-xs p-2 rounded-lg shadow-lg mt-2">
                     <p class="font-semibold mb-1">Why disable?</p>
                     <p class="text-slate-700 dark:text-slate-300">Most performance-intensive effect. Biggest performance gain on low-end devices.</p>
                   </div>
@@ -195,7 +195,7 @@ import {
 
               <!-- Performance Monitor -->
               <div class="relative group">
-                <div class="flex items-center justify-between bg-white/60 dark:bg-slate-800/60 rounded-lg p-3 shadow-sm">
+                <div class="flex items-center justify-between settings-inset rounded-lg p-3 shadow-sm">
                   <div class="flex-1 pr-3">
                     <div class="text-sm font-medium text-slate-700 dark:text-slate-300 font-inter">Performance Monitor</div>
                     <div class="text-xs text-slate-600 dark:text-slate-400 font-inter">Real-time metrics overlay (Ctrl+Shift+P)</div>
@@ -214,7 +214,7 @@ import {
                 </div>
                 
                 <div class="absolute left-0 right-0 -bottom-2 translate-y-full opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50">
-                  <div class="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xs p-2 rounded-lg shadow-lg mt-2 border border-slate-300 dark:border-slate-600">
+                  <div class="settings-tooltip text-slate-900 dark:text-white text-xs p-2 rounded-lg shadow-lg mt-2">
                     <p class="font-semibold mb-1">What does this do?</p>
                     <p class="text-slate-700 dark:text-slate-300">Draggable overlay with FPS, memory, CPU, DOM stats, and network activity.</p>
                   </div>
@@ -222,7 +222,7 @@ import {
               </div>
 
               <!-- Performance Monitor Theme Color -->
-              <div class="bg-white/60 dark:bg-slate-800/60 rounded-lg p-3 shadow-sm">
+              <div class="settings-inset rounded-lg p-3 shadow-sm">
                 <div class="mb-2">
                   <div class="text-sm font-medium text-slate-700 dark:text-slate-300 font-inter">Monitor Theme Color</div>
                   <div class="text-xs text-slate-600 dark:text-slate-400 font-inter">Customize overlay color</div>
@@ -270,7 +270,7 @@ import {
             <h2 class="text-base font-semibold text-slate-700 dark:text-slate-300 mb-2 font-outfit">Animation Settings</h2>
             
             <!-- Background Animation Toggle -->
-            <div class="flex items-center justify-between bg-white/60 dark:bg-slate-800/60 rounded-lg p-3 shadow-sm">
+            <div class="flex items-center justify-between settings-inset rounded-lg p-3 shadow-sm">
               <div>
                 <div class="text-sm font-medium text-slate-700 dark:text-slate-300 font-inter">Background Animation</div>
                 <div class="text-xs text-slate-600 dark:text-slate-400 font-inter">Animated particles with connecting lines</div>
@@ -315,11 +315,11 @@ import {
               [class.opacity-100]="isAdvancedSettingsExpanded"
             >
               <!-- Physics Toggles -->
-              <div class="bg-white/60 dark:bg-slate-800/60 rounded-lg p-3 shadow-sm">
+              <div class="settings-inset rounded-lg p-3 shadow-sm">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
 
                   <!-- Magnetic Force Toggle -->
-                  <div class="flex items-center justify-between p-3 rounded-lg border-2 border-slate-300 dark:border-slate-600 bg-white/80 dark:bg-slate-800/80 shadow-sm">
+                  <div class="flex items-center justify-between p-3 rounded-lg settings-inset border border-slate-300/60 dark:border-white/10 shadow-sm">
                     <div class="flex-1">
                       <div class="text-xs font-semibold text-slate-700 dark:text-slate-300 font-inter">Magnetic Attraction</div>
                       <div class="text-[10px] text-slate-600 dark:text-slate-400 font-inter">Pull particles together</div>
@@ -338,7 +338,7 @@ import {
                   </div>
 
                   <!-- Repulsion Force Toggle -->
-                  <div class="flex items-center justify-between p-3 rounded-lg border-2 border-slate-300 dark:border-slate-600 bg-white/80 dark:bg-slate-800/80 shadow-sm">
+                  <div class="flex items-center justify-between p-3 rounded-lg settings-inset border border-slate-300/60 dark:border-white/10 shadow-sm">
                     <div class="flex-1">
                       <div class="text-xs font-semibold text-slate-700 dark:text-slate-300 font-inter">Repulsion Force</div>
                       <div class="text-[10px] text-slate-600 dark:text-slate-400 font-inter">Push apart when close</div>
@@ -357,7 +357,7 @@ import {
                   </div>
 
                   <!-- Damping Toggle -->
-                  <div class="flex items-center justify-between p-3 rounded-lg border-2 border-slate-300 dark:border-slate-600 bg-white/80 dark:bg-slate-800/80 shadow-sm">
+                  <div class="flex items-center justify-between p-3 rounded-lg settings-inset border border-slate-300/60 dark:border-white/10 shadow-sm">
                     <div class="flex-1">
                       <div class="text-xs font-semibold text-slate-700 dark:text-slate-300 font-inter">Velocity Damping</div>
                       <div class="text-[10px] text-slate-600 dark:text-slate-400 font-inter">Simulate air resistance</div>
@@ -376,7 +376,7 @@ import {
                   </div>
 
                   <!-- Brownian Motion Toggle -->
-                  <div class="flex items-center justify-between p-3 rounded-lg border-2 border-slate-300 dark:border-slate-600 bg-white/80 dark:bg-slate-800/80 shadow-sm">
+                  <div class="flex items-center justify-between p-3 rounded-lg settings-inset border border-slate-300/60 dark:border-white/10 shadow-sm">
                     <div class="flex-1">
                       <div class="text-xs font-semibold text-slate-700 dark:text-slate-300 font-inter">Brownian Motion</div>
                       <div class="text-[10px] text-slate-600 dark:text-slate-400 font-inter">Random jittering</div>
@@ -398,7 +398,7 @@ import {
               </div>
 
               <!-- Polygon Stabilizer -->
-              <div class="bg-white/60 dark:bg-slate-800/60 rounded-lg p-3 shadow-sm">
+              <div class="settings-inset rounded-lg p-3 shadow-sm">
                 <div class="flex items-center justify-between mb-2 gap-3">
                   <div>
                     <div class="text-xs font-semibold text-slate-700 dark:text-slate-300 font-inter">Polygon Stabilizer</div>
@@ -422,7 +422,7 @@ import {
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2"
                      [class.opacity-60]="!((enablePolygonStabilizer$ | async) ?? false)"
                      [class.pointer-events-none]="!((enablePolygonStabilizer$ | async) ?? false)">
-                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                  <div class="settings-inset rounded p-2">
                     <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">
                       Target Spacing: {{polygonTargetSpacing$ | async | number:'1.0-0'}}px
                     </label>
@@ -434,7 +434,7 @@ import {
                       (input)="onPolygonTargetSpacingChange(+$any($event.target).value)"
                       class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
                   </div>
-                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                  <div class="settings-inset rounded p-2">
                     <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">
                       Stabilizer Strength: {{polygonStrength$ | async | number:'1.4-4'}}
                     </label>
@@ -450,7 +450,7 @@ import {
               </div>
 
               <!-- Magnetic Cooldown -->
-              <div class="bg-white/60 dark:bg-slate-800/60 rounded-lg p-3 shadow-sm">
+              <div class="settings-inset rounded-lg p-3 shadow-sm">
                 <div class="flex items-center justify-between mb-2 gap-3">
                   <div>
                     <div class="text-xs font-semibold text-slate-700 dark:text-slate-300 font-inter">Magnetic Cooldown</div>
@@ -474,7 +474,7 @@ import {
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-2"
                      [class.opacity-60]="!((enableCooldownAttraction$ | async) ?? false)"
                      [class.pointer-events-none]="!((enableCooldownAttraction$ | async) ?? false)">
-                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                  <div class="settings-inset rounded p-2">
                     <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">
                       Min Distance: {{cooldownMinDistance$ | async | number:'1.0-0'}}px
                     </label>
@@ -486,7 +486,7 @@ import {
                       (input)="onCooldownMinDistanceChange(+$any($event.target).value)"
                       class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
                   </div>
-                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                  <div class="settings-inset rounded p-2">
                     <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">
                       Reset Distance: {{cooldownResetDistance$ | async | number:'1.0-0'}}px
                     </label>
@@ -498,7 +498,7 @@ import {
                       (input)="onCooldownResetDistanceChange(+$any($event.target).value)"
                       class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
                   </div>
-                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                  <div class="settings-inset rounded p-2">
                     <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">
                       Cooldown: {{cooldownDuration$ | async}}ms
                     </label>
@@ -514,7 +514,7 @@ import {
               </div>
 
               <!-- Fine-Tune Parameters -->
-              <div class="bg-white/60 dark:bg-slate-800/60 rounded-lg p-4 shadow-sm">
+              <div class="settings-inset rounded-lg p-4 shadow-sm">
                 <div class="flex items-center justify-between mb-3">
                   <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 font-inter">Fine-Tune Parameters</h3>
                   <button
@@ -527,7 +527,7 @@ import {
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
                   
-                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                  <div class="settings-inset rounded p-2">
                     <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">Point Density: {{numPoints$ | async}}</label>
                     <div class="text-[9px] text-slate-500 dark:text-slate-500 font-inter mb-1">Higher = more particles (auto-scales to screen size)</div>
                     <input type="range" min="20" max="2000" step="10" 
@@ -536,7 +536,7 @@ import {
                       class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
                   </div>
 
-                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                  <div class="settings-inset rounded p-2">
                     <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">Connection Range: {{connectionRadius$ | async}}</label>
                     <div class="text-[9px] text-slate-500 dark:text-slate-500 font-inter mb-1">Max distance for lines (in pixels)</div>
                     <input type="range" min="50" max="400" step="5" 
@@ -545,7 +545,7 @@ import {
                       class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
                   </div>
 
-                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                  <div class="settings-inset rounded p-2">
                     <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">Dot Size: {{pointsSize$ | async}}</label>
                     <div class="text-[9px] text-slate-500 dark:text-slate-500 font-inter mb-1">Particle radius (in pixels)</div>
                     <input type="range" min="1" max="15" step="0.5" 
@@ -554,7 +554,7 @@ import {
                       class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
                   </div>
 
-                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                  <div class="settings-inset rounded p-2">
                     <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">Line Width: {{lineWidth$ | async}}</label>
                     <div class="text-[9px] text-slate-500 dark:text-slate-500 font-inter mb-1">Connection thickness (in pixels)</div>
                     <input type="range" min="1" max="15" step="0.5" 
@@ -563,7 +563,7 @@ import {
                       class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
                   </div>
 
-                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                  <div class="settings-inset rounded p-2">
                     <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">Min Speed: {{minSpeed$ | async | number:'1.2-2'}}</label>
                     <div class="text-[9px] text-slate-500 dark:text-slate-500 font-inter mb-1">Minimum velocity (px/frame)</div>
                     <input type="range" min="0.05" max="1" step="0.01" 
@@ -572,7 +572,7 @@ import {
                       class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
                   </div>
 
-                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                  <div class="settings-inset rounded p-2">
                     <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">Max Speed: {{maxSpeed$ | async | number:'1.2-2'}}</label>
                     <div class="text-[9px] text-slate-500 dark:text-slate-500 font-inter mb-1">Maximum velocity (px/frame)</div>
                     <input type="range" min="0.2" max="2" step="0.02" 
@@ -581,7 +581,7 @@ import {
                       class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
                   </div>
 
-                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                  <div class="settings-inset rounded p-2">
                     <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">Magnetic Range: {{magneticRadius$ | async}}</label>
                     <div class="text-[9px] text-slate-500 dark:text-slate-500 font-inter mb-1">Attraction distance (in pixels)</div>
                     <input type="range" min="20" max="200" step="2" 
@@ -590,7 +590,7 @@ import {
                       class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
                   </div>
 
-                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                  <div class="settings-inset rounded p-2">
                     <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">Magnetic Strength: {{magneticStrength$ | async | number:'1.4-4'}}</label>
                     <div class="text-[9px] text-slate-500 dark:text-slate-500 font-inter mb-1">Pull-together force</div>
                     <input type="range" min="0.0001" max="0.005" step="0.0001" 
@@ -599,7 +599,7 @@ import {
                       class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
                   </div>
 
-                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                  <div class="settings-inset rounded p-2">
                     <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">Repulsion Range: {{repulsionRadius$ | async}}</label>
                     <div class="text-[9px] text-slate-500 dark:text-slate-500 font-inter mb-1">Push-apart distance (in pixels)</div>
                     <input type="range" min="5" max="100" step="2" 
@@ -608,7 +608,7 @@ import {
                       class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
                   </div>
 
-                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                  <div class="settings-inset rounded p-2">
                     <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">Repulsion Strength: {{repulsionStrength$ | async | number:'1.1-1'}}</label>
                     <div class="text-[9px] text-slate-500 dark:text-slate-500 font-inter mb-1">Push-apart force</div>
                     <input type="range" min="0.1" max="5" step="0.1" 
@@ -617,7 +617,7 @@ import {
                       class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
                   </div>
 
-                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                  <div class="settings-inset rounded p-2">
                     <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">Damping: {{dampingFactor$ | async | number:'1.3-3'}}</label>
                     <div class="text-[9px] text-slate-500 dark:text-slate-500 font-inter mb-1">Air resistance (higher = slower stop)</div>
                     <input type="range" min="0.80" max="0.999" step="0.001" 
@@ -626,7 +626,7 @@ import {
                       class="w-full h-1 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer slider" />
                   </div>
 
-                  <div class="bg-white/60 dark:bg-slate-800/60 rounded p-2">
+                  <div class="settings-inset rounded p-2">
                     <label class="text-xs font-medium text-slate-700 dark:text-slate-300 font-inter">Brownian Motion: {{brownianStrength$ | async | number:'1.3-3'}}</label>
                     <div class="text-[9px] text-slate-500 dark:text-slate-500 font-inter mb-1">Random jittering</div>
                     <input type="range" min="0" max="0.1" step="0.002" 
@@ -647,6 +647,27 @@ import {
     :host {
       display: block;
       min-height: 100vh;
+    }
+
+    .settings-card {
+      background-color: var(--surface-glass);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--surface-glass-border);
+      box-shadow: var(--surface-glass-shadow);
+    }
+
+    .settings-inset {
+      background-color: var(--surface-inset);
+      border: 1px solid var(--surface-inset-border);
+    }
+
+    .settings-tooltip {
+      background-color: var(--surface-popover);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--surface-glass-border);
+      box-shadow: var(--surface-glass-shadow);
     }
 
     /* Magnetic mode buttons */

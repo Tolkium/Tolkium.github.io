@@ -6,10 +6,10 @@ $breakpoint-lg: 1024px;
   display: block;
   min-height: 100vh;
 
-  // CSS Variables for theme colors
-  --about-primary-color: #f29f67;
-  --about-secondary-color: #8833cc;
-  --about-success-color: #10b981;
+  // CSS Variables for theme colors — Crystal Frost
+  --about-primary-color: #f5a164;
+  --about-secondary-color: #9d4edd;
+  --about-success-color: #6ee7b7;
 }
 
 // ============================================
@@ -36,6 +36,11 @@ $breakpoint-lg: 1024px;
   width: 0.75rem;
   height: 0.75rem;
   border-radius: 9999px;
+
+  :host-context(.dark) &,
+  .dark & {
+    opacity: 0.78;
+  }
 }
 
 .terminal-dot-red {
@@ -87,8 +92,23 @@ $breakpoint-lg: 1024px;
   width: 6rem;
   height: 6rem;
   border-radius: 9999px;
-  background: linear-gradient(to bottom right, var(--about-primary-color), var(--about-secondary-color));
-  padding: 0.25rem;
+  overflow: hidden;
+  padding-top: 0.35rem;
+  background: radial-gradient(circle at 50% 28%, #ffffff 0%, #e2e8f0 85%);
+  border: 1.5px solid rgba(15, 23, 42, 0.15);
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.45),
+    0 0 0 4px rgba(15, 23, 42, 0.07);
+
+  :host-context(.dark) &,
+  .dark & {
+    background: radial-gradient(circle at 50% 28%, #1d2030 0%, #0b0c14 78%);
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow:
+      0 0 0 4px rgba(255, 255, 255, 0.03),
+      0 0 0 5px rgba(255, 255, 255, 0.07),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
 
   @media (min-width: $breakpoint-md) {
     width: 7rem;
@@ -101,24 +121,23 @@ $breakpoint-lg: 1024px;
   height: 100%;
   border-radius: 9999px;
   object-fit: cover;
-  mix-blend-mode: multiply;
+  object-position: center top;
+  display: block;
 }
 
 .status-indicator {
   position: absolute;
-  bottom: -0.25rem;
-  right: -0.25rem;
-  width: 1.5rem;
-  height: 1.5rem;
-  background-color: rgba(34, 197, 94, 1);
+  bottom: 0.2rem;
+  right: 0.2rem;
+  width: 0.875rem;
+  height: 0.875rem;
+  background-color: var(--accent-mint);
   border-radius: 9999px;
-  border-width: 4px;
-  border-style: solid;
-  border-color: rgba(255, 255, 255, 1);
+  border: 2.5px solid #f4f6f9;
 
   :host-context(.dark) &,
   .dark & {
-    border-color: rgba(15, 23, 42, 1);
+    border-color: #0e1018;
   }
 }
 
@@ -131,7 +150,8 @@ $breakpoint-lg: 1024px;
   font-size: 1.875rem;
   line-height: 2.25rem;
   font-weight: 700;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-display);
+  letter-spacing: -0.025em;
   margin-bottom: 0.25rem;
 
   @media (min-width: $breakpoint-md) {
@@ -158,15 +178,10 @@ $breakpoint-lg: 1024px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: rgba(22, 163, 74, 1);
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  color: var(--accent-mint);
+  font-family: var(--font-mono);
   font-size: 0.875rem;
   line-height: 1.25rem;
-
-  :host-context(.dark) &,
-  .dark & {
-    color: rgba(74, 222, 128, 1);
-  }
 
   @media (min-width: $breakpoint-md) {
     font-size: 1rem;
@@ -180,9 +195,14 @@ $breakpoint-lg: 1024px;
   gap: 0.5rem;
   margin-top: 0.5rem;
   color: rgba(100, 116, 139, 1);
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-mono);
   font-size: 0.875rem;
   line-height: 1.25rem;
+
+  :host-context(.dark) &,
+  .dark & {
+    color: #81879e;
+  }
 }
 
 .profile-location-icon {
@@ -265,7 +285,7 @@ $breakpoint-lg: 1024px;
 .education-institution {
   color: rgba(30, 41, 59, 1);
   font-weight: 600;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-display);
   margin-bottom: 0.25rem;
 
   :host-context(.dark) &,
@@ -306,22 +326,23 @@ $breakpoint-lg: 1024px;
 // ============================================
 .code-card.experience-card {
   // Light theme
-  --tl-main: #4f8fd9; // career path line
-  --tl-side: #d4688f; // work-during-studies branch line
-  --tl-school: #a07ad6; // school branch line
-  --tl-main-text: #23609f; // badge text, same hue as the line, darker for AA contrast
-  --tl-side-text: #a2365f;
-  --tl-school-text: #6a45a0;
-  --tl-accent: #1f8a80; // hover/interactive only
+  --tl-main: #d97736; // career path line
+  --tl-side: #059669; // work-during-studies branch line
+  --tl-school: #7c3aed; // school branch line
+  --tl-main-text: #9a3412; // badge text, AA contrast
+  --tl-side-text: #065f46;
+  --tl-school-text: #5b21b6;
+  --tl-accent: #7c3aed; // hover/interactive only
   --tl-muted: #94a3b8; // initial commit node
-  --tl-surface: #ffffff; // card + node fill
-  --tl-border: rgba(15, 23, 42, 0.08);
-  --tl-title: rgba(15, 23, 42, 0.9);
+  --tl-node-fill: #ffffff; // opaque hollow node interior
+  --tl-border: var(--surface-glass-border);
+  --tl-title: rgba(15, 23, 42, 0.92);
   --tl-body: rgba(15, 23, 42, 0.72);
-  --tl-dim: rgba(15, 23, 42, 0.6);
-  --tl-tag-fg: rgba(15, 23, 42, 0.7);
+  --tl-dim: rgba(15, 23, 42, 0.56);
+  --tl-tag-fg: rgba(30, 41, 59, 0.82);
   --tl-tag-bg: rgba(15, 23, 42, 0.05);
-  --tl-hover-bg: color-mix(in srgb, var(--tl-accent) 6%, transparent);
+  --tl-tag-border: rgba(15, 23, 42, 0.1);
+  --tl-hover-bg: color-mix(in srgb, var(--tl-accent) 5%, transparent);
 
   // Geometry. Lane x positions / node y live in GRAPH (about-me.component.ts);
   // --tl-node-y must match GRAPH.nodeY so text lines up with the nodes.
@@ -332,33 +353,37 @@ $breakpoint-lg: 1024px;
   width: 100%;
   display: flex;
   flex-direction: column;
-  background-color: var(--tl-surface); // opaque: no background effect behind the timeline
-  backdrop-filter: none;
-  box-shadow: none;
+  background-color: var(--surface-glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--surface-glass-shadow);
   border-color: var(--tl-border);
 
   :host-context(.dark) &,
   .dark & {
-    --tl-main-text: #9cc5f5;
-    --tl-side-text: #f2a7c2;
-    --tl-school: #a986e0;
-    --tl-school-text: #d2bdf3;
-    --tl-accent: #3fb8ad;
-    --tl-muted: #64748b;
-    --tl-surface: #1a2537; // matches the other (translucent) cards on the dark page
-    --tl-border: rgba(255, 255, 255, 0.07);
-    --tl-title: rgba(255, 255, 255, 0.88);
-    --tl-body: rgba(255, 255, 255, 0.7);
-    --tl-dim: rgba(255, 255, 255, 0.55);
-    --tl-tag-fg: rgba(255, 255, 255, 0.7);
-    --tl-tag-bg: rgba(255, 255, 255, 0.06);
+    --tl-main: #f5a164;
+    --tl-side: #6ee7b7;
+    --tl-school: #c084fc;
+    --tl-main-text: #fbd2b4;
+    --tl-side-text: #a7f3d0;
+    --tl-school-text: #e9d5ff;
+    --tl-accent: #c084fc;
+    --tl-muted: #757b94;
+    --tl-node-fill: #0f1018;
+    --tl-border: var(--surface-glass-border);
+    --tl-title: #ffffff;
+    --tl-body: #b4b9cc;
+    --tl-dim: #81879e;
+    --tl-tag-fg: #b4b9cc;
+    --tl-tag-bg: rgba(6, 7, 12, 0.52);
+    --tl-tag-border: rgba(255, 255, 255, 0.12);
 
-    background-color: var(--tl-surface);
+    background-color: var(--surface-glass);
     border-color: var(--tl-border);
   }
 
   .code-card-header {
-    border-bottom-color: var(--tl-border);
+    border-bottom-color: var(--surface-glass-header-border);
   }
 
   .code-header-icon {
@@ -434,13 +459,13 @@ $breakpoint-lg: 1024px;
 }
 
 .tl-node {
-  fill: var(--tl-surface);
+  fill: var(--tl-node-fill);
   stroke: var(--c);
   stroke-width: var(--tl-stroke);
   transition: fill 120ms ease;
 
   .tl-row:hover & {
-    fill: color-mix(in srgb, var(--tl-accent) 6%, var(--tl-surface));
+    fill: color-mix(in srgb, var(--tl-accent) 12%, var(--tl-node-fill));
   }
 
   // Dashed outline = not a regular commit (break / initial). pathLength=24 -> 6 even dashes
@@ -571,12 +596,14 @@ $breakpoint-lg: 1024px;
 }
 
 .tl-tag {
-  padding: 0 0.4375rem;
+  padding: 0.0625rem 0.45rem;
+  font-family: var(--font-mono);
   font-size: 0.6875rem;
   line-height: 1.125rem;
-  border-radius: 9999px;
+  border-radius: 0.25rem;
   color: var(--tl-tag-fg);
   background-color: var(--tl-tag-bg);
+  border: 1px solid var(--tl-tag-border);
 }
 
 // Initial commit: node sits lower so all branches can fork off it
@@ -616,7 +643,7 @@ $breakpoint-lg: 1024px;
 
 .cta-heading {
   color: rgba(30, 41, 59, 1);
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-display);
   font-weight: 600;
   margin: 0;
 
@@ -822,36 +849,26 @@ $breakpoint-lg: 1024px;
   }
 }
 
-// Base glass-morphism card style
+// Base Crystal Frost glass-morphism card style
 .code-card {
-  background-color: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
+  background-color: var(--surface-glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border-radius: 0.75rem;
-  border: 1px solid rgba(226, 232, 240, 0.5);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--surface-glass-border);
+  box-shadow: var(--surface-glass-shadow);
   overflow: hidden;
-
-  :host-context(.dark) &,
-  .dark & {
-    background-color: rgba(30, 41, 59, 0.5);
-    border-color: rgba(51, 65, 85, 0.5);
-  }
 }
 
-// Terminal header (uses same style as code-card)
+// Terminal header (uses same Crystal Frost style as code-card)
 .terminal-header {
-  background-color: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
+  background-color: var(--surface-glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border-radius: 0.75rem;
-  border: 1px solid rgba(226, 232, 240, 0.5);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--surface-glass-border);
+  box-shadow: var(--surface-glass-shadow);
   overflow: hidden;
-
-  :host-context(.dark) &,
-  .dark & {
-    background-color: rgba(30, 41, 59, 0.5);
-    border-color: rgba(51, 65, 85, 0.5);
-  }
 }
 
 // Code card header bar
@@ -860,14 +877,8 @@ $breakpoint-lg: 1024px;
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 1rem;
-  background-color: rgba(241, 245, 249, 0.5);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
-
-  :host-context(.dark) &,
-  .dark & {
-    background-color: rgba(15, 23, 42, 0.3);
-    border-bottom-color: rgba(51, 65, 85, 0.5);
-  }
+  background-color: var(--surface-glass-header);
+  border-bottom: 1px solid var(--surface-glass-header-border);
 }
 
 // Terminal bar (similar to code-card-header)
@@ -876,14 +887,8 @@ $breakpoint-lg: 1024px;
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
-  background-color: rgba(241, 245, 249, 0.5);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
-
-  :host-context(.dark) &,
-  .dark & {
-    background-color: rgba(15, 23, 42, 0.3);
-    border-bottom-color: rgba(51, 65, 85, 0.5);
-  }
+  background-color: var(--surface-glass-header);
+  border-bottom: 1px solid var(--surface-glass-header-border);
 }
 
 // Main content grid - ensure columns align properly and match height
@@ -915,21 +920,6 @@ $breakpoint-lg: 1024px;
   }
 }
 
-// Avatar image
-.avatar-image {
-  mix-blend-mode: multiply;
-}
-
-// Status pulse animation
-.status-pulse {
-  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse-ring {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
-  50% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
-}
-
 // Typing cursor animation
 .typing-cursor {
   animation: blink 1s step-end infinite;
@@ -945,20 +935,14 @@ $breakpoint-lg: 1024px;
   text-align: center;
   padding: 0.5rem;
   border-radius: 0.5rem;
-  background-color: rgba(241, 245, 249, 0.5);
-  border: 1px solid rgba(226, 232, 240, 0.5);
+  background-color: var(--surface-inset);
+  border: 1px solid var(--surface-inset-border);
   min-width: 0;
   transition: all 0.2s ease;
   overflow: hidden;
 
   @media (min-width: $breakpoint-md) {
     padding: 0.75rem;
-  }
-
-  :host-context(.dark) &,
-  .dark & {
-    background-color: rgba(51, 65, 85, 0.3);
-    border-color: rgba(71, 85, 105, 0.3);
   }
 
   &:hover {
@@ -968,77 +952,71 @@ $breakpoint-lg: 1024px;
 
 // Skill tag base
 .skill-tag {
-  padding: 0.375rem 0.75rem;
+  padding: 0.35rem 0.7rem;
   border-radius: 0.375rem;
   font-size: 0.75rem;
   font-weight: 500;
   border-width: 1px;
-  transition: all 0.2s ease;
+  border-style: solid;
+  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
   cursor: default;
 
   &:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
   }
 }
 
-// Skill tag variants
+// Skill tag variants — Crystal Frost (crisp frosted glass plates + subtle warm amber soft skills)
 .skill-tag-purple {
-  background-color: rgba(243, 232, 255, 0.6);
-  color: rgba(126, 34, 206, 1);
-  border-color: rgba(196, 181, 253, 0.4);
+  font-family: var(--font-mono);
+  background-color: rgba(15, 23, 42, 0.045);
+  color: #1e293b;
+  border-color: rgba(15, 23, 42, 0.12);
 
   :host-context(.dark) &,
   .dark & {
-    background-color: rgba(88, 28, 135, 0.3);
-    color: rgba(196, 181, 253, 1);
-    border-color: rgba(139, 92, 246, 0.3);
+    background-color: rgba(255, 255, 255, 0.06);
+    color: #f8fafc;
+    border-color: rgba(255, 255, 255, 0.14);
 
     &:hover {
-      border-color: rgba(139, 92, 246, 0.5);
+      background-color: rgba(192, 132, 252, 0.1);
+      border-color: rgba(192, 132, 252, 0.42);
     }
   }
 
   &:hover {
-    border-color: rgba(167, 139, 250, 1);
-
-    :host-context(.dark) &,
-    .dark & {
-      border-color: rgba(167, 139, 250, 0.5);
-    }
+    border-color: rgba(124, 58, 237, 0.4);
   }
 }
 
 .skill-tag-green {
-  background-color: rgba(220, 252, 231, 0.5);
-  color: rgba(21, 128, 61, 1);
-  border-color: rgba(134, 239, 172, 0.3);
+  background-color: rgba(217, 119, 54, 0.09);
+  color: #9a3412;
+  border-color: rgba(217, 119, 54, 0.26);
 
   :host-context(.dark) &,
   .dark & {
-    background-color: rgba(20, 83, 45, 0.2);
-    color: rgba(134, 239, 172, 1);
-    border-color: rgba(34, 197, 94, 0.3);
+    background-color: rgba(245, 161, 100, 0.07);
+    color: #fbd2b4;
+    border-color: rgba(245, 161, 100, 0.22);
 
     &:hover {
-      border-color: rgba(34, 197, 94, 0.5);
+      background-color: rgba(245, 161, 100, 0.13);
+      border-color: rgba(245, 161, 100, 0.42);
     }
   }
 
   &:hover {
-    border-color: rgba(34, 197, 94, 0.5);
-
-    :host-context(.dark) &,
-    .dark & {
-      border-color: rgba(34, 197, 94, 0.5);
-    }
+    border-color: rgba(217, 119, 54, 0.45);
   }
 }
 
 // Code content container
 .code-content {
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-mono);
   font-size: 0.875rem;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 // Code line
@@ -1067,7 +1045,7 @@ $breakpoint-lg: 1024px;
   }
 }
 
-// Code syntax highlighting
+// Code syntax highlighting — Crystal Frost
 .code-text {
   &--comment {
     color: rgba(100, 116, 139, 1);
@@ -1075,34 +1053,29 @@ $breakpoint-lg: 1024px;
 
     :host-context(.dark) &,
     .dark & {
-      color: rgba(100, 116, 139, 1);
+      color: #757b94;
     }
   }
 
   &--keyword {
-    color: rgba(147, 51, 234, 1);
+    color: #7c3aed;
 
     :host-context(.dark) &,
     .dark & {
-      color: rgba(196, 181, 253, 1);
+      color: #c084fc;
     }
   }
 
   &--variable {
-    color: rgba(14, 165, 233, 1);
-
-    :host-context(.dark) &,
-    .dark & {
-      color: rgba(125, 211, 252, 1);
-    }
+    color: var(--accent-orange);
   }
 
   &--string {
-    color: rgba(22, 163, 74, 1);
+    color: var(--accent-mint);
 
     :host-context(.dark) &,
     .dark & {
-      color: rgba(134, 239, 172, 1);
+      color: #94eec9;
     }
   }
 
@@ -1111,16 +1084,16 @@ $breakpoint-lg: 1024px;
 
     :host-context(.dark) &,
     .dark & {
-      color: rgba(203, 213, 225, 1);
+      color: #b4b9cc;
     }
   }
 
   &--property {
-    color: rgba(99, 102, 241, 1);
+    color: #4f46e5;
 
     :host-context(.dark) &,
     .dark & {
-      color: rgba(165, 180, 252, 1);
+      color: #e4e7f5;
     }
   }
 
@@ -1129,7 +1102,7 @@ $breakpoint-lg: 1024px;
 
     :host-context(.dark) &,
     .dark & {
-      color: rgba(203, 213, 225, 1);
+      color: #b4b9cc;
     }
   }
 }
@@ -1141,7 +1114,7 @@ $breakpoint-lg: 1024px;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
   font-weight: 600;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-display);
   color: rgba(255, 255, 255, 1);
   background: linear-gradient(to right, var(--about-secondary-color), var(--about-primary-color));
   border: none;
@@ -1195,11 +1168,6 @@ $breakpoint-lg: 1024px;
   gap: 0.25rem;
 }
 
-// Avatar wrapper
-.avatar-wrapper {
-  border: 1px solid transparent;
-}
-
 // Profile section
 .profile-section {
   display: flex;
@@ -1212,12 +1180,7 @@ $breakpoint-lg: 1024px;
 }
 
 .profile-title {
-  color: rgba(22, 163, 74, 1);
-
-  :host-context(.dark) &,
-  .dark & {
-    color: rgba(74, 222, 128, 1);
-  }
+  color: var(--accent-mint);
 }
 
 .profile-location {
@@ -1243,7 +1206,8 @@ $breakpoint-lg: 1024px;
   font-size: 1.125rem;
   line-height: 1.75rem;
   font-weight: 700;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
 
   @media (min-width: $breakpoint-md) {
     font-size: 1.5rem;
@@ -1262,11 +1226,11 @@ $breakpoint-lg: 1024px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   white-space: nowrap;
-  color: rgba(71, 85, 105, 1); // slate-600 for light mode visibility
+  color: rgba(71, 85, 105, 1);
 
   :host-context(.dark) &,
   .dark & {
-    color: rgba(255, 255, 255, 1); // Keep white in dark mode
+    color: #81879e;
   }
 
   @media (min-width: $breakpoint-md) {
